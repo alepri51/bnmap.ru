@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="options.visible" persistent max-width="500px">
+    <v-dialog v-model="visible_modal" persistent max-width="500px">
         <v-card>
             <v-card-title>
                 <v-icon class="mr-1 primary--text">fas fa-exclamation</v-icon>
@@ -49,7 +49,8 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'news')">Не сохранять</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { news: void 0 })">Не сохранять</v-btn>
+                <!-- <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'news')">Не сохранять</v-btn> -->
                 <v-btn dark class="default-action" flat @click.native="submit">Сохранить</v-btn>
             </v-card-actions>
 
@@ -61,18 +62,23 @@
 <script>
     export default {
         inheritAttrs: false,
-        props: ['options'],
+        //props: ['options'],
         data() {
             return {
-                _options: { ...this.options.defaults }
+                options: {},
+                default_values: {}
             }
         },
-        created() {
-            //debugger;
+        async created() {
+            debugger;
+            let response = await this.execute({ endpoint: 'news.defaults' });
+            let { token, auth, cached, ...defaults } = response.data;
+            this.$set(this.$data, 'default_values', defaults);
         },
         computed: {
             defaults() {
-                return { ...this.options.defaults }
+                let aaa = this.state.modals['news'];
+                return Object.keys(this.state.modals['news']).length ? { ...this.state.modals['news'] } : { ...this.default_values }
             }
         },
         methods: {

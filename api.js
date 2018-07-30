@@ -316,6 +316,14 @@ class DBAccess extends SecuredAPI {
         super(...args);
     }
 
+    defaults() {
+        return {
+            name: 'some name',
+            value: 100,
+            //percent: 100
+        }
+    }
+
     accessGranted(payload) {
         return true;
     }
@@ -378,7 +386,7 @@ class News extends DBAccess {
     }
 
     accessGranted(payload) {
-        return payload.member && payload.member === this.member;
+        return (payload._id && payload.member && payload.member === this.member) || true;
     }
 
     async beforeInsert(payload) {

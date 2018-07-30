@@ -11,7 +11,7 @@
                     dark
                     bottom
                     color="green"
-                    @click="commit('SHOW_DIALOG', { dialog: 'news', data: { percent: 50, name: 'hello' }})"
+                    @click="commit('SHOW_MODAL', { news: void 0 })"
                 >
                     <v-icon>fas fa-plus</v-icon>
                 </v-btn>
@@ -20,13 +20,14 @@
 
             <v-card-text class="scrollable" id="scrollable">
                 <v-card 
+                    v-for="(data, key, inx) in filter"
+                    :key="data._id"
+
                     class="ma-2" 
                     @mouseover="onHover(data._id)" 
                     @mouseout="value[data._id] = false" 
                     hover 
                     v-scroll:#scrollable="onScroll"
-                    v-for="(data, key, inx) in entities.news"
-                    :key="data._id"
                     :width="300"
                     :height="200"
                     
@@ -74,7 +75,7 @@
                             dark
                             small
                             color="green darken-2"
-                            @click="edit(data)"
+                            @click="commit('SHOW_MODAL', { news: data })"
                         >
                             <v-icon>fas fa-pen</v-icon>
                         </v-btn>
@@ -92,37 +93,13 @@
                 </v-card>
             </v-card-text> 
 
-            <news :options="Object.assign({}, dialogs.news)" @remove="onRemove"/>
+            <news/>
+            <!-- <news :options="dialogs.news" @remove="onRemove"/> -->
         </v-card>
     </widget>
     
          
 </template>
-
-<style scoped>
-    .v-speed-dial {
-        margin-top: 16px;
-        padding-bottom: 6px;
-        /* margin-right: 16px; */
-    }
-
-    .v-card {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .scrollable {
-        overflow: auto; 
-        position: relative; 
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    /* .v-btn--top.v-btn--absolute {
-        top: 16px;
-    } */
-</style>
 
 <script>
     export default {
@@ -139,9 +116,23 @@
             let container = this.$el.querySelector("#scrollable");
             container && (container.scrollTop = this.scroll_position);
         },
+        computed: {
+            entity() {
+                return 'news';
+            },
+            filter() {
+                return this.entity_data && Object.values(this.entity_data).filter(item => item.member === this.auth.member);
+            }
+        },
+        filters: {
+            mine(value) {
+                return value;
+            }
+        },
         methods: {
             edit(news) {
-                 this.commit('SHOW_DIALOG', { dialog: 'news', data: { ...news }})
+                 this.commit('SHOW_MODAL', 'news');
+                 //this.commit('SHOW_DIALOG', { dialog: 'news', data: { ...news }})
             },
             remove(news) {
                  this.commit('SHOW_DIALOG', { dialog: 'news', data: { disabled: true, ...news }});
@@ -258,5 +249,27 @@
     }
 </script>
 
+<style scoped>
+    .v-speed-dial {
+        margin-top: 16px;
+        padding-bottom: 6px;
+        /* margin-right: 16px; */
+    }
 
+    .v-card {
+        display: flex;
+        flex-direction: column;
+    }
 
+    .scrollable {
+        overflow: auto; 
+        position: relative; 
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* .v-btn--top.v-btn--absolute {
+        top: 16px;
+    } */
+</style>

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import router from './router';
+
 import axios from 'axios';
 import deepmerge from 'deepmerge';
 //import MockAdapter from 'axios-mock-adapter';
@@ -17,6 +17,7 @@ export default new Vuex.Store({
         api: void 0,
         loading: false,
         view: '',
+        modals: {},
         dialogs: {
             signin: {
                 visible: false
@@ -72,8 +73,9 @@ export default new Vuex.Store({
         ]
     },
     mutations: {
-        CLEAR_CACHE() {
+        CLEAR_CACHE(state) {
             requests_cache.reset();
+            state.entities = {};
         },
         INIT(state) {
             state.api = axios.create({ 
@@ -164,6 +166,17 @@ export default new Vuex.Store({
         },
         NOT_FOUND(state) {
             state.notFound = true;
+        },
+        SHOW_MODAL(state, params) {
+            debugger;
+            let name = Object.keys(params)[0];
+            let data = params[name] || {};
+            
+            Vue.set(state.modals, name, data || true);
+        },
+        HIDE_MODAL(state, params) {
+            let name = Object.keys(params)[0];
+            state.modals[name] = false;
         },
         SHOW_DIALOG(state, payload) {
             let {disabled, ...data} = payload.data || {};

@@ -51,7 +51,7 @@ Vue.mixin({
         ...mapStoreActions(),
         call(action, ...args) {
             this[action](...args);
-        }
+        },
     },
     computed: {
         state() {
@@ -66,9 +66,27 @@ Vue.mixin({
         auth() {
             return this.$store.state.auth || {name: 'Аноним'};
         },
+
         entities() {
             return this.$store.state.entities;
-        }
+        },
+        entity() {
+            return ''; //переопределить в компоненте
+        },
+        entity_data() {
+            //debugger;
+
+            return this.$store.state.entities[this.entity];
+        },
+        filter() {
+            return this.entity_data; //переопределить в компоненте если надо фильтроапть данные
+        },
+        visible_modal: {
+            get() {
+                return this.state.modals.news;
+            },
+            set: () => {}
+        },
     }
 });
 
