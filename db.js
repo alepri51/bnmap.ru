@@ -10,7 +10,7 @@
 //await db.find('$имя_коллекции$', { _id: payload.member });
 
 //массив коллекций, создается при старте
-let collections = ['member', 'token', 'transaction', 'product', 'list', 'dream', 'wallet'];
+let collections = ['member', 'token', 'transaction', 'product', 'list', 'news', 'wallet'];
 
 const cluster = require('cluster');
 const path = require('path');
@@ -28,7 +28,7 @@ if(cluster.isMaster) {
 
     db.find = function (collection, query, options) {
         return new Promise(function (resolve, reject) {
-            db[collection].find(query).exec(function (err, results) {
+            db[collection].find(query).sort({ created: 1 }).exec(function (err, results) {
                 err ? reject(err) : resolve(results);
             })
         });

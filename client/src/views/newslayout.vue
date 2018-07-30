@@ -49,12 +49,12 @@
                     {
                         "id": 1,
                         "x": 1,
-                        "y": 1,
+                        "y": 0,
                         "w": 4,
-                        "h": 7,
-                        "text": "dreams",
+                        "h": 8,
+                        "text": "news",
                         "available": false,
-                        "comp": "news-control"
+                        "comp": "news-feed"
                     },
                     {
                         "id": 2,
@@ -63,7 +63,7 @@
                         "w": 4,
                         "h": 1,
                         "text": "bio",
-                        "available": false,
+                        "available": true,
                         "comp": "bio"
                     },
                     {

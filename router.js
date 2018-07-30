@@ -16,6 +16,7 @@ router.all(patterns, async (req, res, next) => {
 
     console.log('REQUEST:', { type, id, action });
 
+    type = type.toLowerCase();
     !types[type] && (type = 'auth');
 
     let object = new types[type](req.headers.authorization, id);

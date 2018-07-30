@@ -27,9 +27,9 @@
     <v-spacer/>
 
     <v-toolbar-items v-if="!$store.state.auth">
-        <!-- <v-btn flat @click="commit('SHOW_DIALOG', { dialog: 'signup' })" color="primary">
+        <v-btn flat @click="commit('SHOW_DIALOG', { dialog: 'signup' })" color="primary">
             <v-icon small class="mr-1">fas fa-user-plus</v-icon>Регистрация
-        </v-btn> -->
+        </v-btn>
 
         <v-btn flat @click="commit('SHOW_DIALOG', { dialog: 'signin' })" color="primary">
             <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon>вход

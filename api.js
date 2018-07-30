@@ -62,7 +62,7 @@ class API {
     }
 
     get class_name() {
-        return this.constructor.name;
+        return this.constructor.name.toLowerCase();
     }
 
     security(name, method) {
@@ -117,7 +117,7 @@ class API {
         delete payload.iat;
         delete payload.exp;
 
-        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '5m'});
+        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '10s'});
         this.payload = payload;
     }
 
@@ -197,24 +197,7 @@ class Signin extends API {
 
         auth && await this.generateJWT({ member });
 
-        let dreams = await db.findOne('dream', { member: member._id });
-        if(!dreams) {
-            await db.insert('dream', { member: member._id, name: 'Купить яхту', progress: 4500, value: 300000 });
-            await db.insert('dream', { member: member._id, name: 'Купить машину', progress: 7000, value: 30000 });
-            await db.insert('dream', { member: member._id, name: 'Съездить на Бали', progress: 1000, value: 5000 });
-        }
-
-        let wallets = await db.findOne('wallet', { member: member._id });
-        if(!wallets) {
-            await db.insert('wallet', { member: member._id, address: await this.createPassword(64), name: 'Основной' });
-            await db.insert('wallet', { member: member._id, address: await this.createPassword(64), name: 'Резервный' });
-        }
-
         !auth && this.generateError({ code: 404, message: 'Пользователь не найден' });
-        /* if(auth) {
-            let account = new Account(this.token);
-            return account.default();
-        } */
     }
 }
 
@@ -277,7 +260,7 @@ class Signup extends API {
     }
 }
 
-class News extends SecuredAPI {
+class NewsLayout extends SecuredAPI {
     constructor(...args) {
         super(...args);
         //use proxy to handle not auth
@@ -308,7 +291,7 @@ class News extends SecuredAPI {
             return sum;
         }, {}); */
 
-        let dreams = await db.find('dream', { member: this.member });
+        let news = await db.find('news', { member: this.member });
 
         let result = model({
             account: { 
@@ -316,7 +299,7 @@ class News extends SecuredAPI {
                 balance: {
                     ...sum 
                 }, 
-                dreams, 
+                news, 
                 transactions, 
                 params 
             }
@@ -328,26 +311,90 @@ class News extends SecuredAPI {
     }
 }
 
-class Dream extends SecuredAPI {
+class DBAccess extends SecuredAPI {
     constructor(...args) {
         super(...args);
     }
 
-    async submit(payload, req) {
-        payload.member = this.member;
+    accessGranted(payload) {
+        return true;
+    }
 
-        let dream = payload._id ? req.method === 'DELETE' ? await db.remove('dream', { _id: payload._id }) : await db.update('dream', { _id: payload._id }, { ...payload }) : await db.insert('dream', { ...payload });
+    async beforeInsert(payload) {
+        return payload;
+    }
 
-        let result = model({
-            account: {
-                _id: this.member,
-                dreams: [dream]
+    async insert(payload) {
+        payload = await this.beforeInsert(payload);
+        return await db.insert(this.class_name, { ...payload });
+    }
+
+    async beforeUpdate(payload) {
+        return payload;
+    }
+
+    async update(payload) {
+        payload = await this.beforeUpdate(payload)
+        return await db.update(this.class_name, { _id: payload._id }, { ...payload });
+    }
+
+    async beforeDelete(payload) {
+        return payload;
+    }
+
+    async delete(payload) {
+        payload = await this.beforeDelete(payload);
+        return await db.remove(this.class_name, { _id: payload._id });
+    }
+
+    async transformData(data, req) {
+        return data;
+    }
+
+    async save(payload, req) {
+        if(this.accessGranted(payload)) {
+            let data = void 0;
+
+            switch(req.method) {
+                case 'DELETE':
+                    data = await this.delete(payload);
+                    break;
+                default:
+                    data = payload._id ? await this.update(payload) : await this.insert(payload);
+                    break;
             }
-        });
 
-        return result;
+            let normalized = model(await this.transformData(data, req));
+
+            return normalized;
+        }
+        else this.generateError({ code:403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь', data: this.constructor.name });
     }
 }
+
+class News extends DBAccess {
+    constructor(...args) {
+        super(...args);
+    }
+
+    accessGranted(payload) {
+        return payload.member && payload.member === this.member;
+    }
+
+    async beforeInsert(payload) {
+        payload.member = this.member;
+        return payload;
+    }
+
+    async transformData(data, req) {
+        return {
+            account: {
+                _id: data.member,
+                news: [data]
+            }
+        }
+    }
+} 
 
 let classes = {
     API,
@@ -355,8 +402,8 @@ let classes = {
     Signup,
     Signout,
     Auth,
-    News,
-    Dream
+    NewsLayout,
+    News
 }
 
 module.exports = Object.entries(classes).reduce((memo, item) => {

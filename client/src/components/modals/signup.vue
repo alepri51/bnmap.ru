@@ -71,7 +71,7 @@
                         method: 'post', 
                         endpoint: 'signup.submit', 
                         payload: this.$data, 
-                        callback: (response) =>  !response.error && (this.commit('HIDE_DIALOG', 'signup'), this.$router.replace('news')) 
+                        callback: (response) =>  !response.error && (this.commit('HIDE_DIALOG', 'signup'), this.$router.replace('newslayout')) 
                     })
                     :
                     this.commit('SHOW_SNACKBAR', {text: 'Не корректно введены данные' });

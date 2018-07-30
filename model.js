@@ -76,10 +76,10 @@ model = (data) => {
     let schema = normalizer.schema;
 
     const _transaction = new schema.Entity('transaction', {}, { idAttribute: '_id' });
-    const _dream = new schema.Entity('dream', {}, { idAttribute: '_id' });
+    const _news = new schema.Entity('news', {}, { idAttribute: '_id' });
 
     const _member = new schema.Entity('member', {
-        dreams: [_dream],
+        news: [_news],
         transactions: [_transaction]
     }, { 
         idAttribute: '_id',

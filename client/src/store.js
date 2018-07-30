@@ -17,7 +17,6 @@ export default new Vuex.Store({
         api: void 0,
         loading: false,
         view: '',
-        referer: void 0,
         dialogs: {
             signin: {
                 visible: false
@@ -31,7 +30,7 @@ export default new Vuex.Store({
             stepper: {
                 visible: false
             },
-            dream: {
+            news: {
                 visible: false,
                 defaults: {
                     name: 'ooo',
@@ -44,9 +43,6 @@ export default new Vuex.Store({
         token: void 0,
         auth: void 0,
         entities: {},
-        account: {
-            balance: {}
-        },
         snackbar: {
             visible: false,
             color: 'red darken-2',
@@ -61,7 +57,7 @@ export default new Vuex.Store({
             {
                 icon: '',
                 name: 'Новости',
-                to: 'news'
+                to: 'newslayout'
             },
             {
                 icon: '',
@@ -103,6 +99,7 @@ export default new Vuex.Store({
                     if(!error.system) {
                         let vertical = error.message.length > 50;
                         this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
+                        error.code === 403 && this.commit('SHOW_DIALOG', { dialog: 'signin' });
                     }
                     else console.error(error.code, error.message, error.data);
                     //Для упрощения достопа к ошибке

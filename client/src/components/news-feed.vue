@@ -4,14 +4,14 @@
             <v-card-title style="position: relative">
                 <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
                 <v-btn
-                    v-if="auth.member"
                     absolute
                     right
                     fab
+                    
                     dark
-                    top
+                    bottom
                     color="green"
-                    @click="commit('SHOW_DIALOG', { dialog: 'dream', data: { percent: 50, name: 'hello' }})"
+                    @click="commit('SHOW_DIALOG', { dialog: 'news', data: { percent: 50, name: 'hello' }})"
                 >
                     <v-icon>fas fa-plus</v-icon>
                 </v-btn>
@@ -19,15 +19,20 @@
             <v-divider/>
 
             <v-card-text class="scrollable" id="scrollable">
-                <v-card class="ma-2" @mouseover="onHover(data._id)" @mouseout="value[data._id] = false" hover v-scroll:#scrollable="onScroll"
-                    v-for="(data, key, inx) in entities.dream"
+                <v-card 
+                    class="ma-2" 
+                    @mouseover="onHover(data._id)" 
+                    @mouseout="value[data._id] = false" 
+                    hover 
+                    v-scroll:#scrollable="onScroll"
+                    v-for="(data, key, inx) in entities.news"
                     :key="data._id"
                     :width="300"
                     :height="200"
                     
                 >
                     <v-card-media
-                        :src="(inx % 2 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
+                        :src="(inx % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
                         
                         height="200px"
                     >
@@ -87,7 +92,7 @@
                 </v-card>
             </v-card-text> 
 
-            <dream :options="Object.assign({}, dialogs.dream)" @remove="onRemove"/>
+            <news :options="Object.assign({}, dialogs.news)" @remove="onRemove"/>
         </v-card>
     </widget>
     
@@ -113,12 +118,16 @@
         flex-wrap: wrap;
         justify-content: center;
     }
+
+    /* .v-btn--top.v-btn--absolute {
+        top: 16px;
+    } */
 </style>
 
 <script>
     export default {
         components: {
-            dream: () => import('./modals/dream')
+            news: () => import('./modals/news')
         },
         created() {
             //debugger;
@@ -127,30 +136,25 @@
             //debugger;
         },
         activated() {
-            var container = this.$el.querySelector("#scrollable");
-            container && (container.scrollTop = this.inc);
-            console.log(this.auth);
+            let container = this.$el.querySelector("#scrollable");
+            container && (container.scrollTop = this.scroll_position);
         },
         methods: {
-            edit(dream) {
-                 this.commit('SHOW_DIALOG', { dialog: 'dream', data: { ...dream }})
+            edit(news) {
+                 this.commit('SHOW_DIALOG', { dialog: 'news', data: { ...news }})
             },
-            remove(dream) {
-                 this.commit('SHOW_DIALOG', { dialog: 'dream', data: { disabled: true, ...dream }});
+            remove(news) {
+                 this.commit('SHOW_DIALOG', { dialog: 'news', data: { disabled: true, ...news }});
             },
-            onRemove(id) {
-                //debugger;
-                delete this.entities.dream[id];
+            onRemove(id) { ///////////////////////////
+                delete this.entities.news[id];
             },
             onScroll(e) {
-                this.inc = e.target.scrollTop;
-                //console.log('SCROLL', e.target.scrollTop);
+                this.scroll_position = e.target.scrollTop;
             },
             onHover(id) {
-                //debugger;
                 this.value[id] = true;
                 this.active = id;
-                //console.log(JSON.stringify(this.value, null, '\t'));
             },
             chart_title(title, subtitle, percent) {
                 let title_config = {...this.gauge.title};
@@ -163,7 +167,7 @@
         },
         data() {
             return {
-                inc: 0,
+                scroll_position: 0,
 
                 active: false,
                 value: {},
