@@ -1,1 +1,1 @@
-# bnmap.ru
+# RU

@@ -1,0 +1,254 @@
+<template>
+    <v-card width="100%">
+        <v-card-title style="position: relative">
+            <h2><v-icon color="primary" class="mr-2">fas fa-cloud</v-icon>Мои мечты:</h2>
+            <v-btn
+                absolute
+                right
+                fab
+                dark
+                top
+                color="green"
+                @click="commit('SHOW_DIALOG', { dialog: 'dream', data: { percent: 50, name: 'hello' }})"
+            >
+                <v-icon>fas fa-plus</v-icon>
+            </v-btn>
+        </v-card-title>
+        <v-divider/>
+
+        <v-card-text class="scrollable" id="scrollable">
+            <v-card class="ma-2" @mouseover="onHover(dream._id)" @mouseout="value[dream._id] = false" hover v-scroll:#scrollable="onScroll"
+                v-for="dream in entities.dream"
+                :key="dream._id"
+            >
+                <dx-linear-gauge 
+                    v-bind="gauge"
+                    :value="54"
+                    :subvalues="[54]"
+                    :title="chart_title(dream.name, dream.value, dream.percent)"
+                >
+                    <v-speed-dial 
+                        absolute
+                        v-model="fab[dream._id]"
+                        
+                        :bottom="bottom"
+                        :right="right"
+                        :left="left"
+                        :direction="direction"
+                        :open-on-hover="hover"
+                        :transition="transition"
+                        v-show="dream._id === active"
+                    >
+                        <v-btn
+                            slot="activator"
+                            v-model="fab[dream._id]"
+                            :style="fab[dream._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
+                            dark
+                            fab
+                            small
+                            
+                        >
+                            <v-icon>fas fa-chevron-down</v-icon>
+                            <v-icon>fas fa-chevron-up</v-icon>
+                        </v-btn>
+                        <v-btn
+                            fab
+                            dark
+                            small
+                            color="green darken-2"
+                            @click="edit(dream)"
+                        >
+                            <v-icon>fas fa-pen</v-icon>
+                        </v-btn>
+                        <v-btn
+                            fab
+                            dark
+                            small
+                            color="red darken-2"
+                            @click="remove(dream)"
+                        >
+                            <v-icon>fas fa-times</v-icon>
+                        </v-btn>
+                    </v-speed-dial>
+                </dx-linear-gauge>
+            </v-card>
+        </v-card-text> 
+        <div style="position: absolute; bottom: 4px; right: 8px; font-size: 10px" class="grey--text">мечты</div>
+
+        <dream :options="Object.assign({}, dialogs.dream)" @remove="onRemove"/>
+    </v-card>
+         
+</template>
+
+<style scoped>
+    .v-speed-dial {
+        margin-top: 16px;
+        padding-bottom: 6px;
+        /* margin-right: 16px; */
+    }
+
+    .v-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .scrollable {
+        overflow: auto; 
+        position: relative; 
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .tile {
+        margin: 4px;
+    }
+
+    /* .widget div:first-child {
+        height: 100%;
+    } */
+</style>
+
+<script>
+    import { DxLinearGauge } from 'devextreme-vue';
+
+    export default {
+        components: {
+            DxLinearGauge,
+            dream: () => import('./modals/dream')
+        },
+        created() {
+            //debugger;
+        },
+        mounted() {
+            //debugger;
+        },
+        activated() {
+            var container = this.$el.querySelector("#scrollable");
+            container && (container.scrollTop = this.inc);
+        },
+        methods: {
+            edit(dream) {
+                 this.commit('SHOW_DIALOG', { dialog: 'dream', data: { ...dream }})
+            },
+            remove(dream) {
+                 this.commit('SHOW_DIALOG', { dialog: 'dream', data: { disabled: true, ...dream }});
+            },
+            onRemove(id) {
+                //debugger;
+                delete this.entities.dream[id];
+            },
+            onScroll(e) {
+                this.inc = e.target.scrollTop;
+                //console.log('SCROLL', e.target.scrollTop);
+            },
+            onHover(id) {
+                //debugger;
+                this.value[id] = true;
+                this.active = id;
+                //console.log(JSON.stringify(this.value, null, '\t'));
+            },
+            chart_title(title, subtitle, percent) {
+                let title_config = {...this.gauge.title};
+                title_config.text = title + ' (' + percent + '%)';
+                title_config.subtitle = {...this.gauge.title.subtitle};
+                title_config.subtitle.text = subtitle + '$';
+
+                return title_config;
+            }
+        },
+        data() {
+            return {
+                inc: 0,
+
+                active: false,
+                value: {},
+                direction: 'bottom',
+                fab: {},
+                hover: true,
+                tabs: null,
+                top: true,
+                right: true,
+                bottom: false,
+                left: false,
+                transition: 'slide-y-reverse-transition',
+                
+                gauge: {
+                    size: {
+                        height: 200
+                    },
+                    title: {
+                        font: {
+                            family: 'Roboto Condensed'
+                        },
+                        horizontalAlignment: 'left',
+                        //verticalAlignment: 'bottom',
+                        margin: {
+                            left: 55
+                        },
+                        text: 'Купить квартиру',
+                        subtitle: {
+                            font: {
+                                family: 'Roboto Condensed'
+                            },
+                            text: '1000$'
+                        }
+                    },
+                    scale: {
+                        startValue: 0,
+                        endValue: 100,
+                        tickInterval: 10,
+                        minorTickInterval: 5,
+                        minorTick: {
+                            visible: true
+                        },
+                        orientation: 'inside',
+                        label: {
+                            useRangeColors: true,
+                            format: {
+                                type: 'decimal',
+                                precision: 0
+                            },
+                            customizeText: function (arg) {
+                                return (arg.value === arg.min || arg.value === arg.max) ? arg.valueText + '%' : arg.valueText;
+                            }
+                        }
+                    },
+                    rangeContainer: {
+                        //offset: 10,
+                        ranges: [
+                            { startValue: 0, endValue: 20, color: this.$colors.red.darken2 },
+                            { startValue: 20, endValue: 70, color: this.$colors.yellow.darken2 },
+                            { startValue: 70, endValue: 100, color: this.$colors.green.darken2 }
+                        ]
+                    },
+                    value: 70,
+                    subvalues: [70, 50],
+                    valueIndicator: {
+                        offset: 10,
+                        palette: 'Material',
+                        color: this.$colors.green.darken2,
+                    },
+                    subvalueIndicator: {
+                        offset: -25,
+                        type: 'textCloud',
+                        text: {
+                            font: {
+                                family: 'Roboto Condensed'
+                            },
+                            format: {
+                                precision: 0
+                                
+                            },
+                            customizeText: (obj) => obj.valueText + ' %'
+                        },
+                        palette: 'Material'
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+
+
