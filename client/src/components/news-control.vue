@@ -1,35 +1,48 @@
 <template>
-    <v-card width="100%">
-        <v-card-title style="position: relative">
-            <h2><v-icon color="primary" class="mr-2">fas fa-cloud</v-icon>Мои мечты:</h2>
-            <v-btn
-                absolute
-                right
-                fab
-                dark
-                top
-                color="green"
-                @click="commit('SHOW_DIALOG', { dialog: 'dream', data: { percent: 50, name: 'hello' }})"
-            >
-                <v-icon>fas fa-plus</v-icon>
-            </v-btn>
-        </v-card-title>
-        <v-divider/>
-
-        <v-card-text class="scrollable" id="scrollable">
-            <v-card class="ma-2" @mouseover="onHover(dream._id)" @mouseout="value[dream._id] = false" hover v-scroll:#scrollable="onScroll"
-                v-for="dream in entities.dream"
-                :key="dream._id"
-            >
-                <dx-linear-gauge 
-                    v-bind="gauge"
-                    :value="54"
-                    :subvalues="[54]"
-                    :title="chart_title(dream.name, dream.value, dream.percent)"
+    <widget name="новости">
+        <v-card width="100%">
+            <v-card-title style="position: relative">
+                <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
+                <v-btn
+                    v-if="auth.member"
+                    absolute
+                    right
+                    fab
+                    dark
+                    top
+                    color="green"
+                    @click="commit('SHOW_DIALOG', { dialog: 'dream', data: { percent: 50, name: 'hello' }})"
                 >
+                    <v-icon>fas fa-plus</v-icon>
+                </v-btn>
+            </v-card-title>
+            <v-divider/>
+
+            <v-card-text class="scrollable" id="scrollable">
+                <v-card class="ma-2" @mouseover="onHover(data._id)" @mouseout="value[data._id] = false" hover v-scroll:#scrollable="onScroll"
+                    v-for="(data, key, inx) in entities.dream"
+                    :key="data._id"
+                    :width="300"
+                    :height="200"
+                    
+                >
+                    <v-card-media
+                        :src="(inx % 2 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
+                        
+                        height="200px"
+                    >
+                        <!-- INDEX: {{inx}} -->
+                    </v-card-media>
+                    <v-card-title class="primary--text">
+                        <h3>{{data.name}}</h3>
+                    </v-card-title>
+
+                    <v-card-text>
+                        {{data.value}}
+                    </v-card-text>
                     <v-speed-dial 
                         absolute
-                        v-model="fab[dream._id]"
+                        v-model="fab[data._id]"
                         
                         :bottom="bottom"
                         :right="right"
@@ -37,12 +50,12 @@
                         :direction="direction"
                         :open-on-hover="hover"
                         :transition="transition"
-                        v-show="dream._id === active"
+                        v-show="data._id === active"
                     >
                         <v-btn
                             slot="activator"
-                            v-model="fab[dream._id]"
-                            :style="fab[dream._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
+                            v-model="fab[data._id]"
+                            :style="fab[data._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
                             dark
                             fab
                             small
@@ -56,7 +69,7 @@
                             dark
                             small
                             color="green darken-2"
-                            @click="edit(dream)"
+                            @click="edit(data)"
                         >
                             <v-icon>fas fa-pen</v-icon>
                         </v-btn>
@@ -65,18 +78,19 @@
                             dark
                             small
                             color="red darken-2"
-                            @click="remove(dream)"
+                            @click.native="remove(data)"
                         >
                             <v-icon>fas fa-times</v-icon>
                         </v-btn>
                     </v-speed-dial>
-                </dx-linear-gauge>
-            </v-card>
-        </v-card-text> 
-        <div style="position: absolute; bottom: 4px; right: 8px; font-size: 10px" class="grey--text">мечты</div>
+                    
+                </v-card>
+            </v-card-text> 
 
-        <dream :options="Object.assign({}, dialogs.dream)" @remove="onRemove"/>
-    </v-card>
+            <dream :options="Object.assign({}, dialogs.dream)" @remove="onRemove"/>
+        </v-card>
+    </widget>
+    
          
 </template>
 
@@ -99,22 +113,11 @@
         flex-wrap: wrap;
         justify-content: center;
     }
-
-    .tile {
-        margin: 4px;
-    }
-
-    /* .widget div:first-child {
-        height: 100%;
-    } */
 </style>
 
 <script>
-    import { DxLinearGauge } from 'devextreme-vue';
-
     export default {
         components: {
-            DxLinearGauge,
             dream: () => import('./modals/dream')
         },
         created() {
@@ -126,6 +129,7 @@
         activated() {
             var container = this.$el.querySelector("#scrollable");
             container && (container.scrollTop = this.inc);
+            console.log(this.auth);
         },
         methods: {
             edit(dream) {

@@ -69,7 +69,7 @@
                             if(!response.error) {
                                 this.commit('CLEAR_CACHE');
                                 this.commit('HIDE_DIALOG', 'signin');
-                                this.state.view !== 'account' ? this.$router.replace('account') : this.commit('LOCATION', 'account');
+                                this.state.view !== 'news' ? this.$router.replace('news') : this.commit('LOCATION', 'news');
                             }
                         }
                     })

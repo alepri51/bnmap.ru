@@ -1,19 +1,17 @@
 <template>
-  <v-parallax :src="require('../assets/demo.jpg')">
+  <v-parallax :src="require('../assets/150289557589.jpg')">
     <v-layout
       column
       align-center
       justify-center
       class="white--text"
     >
-      <div class="subheading mb-1 hero-text-sub text-xs-center">Жизнь | Мечта | Счастье</div>
-      <p class="white--text hero-text-header mb-2 display-2 text-xs-center">Воплоти свою мечту в жизнь и стань счастливым!</p>
-      <div class="subheading mb-3 hero-text-sub text-xs-center">Узнайте как <span>ATLANT</span><span class="secondary--text">Club</span> может помочь осуществить давнюю мечту</div>
-      <v-btn
-        class="mt-3 green darken-1 accented-text" dark @click="commit('SHOW_DIALOG', { dialog: 'signup' })"
-      >
-        Зарегистрироваться
-      </v-btn>
+      <div class="subheading mb-1 hero-text-sub text-xs-center">Жизнь | Квартира | Счастье</div>
+      <p class="white--text hero-text-header mb-2 display-2 text-xs-center">Купи квартиру - стань счастливым!</p>
+      <div class="subheading mb-3 hero-text-sub text-xs-center">Узнайте как <span>ВСЕ</span><span class="secondary--text">Новостройки</span> помогают выбрать квартиру</div>
+      <v-btn class="mt-3 green darken-1 accented-text" dark @click="commit('SHOW_DIALOG', { dialog: 'signup' })">НАЙТИ МНЕ КВАРТИРУ</v-btn>
+      <div class="mt-2">ИЛИ</div>
+      <v-btn class="mt-3 green darken-1 accented-text" dark @click="commit('SHOW_DIALOG', { dialog: 'signup' })">Я САМ СПРАВЛЮСЬ</v-btn>
     </v-layout>
     
   </v-parallax>

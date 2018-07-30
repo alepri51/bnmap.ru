@@ -60,8 +60,8 @@ export default new Vuex.Store({
         menu: [
             {
                 icon: '',
-                name: 'Кабинет',
-                to: 'account'
+                name: 'Новости',
+                to: 'news'
             },
             {
                 icon: '',

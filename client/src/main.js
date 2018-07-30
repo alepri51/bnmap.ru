@@ -18,7 +18,7 @@ Vue.use(Vuetify, {
     theme: {
         primary: colors.indigo.darken2,
         secondary: colors.amber.darken2,
-        accent: colors.shades.black,
+        accent: colors.green.darken2,
         'primary-light': '#F5F5F5',
         error: colors.red.darken2,
         inactive: colors.blueGrey.base,
@@ -41,7 +41,12 @@ let mapStoreActions = () => {
 
 Vue.prototype.$colors = colors;
 
+import widget from './components/widget';
+
 Vue.mixin({
+    components: {
+        widget
+    },
     methods: {
         ...mapStoreActions(),
         call(action, ...args) {

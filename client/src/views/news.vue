@@ -4,10 +4,10 @@
 
 
 <script>
-	import dashboard from '../components/dashboard';
-
     export default {
-		components: { dashboard },
+		components: { 
+             dashboard: () => import('../components/dashboard') 
+        },
 		methods: {
 			onResize() {
 
@@ -43,18 +43,18 @@
 			return {
 				layout: {
 					cols: 8,
-					rows: 7
+					rows: 8
 				},
 				components: [
                     {
                         "id": 1,
                         "x": 1,
                         "y": 1,
-                        "w": 6,
-                        "h": 6,
+                        "w": 4,
+                        "h": 7,
                         "text": "dreams",
                         "available": false,
-                        "comp": "dreams"
+                        "comp": "news-control"
                     },
                     {
                         "id": 2,
@@ -67,6 +67,16 @@
                         "comp": "bio"
                     },
                     {
+                        "id": 4,
+                        "x": 5,
+                        "y": 1,
+                        "w": 2,
+                        "h": 5,
+                        "text": "bio",
+                        "available": false,
+                        "comp": "calendar"
+                    },
+                    {
                         "id": 3,
                         "x": 5,
                         "y": 0,
@@ -74,7 +84,7 @@
                         "h": 1,
                         "text": "balance",
                         "available": false,
-                        "comp": "balance"
+                        "comp": "auth-control"
                     }
                 ]
 			}

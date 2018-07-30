@@ -68,7 +68,7 @@
             }
         },
         created() {
-            debugger;
+            //debugger;
         },
         computed: {
             defaults() {

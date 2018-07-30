@@ -183,57 +183,6 @@ class Auth extends API {
     }
 }
 
-class Account extends SecuredAPI {
-    constructor(...args) {
-        super(...args);
-        //use proxy to handle not auth
-    }
-
-    async default(params) {
-        //console.log(this.payload.member);
-        let wallet = await db.findOne('wallet', { member: this.member, default: true });
-        let transactions = await db.find('transaction', { $or: [{ to: wallet.address } , { from: wallet.address }] });
-        //let out_txs = await db.find('transaction', { from: wallet.address });
-
-        let sum = transactions.reduce((sum, tx) => {
-            sum[tx.currency] = sum[tx.currency] || 0;
-            tx.to === wallet.address ? sum[tx.currency] += tx.amount : sum[tx.currency] -= tx.amount;
-
-            return sum;
-        }, {});
-
-        /* let outcome = out_txs.reduce((sum, tx) => {
-            sum[tx.currency] = sum[tx.currency] || 0;
-            sum[tx.currency] += tx.amount;
-
-            return sum;
-        }, {});
-
-        let sum = Object.entries(outcome).reduce((sum, [currency, value]) => {
-            sum[currency] = income[currency] - value;
-            return sum;
-        }, {}); */
-
-        let dreams = await db.find('dream', { member: this.member });
-
-        let result = model({
-            account: { 
-                _id: this.member,
-                balance: {
-                    ...sum 
-                }, 
-                dreams, 
-                transactions, 
-                params 
-            }
-        });
-
-        return result;
-
-        //return { balance:  { ...sum }, dreams, transactions: { in_txs, out_txs }, params };
-    }
-}
-
 class Signin extends API {
     constructor(...args) {
         super(...args);
@@ -328,6 +277,57 @@ class Signup extends API {
     }
 }
 
+class News extends SecuredAPI {
+    constructor(...args) {
+        super(...args);
+        //use proxy to handle not auth
+    }
+
+    async default(params) {
+        //console.log(this.payload.member);
+        let wallet = await db.findOne('wallet', { member: this.member, default: true });
+        let transactions = await db.find('transaction', { $or: [{ to: wallet.address } , { from: wallet.address }] });
+        //let out_txs = await db.find('transaction', { from: wallet.address });
+
+        let sum = transactions.reduce((sum, tx) => {
+            sum[tx.currency] = sum[tx.currency] || 0;
+            tx.to === wallet.address ? sum[tx.currency] += tx.amount : sum[tx.currency] -= tx.amount;
+
+            return sum;
+        }, {});
+
+        /* let outcome = out_txs.reduce((sum, tx) => {
+            sum[tx.currency] = sum[tx.currency] || 0;
+            sum[tx.currency] += tx.amount;
+
+            return sum;
+        }, {});
+
+        let sum = Object.entries(outcome).reduce((sum, [currency, value]) => {
+            sum[currency] = income[currency] - value;
+            return sum;
+        }, {}); */
+
+        let dreams = await db.find('dream', { member: this.member });
+
+        let result = model({
+            account: { 
+                _id: this.member,
+                balance: {
+                    ...sum 
+                }, 
+                dreams, 
+                transactions, 
+                params 
+            }
+        });
+
+        return result;
+
+        //return { balance:  { ...sum }, dreams, transactions: { in_txs, out_txs }, params };
+    }
+}
+
 class Dream extends SecuredAPI {
     constructor(...args) {
         super(...args);
@@ -355,7 +355,7 @@ let classes = {
     Signup,
     Signout,
     Auth,
-    Account,
+    News,
     Dream
 }
 
