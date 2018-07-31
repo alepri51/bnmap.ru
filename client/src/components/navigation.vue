@@ -50,7 +50,10 @@
 </template>
 
 <script>
+    import Base from './class_base';
+
     export default {
+        extends: Base,
         props: ['menu'],
         data() {
             return {

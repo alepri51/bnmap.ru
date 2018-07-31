@@ -101,14 +101,12 @@
 </template>
 
 <script>
-    import components from './hierarchy';
-    import news from './modals/news';
+    import Widget from './class_widget';
 
     export default {
-        extends: components.Base,
+        extends: Widget,
         components: {
-            //news: () => import('./modals/news')
-            news
+            news: () => import('./modals/news')
         },
         activated() {
             let container = this.$el.querySelector("#scrollable");
@@ -116,8 +114,7 @@
         },
         computed: {
             filter() {
-                //debugger;
-                return this.entity_data && Object.values(this.entity_data).filter(item => item.member === this.auth.member);
+                return this.raw_data && Object.values(this.raw_data).filter(item => item.member === this.auth.member);
             }
         },
         filters: {

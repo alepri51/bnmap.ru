@@ -23,7 +23,10 @@
 </template>
 
 <script>
+    import Widget from './class_widget';
+
     export default {
+        extends: Widget,
         data: () => ({
             today: new Date().toISOString().slice(0, 10),
             picker: new Date().toISOString().slice(0, 10),

@@ -65,18 +65,17 @@
 </template>
 
 <script>
-    import components from './../hierarchy';
-
+    import Modal from '../class_modal';
+    
     export default {
-        extends: components.Base,
+        extends: Modal,
         inheritAttrs: false,
         //props: ['options'],
         data() {
             return {
                 //entity: 'news',
                 options: {},
-                defaults: {},
-                form_data: {}
+                defaults: {}
             }
         },
         async created() {
@@ -86,12 +85,6 @@
             this.defaults = response.rest_data;
         },
         computed: {
-            form() {
-                //debugger;
-                return this.form_data;
-                //let aaa = this.state.modals['news'];
-                //return this.state.modals['news'] && Object.keys(this.state.modals['news']).length ? { ...this.state.modals['news'] } : { ...this.default_values }
-            }
         },
         methods: {
             submit() {

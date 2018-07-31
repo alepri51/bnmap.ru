@@ -11,25 +11,11 @@
 </template>
 
 <script>
+    import Base from './class_base';
+
     export default {
-        props: {
-            condition: {
-                //default: this.state.signed_id
-                //type: Boolean,
-                /* default: function () {
-                    console.log('ASAS', this.$store.state.auth)
-                    let condition = !!(this.$store.state.auth && this.$store.state.auth.member);
-                    return condition;
-                },
-                validator: function (value) {
-                    // Значение должно соответствовать одной из этих строк
-                    console.log('VALIDATOR', value);
-                    this.condition = value;
-                    return true;
-                } */
-            },
-            name: {}
-        },
+        props: ['name'],
+        extends: Base,
         computed: {
             signed_id() {
                 return typeof this.condition !== 'undefined' ? this.condition : this.state.signed_id;

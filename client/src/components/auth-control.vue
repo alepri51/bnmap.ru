@@ -12,8 +12,10 @@
 </template>
 
 <script>
+    import Widget from './class_widget';
+    
     export default {
-
+        extends: Widget
     }
 </script>
 

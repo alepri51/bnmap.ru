@@ -78,8 +78,10 @@
 </template>
 
 <script>
+    import Modal from '../class_modal';
+    
     export default {
-
+        extends: Modal,
         data: () => {
             return {
                 e1: 1,

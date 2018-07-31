@@ -4,7 +4,10 @@
 
 
 <script>
+    import Base from './../components/class_base';
+
     export default {
+        extends: Base,
 		components: { 
              dashboard: () => import('../components/dashboard') 
         },

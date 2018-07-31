@@ -22,7 +22,10 @@
 </template>
 
 <script>
+    import Modal from '../class_modal';
+    
     export default {
+        extends: Modal,
         data: () => {
             return {
                 //entity: 'signout'

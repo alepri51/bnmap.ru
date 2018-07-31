@@ -249,6 +249,8 @@ export default new Vuex.Store({
                 Object.keys(merge).length && (state.entities = merge);
             }
             else !state.auth && (state.entities = {});
+
+            console.log('NEWS:', state.entities.news);
         },
         //PROJECT SPECIFIC
         ACCOUNT(state, id) {

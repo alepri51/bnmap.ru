@@ -56,7 +56,10 @@
 </template>
 
 <script>
+    import Base from './components/class_base';
+
     export default {
+        extends: Base,
         name: 'App',
         components: {
             navigation: () => import('./components/navigation'),

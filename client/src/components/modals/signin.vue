@@ -45,11 +45,11 @@
 </template>
 
 <script>
+    import Modal from '../class_modal';
+    
     export default {
+        extends: Modal,
         data: (vm) => {
-            debugger;
-            console.log(vm.$options._componentTag);
-
             return {
                 //entity: 'signin',
                 email: 'o2@atlant.club',
