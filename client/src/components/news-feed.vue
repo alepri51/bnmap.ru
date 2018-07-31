@@ -20,7 +20,7 @@
 
             <v-card-text class="scrollable" id="scrollable">
                 <v-card 
-                    v-for="(data, key, inx) in filter"
+                    v-for="(data, inx) in filter"
                     :key="data._id"
 
                     class="ma-2" 
@@ -94,7 +94,6 @@
             </v-card-text> 
 
             <news/>
-            <!-- <news :options="dialogs.news" @remove="onRemove"/> -->
         </v-card>
     </widget>
     
@@ -102,25 +101,22 @@
 </template>
 
 <script>
+    import components from './hierarchy';
+    import news from './modals/news';
+
     export default {
+        extends: components.Base,
         components: {
-            news: () => import('./modals/news')
-        },
-        created() {
-            //debugger;
-        },
-        mounted() {
-            //debugger;
+            //news: () => import('./modals/news')
+            news
         },
         activated() {
             let container = this.$el.querySelector("#scrollable");
             container && (container.scrollTop = this.scroll_position);
         },
         computed: {
-            entity() {
-                return 'news';
-            },
             filter() {
+                //debugger;
                 return this.entity_data && Object.values(this.entity_data).filter(item => item.member === this.auth.member);
             }
         },
@@ -130,12 +126,8 @@
             }
         },
         methods: {
-            edit(news) {
-                 this.commit('SHOW_MODAL', 'news');
-                 //this.commit('SHOW_DIALOG', { dialog: 'news', data: { ...news }})
-            },
             remove(news) {
-                 this.commit('SHOW_DIALOG', { dialog: 'news', data: { disabled: true, ...news }});
+                 //this.commit('SHOW_DIALOG', { dialog: 'news', data: { disabled: true, ...news }});
             },
             onRemove(id) { ///////////////////////////
                 delete this.entities.news[id];
@@ -158,6 +150,8 @@
         },
         data() {
             return {
+                entity: 'news',
+
                 scroll_position: 0,
 
                 active: false,

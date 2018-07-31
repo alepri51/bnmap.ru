@@ -3,9 +3,9 @@ import Vuex from 'vuex';
 
 import axios from 'axios';
 import deepmerge from 'deepmerge';
-//import MockAdapter from 'axios-mock-adapter';
 import { cacheAdapterEnhancer, throttleAdapterEnhancer, Cache } from 'axios-extensions';
 
+import router from './router';
 
 Vue.use(Vuex);
 
@@ -18,7 +18,7 @@ export default new Vuex.Store({
         loading: false,
         view: '',
         modals: {},
-        dialogs: {
+        /* dialogs: {
             signin: {
                 visible: false
             },
@@ -40,9 +40,10 @@ export default new Vuex.Store({
                     _id: void 0
                 }
             }
-        },
+        }, */
         token: void 0,
         auth: void 0,
+        signed_id: false,
         entities: {},
         snackbar: {
             visible: false,
@@ -75,7 +76,9 @@ export default new Vuex.Store({
     mutations: {
         CLEAR_CACHE(state) {
             requests_cache.reset();
-            state.entities = {};
+            //!state.signed_id && (state.entities = {});
+            //debugger;
+            state.entities = {}
         },
         INIT(state) {
             state.api = axios.create({ 
@@ -95,28 +98,41 @@ export default new Vuex.Store({
             });
 
             let onResponse = (response => {
+
                 let {token, auth, error, entities, map, result, entry, cached, ...rest} = response.data;
+
+                let signed_id = auth ? true : !!state.auth;
+                this.commit('SET_SIGNED_IN', signed_id);
 
                 if(error) {
                     if(!error.system) {
                         let vertical = error.message.length > 50;
                         this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
-                        error.code === 403 && this.commit('SHOW_DIALOG', { dialog: 'signin' });
+
+                        error.code === 403 && signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : router.replace('landing');
+                        //error.code === 403 && signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : void 0;
                     }
                     else console.error(error.code, error.message, error.data);
-                    //Для упрощения достопа к ошибке
+                    //Для упрощения доступа к ошибке
                     response.error = error;
                 }
 
-                //!auth && (router.replace('landing'));
+                //оставшиеся данные
+                response.rest_data = { ...rest };
 
-                this.commit('SET_AUTH', auth);
-                this.commit('SET_TOKEN', token);
+                if(signed_id) {
+                    auth && this.commit('SET_AUTH', auth);
+                    !cached && this.commit('SET_TOKEN', token);
+    
+                    entities = entities || {};
+    
+                    !cached && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
+    
+                    response.data.cached = !!response.config.cache;
+                    return response;
+                }
+                //else  router.replace('landing');
 
-                !cached && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
-
-                response.data.cached = !!response.config.cache;
-                return response;
             });
             
             let onError = (error => {
@@ -144,7 +160,8 @@ export default new Vuex.Store({
         REGISTER_COMPONENT(state, name) {
             Vue.component(
                 name,
-                async () => import(`./components/${name}`).catch(() => {
+                async () => import(`./components/${name}`).catch((err) => {
+                    console.error(err);
                     return import(`./components/stub`);
                 })
             );
@@ -168,7 +185,7 @@ export default new Vuex.Store({
             state.notFound = true;
         },
         SHOW_MODAL(state, params) {
-            debugger;
+            //debugger;
             let name = Object.keys(params)[0];
             let data = params[name] || {};
             
@@ -178,20 +195,23 @@ export default new Vuex.Store({
             let name = Object.keys(params)[0];
             state.modals[name] = false;
         },
-        SHOW_DIALOG(state, payload) {
-            let {disabled, ...data} = payload.data || {};
-            state.dialogs[payload.dialog].disabled = disabled;
-            state.dialogs[payload.dialog].defaults = { ...state.dialogs[payload.dialog].defaults, ...data };
-            state.dialogs[payload.dialog].visible = true;
+        HIDE_MODALS(state) {
+            state.modals = {};
         },
-        HIDE_DIALOG(state, dialog) {
-            state.dialogs[dialog].visible = false;
+        SET_SIGNED_IN(state, signed_id) {
+            state.signed_id = signed_id;
+            if(!signed_id) {
+                this.commit('SET_AUTH', void 0);
+                this.commit('HIDE_MODALS');
+                this.commit('CLEAR_CACHE');
+            }
         },
         SET_TOKEN(state, token) {
             token ? sessionStorage.setItem('token', token) : sessionStorage.removeItem('token');
             state.token = token;
         },
         SET_AUTH(state, auth) {
+            state.auth && JSON.stringify(state.auth) !== JSON.stringify(auth) && this.commit('CLEAR_CACHE');
             state.auth = auth;
         },
         SHOW_SNACKBAR(state, options) {
@@ -204,7 +224,7 @@ export default new Vuex.Store({
         },
         SET_ENTITIES(state, { entities, map, result, entry, method }) {
             if(entities) {
-                let merge = deepmerge(state.entities, entities || {}, {
+                let merge = Object.keys(entities).length ? deepmerge(state.entities, entities || {}, {
                     arrayMerge: function (destination, source, options) {
                         //ALL ARRAYS MUST BE SIMPLE IDs HOLDER AFTER NORMALIZE
                         if(method.toUpperCase() === 'DELETE') {
@@ -222,9 +242,11 @@ export default new Vuex.Store({
 
                         return union;
                     }
-                });
+                })
+                :
+                {};
 
-                state.entities = merge;
+                Object.keys(merge).length && (state.entities = merge);
             }
             else !state.auth && (state.entities = {});
         },

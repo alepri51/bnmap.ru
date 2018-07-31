@@ -140,6 +140,7 @@ class API {
             return payload;
         }
         catch(err) {
+            console.log('ERROR:', err);
             this.revokeJWT(payload.jwtid);
             this.generateError({ code: 403, message: err.message, data: err.expiredAt, system: true });
         };
@@ -169,7 +170,7 @@ class SecuredAPI extends API {
         let self = this;
         if(!except && !this.auth) {
             return function(...args) { 
-                self.generateError({ code:403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь', data: self.constructor.name });
+                self.generateError({ code: 403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь', data: self.constructor.name });
             };
         }
 
@@ -219,6 +220,8 @@ class Signup extends API {
     }
 
     async submit({name, email, password, referer}) {
+        this.error = void 0;
+        
         let member = await db.findOne('member', { email });
 
         if(!member) {
@@ -320,7 +323,7 @@ class DBAccess extends SecuredAPI {
         return {
             name: 'some name',
             value: 100,
-            //percent: 100
+            percent: 0
         }
     }
 
@@ -376,7 +379,7 @@ class DBAccess extends SecuredAPI {
 
             return normalized;
         }
-        else this.generateError({ code:403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь', data: this.constructor.name });
+        else this.generateError({ code:403, message: 'Вам отказано в доступе.', data: this.constructor.name });
     }
 }
 
@@ -386,7 +389,7 @@ class News extends DBAccess {
     }
 
     accessGranted(payload) {
-        return (payload._id && payload.member && payload.member === this.member) || true;
+        return (payload._id && payload.member && payload.member === this.member) || !!!payload._id;
     }
 
     async beforeInsert(payload) {

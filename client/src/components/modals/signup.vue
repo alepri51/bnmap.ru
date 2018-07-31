@@ -43,7 +43,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'signup')">Отменить</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signup: void 0 })">Отменить</v-btn>
                 <v-btn dark class="default-action" flat @click.native="submit">Зарегистрироваться</v-btn>
             </v-card-actions>
 
@@ -54,9 +54,9 @@
 
 <script>
     export default {
-        props: ['visible'],
         data: () => {
             return {
+                //entity: 'signup',
                 name: '',
                 email: '',
                 password: ''
@@ -71,7 +71,12 @@
                         method: 'post', 
                         endpoint: 'signup.submit', 
                         payload: this.$data, 
-                        callback: (response) =>  !response.error && (this.commit('HIDE_DIALOG', 'signup'), this.$router.replace('newslayout')) 
+                        callback: (response) =>  {
+                            if(!response.error) {
+                                this.commit('HIDE_MODAL', { signup: void 0 });
+                                this.state.view !== 'newslayout' ? this.$router.replace('newslayout') : this.commit('LOCATION', 'newslayout');
+                            }
+                        }
                     })
                     :
                     this.commit('SHOW_SNACKBAR', {text: 'Не корректно введены данные' });

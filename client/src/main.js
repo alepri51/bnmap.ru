@@ -43,9 +43,11 @@ Vue.prototype.$colors = colors;
 
 import widget from './components/widget';
 
-Vue.mixin({
-    components: {
-        widget
+let base = {
+    data() {
+        return {
+            entity: this.$options._componentTag
+        }
     },
     methods: {
         ...mapStoreActions(),
@@ -60,8 +62,74 @@ Vue.mixin({
         api() {
             return this.$store.state.api;
         },
-        dialogs() {
-            return this.$store.state.dialogs;
+        auth() {
+            return this.$store.state.auth || {name: 'Аноним'};
+        },
+
+        entities() {
+            return this.$store.state.entities;
+        }        
+    }
+}
+
+let widget_base = {
+    extends: base,
+    components: {
+        widget
+    },
+    computed: {
+        row_data() {
+            return this.$store.state.entities[this.entity];
+        },
+        filter() {
+            return this.row_data; //переопределить в компоненте если надо фильтровать данные
+        }
+    }
+}
+
+let modal_base = {
+    extends: base,
+    data() {
+        return {
+            form_data: {}
+        }
+    },
+    computed: {
+        visible: { 
+            get() {
+                //debugger;
+                let modal_data = this.state.modals[this.entity];
+
+                this.form_data && typeof modal_data === 'object' && Object.keys(modal_data).length ? this.form_data = JSON.parse(JSON.stringify(modal_data)) : this.form_data = JSON.parse(JSON.stringify(this.defaults || {}));
+
+                return !!modal_data;
+            },
+            set: () => {}
+        },
+    }
+}
+
+Vue.mixin({
+    components: {
+        widget
+    },
+    data() {
+        return {
+            entity: this.$options._componentTag
+        }
+    },
+    methods: {
+        ...mapStoreActions(),
+        call(action, ...args) {
+            this[action](...args);
+        },
+    },
+    computed: {
+        state() {
+            return this.$store.state;
+        },
+        api() {
+            return this.$store.state.api;
         },
         auth() {
             return this.$store.state.auth || {name: 'Аноним'};
@@ -70,20 +138,25 @@ Vue.mixin({
         entities() {
             return this.$store.state.entities;
         },
-        entity() {
+        /* entity() {
             return ''; //переопределить в компоненте
-        },
+        }, */
         entity_data() {
             //debugger;
 
             return this.$store.state.entities[this.entity];
         },
         filter() {
-            return this.entity_data; //переопределить в компоненте если надо фильтроапть данные
+            return this.entity_data; //переопределить в компоненте если надо фильтровать данные
         },
-        visible_modal: {
+        visible: { 
             get() {
-                return this.state.modals.news;
+                //debugger;
+                let modal_data = this.state.modals[this.entity];
+
+                this.form_data && typeof modal_data === 'object' && Object.keys(modal_data).length ? this.form_data = JSON.parse(JSON.stringify(modal_data)) : this.form_data = JSON.parse(JSON.stringify(this.defaults || {}));
+
+                return !!modal_data;
             },
             set: () => {}
         },

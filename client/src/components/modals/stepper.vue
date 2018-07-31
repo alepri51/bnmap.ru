@@ -79,7 +79,7 @@
 
 <script>
     export default {
-        props: ['visible'],
+
         data: () => {
             return {
                 e1: 1,

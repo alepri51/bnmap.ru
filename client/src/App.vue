@@ -28,11 +28,12 @@
         <signup :visible="dialogs.signup.visible" />
         <signout :visible="dialogs.signout.visible" /> -->
 
-        <signin :visible="dialogs.signin.visible" />
-        <signup :visible="dialogs.signup.visible" />
-        <signout :visible="dialogs.signout.visible" />
+        <!-- <signin :visible="dialogs.signin.visible" /> -->
+        <signin/>
+        <signup/>
+        <signout/>
 
-        <stepper :visible="dialogs.stepper.visible" />
+        <stepper/>
 
         <v-snackbar
             @input="commit('HIDE_SNACKBAR')"

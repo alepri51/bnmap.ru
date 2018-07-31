@@ -33,9 +33,9 @@
                 </v-card-text>
             </v-card-text>
             <v-card-actions>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'signin')">Вспомнить пароль</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'signin')">Не входить</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
                 <v-btn dark class="default-action" flat @click.native="submit">Войти</v-btn>
             </v-card-actions>
 
@@ -46,9 +46,12 @@
 
 <script>
     export default {
-        props: ['visible'],
-        data: () => {
+        data: (vm) => {
+            debugger;
+            console.log(vm.$options._componentTag);
+
             return {
+                //entity: 'signin',
                 email: 'o2@atlant.club',
                 password: '123'
 
@@ -67,8 +70,7 @@
                         payload: this.$data, 
                         callback: (response) => {
                             if(!response.error) {
-                                this.commit('CLEAR_CACHE');
-                                this.commit('HIDE_DIALOG', 'signin');
+                                this.commit('HIDE_MODAL', { signin: void 0 });
                                 this.state.view !== 'newslayout' ? this.$router.replace('newslayout') : this.commit('LOCATION', 'newslayout');
                             }
                         }

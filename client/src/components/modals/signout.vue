@@ -12,7 +12,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'signout')">Не выходить</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signout: void 0 })">Не выходить</v-btn>
                 <v-btn dark class="default-action" flat @click.native="submit">Выйти</v-btn>
             </v-card-actions>
 
@@ -23,9 +23,9 @@
 
 <script>
     export default {
-        props: ['visible'],
         data: () => {
             return {
+                //entity: 'signout'
             }
         },
         methods: {
@@ -35,9 +35,8 @@
                     method: 'post', 
                     endpoint: 'signout.submit',
                     callback: () => {
-                        this.commit('CLEAR_CACHE');
-                        this.commit('HIDE_DIALOG', 'signout');
-                        this.$router.replace('landing');
+                        this.commit('SET_SIGNED_IN', false);
+                        //this.$router.replace('landing');
                     }    
                 });
             }

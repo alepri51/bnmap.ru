@@ -1,5 +1,5 @@
 <template>
-    <div v-if="visible" class="widget">
+    <div v-if="signed_id" class="widget">
         <slot/>
         <div style="position: absolute; bottom: 4px; right: 8px; font-size: 10px" class="grey--text">{{name}}</div>
     </div>
@@ -14,6 +14,7 @@
     export default {
         props: {
             condition: {
+                //default: this.state.signed_id
                 //type: Boolean,
                 /* default: function () {
                     console.log('ASAS', this.$store.state.auth)
@@ -30,8 +31,9 @@
             name: {}
         },
         computed: {
-            visible() {
-                return typeof this.condition !== 'undefined' ? this.condition : !!(this.auth && this.auth.member);
+            signed_id() {
+                return typeof this.condition !== 'undefined' ? this.condition : this.state.signed_id;
+                //return typeof this.condition !== 'undefined' ? this.condition : !!(this.auth && this.auth.member);
             }
         }
     }
