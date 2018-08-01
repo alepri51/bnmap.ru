@@ -68,8 +68,8 @@ export default new Vuex.Store({
             },
             {
                 icon: '',
-                name: 'Настройки',
-                to: 'settings'
+                name: 'Кошелек',
+                to: 'wallet'
             }
         ]
     },
@@ -186,10 +186,11 @@ export default new Vuex.Store({
         },
         SHOW_MODAL(state, params) {
             //debugger;
-            let name = Object.keys(params)[0];
-            let data = params[name] || {};
+            let [name] = Object.keys(params);
+            //let data = params[name] || {};
+            let [ data = {}, options ] = Object.values(params);
             
-            Vue.set(state.modals, name, data || true);
+            Vue.set(state.modals, name, { data, options } || {});
         },
         HIDE_MODAL(state, params) {
             let name = Object.keys(params)[0];
@@ -255,6 +256,11 @@ export default new Vuex.Store({
         //PROJECT SPECIFIC
         ACCOUNT(state, id) {
             state.account = id;
+        },
+        ENTITY_REMOVE_BY_ID(state, { name, _id}) {
+            //debugger;
+            //delete state.entities[name][_id];
+            Vue.delete(state.entities[name], _id);
         }
     },
     actions: {

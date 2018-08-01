@@ -1,11 +1,21 @@
 <template>
     <widget name="auth">
         <v-card>
-            <h2 class="pa-2"><v-icon class="mr-2 shadow" color="primary">fas fa-user</v-icon>{{auth.name}}</h2>
-            <div class="pa-2">
+            <v-layout column fill-height justify-space-between>
+            <v-card-title>
+                
+                <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-user</v-icon>{{auth.name}}</h2>
+            </v-card-title>
+            
+            <v-card-text>
+                <div class="widget-caption"><v-icon small class="mr-1 green--text">fas fa-dollar-sign</v-icon>Баланс: 0 USD</div>
+            </v-card-text>
+
+            <v-card-actions>
                 <v-btn flat small><v-icon small class="mr-2" color="primary">fas fa-user-circle</v-icon>Настройки</v-btn>
                 <v-btn flat small @click="commit('SHOW_MODAL', { signout: void 0 })">Выход<v-icon small class="ml-2" color="primary">fas fa-sign-out-alt</v-icon></v-btn>
-            </div>
+            </v-card-actions>
+            </v-layout>
         </v-card>
     </widget>
 
@@ -20,6 +30,10 @@
 </script>
 
 <style scoped>
-
+    .widget-caption {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 </style>
 

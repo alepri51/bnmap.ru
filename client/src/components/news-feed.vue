@@ -29,23 +29,26 @@
                     hover 
                     v-scroll:#scrollable="onScroll"
                     :width="300"
-                    :height="200"
+                    
                     
                 >
                     <v-card-media
                         :src="(inx % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
-                        
-                        height="200px"
+                        height="100px"
                     >
-                        <!-- INDEX: {{inx}} -->
                     </v-card-media>
                     <v-card-title class="primary--text">
-                        <h3>{{data.name}}</h3>
+                        <h3>{{data.caption}}</h3>
                     </v-card-title>
 
-                    <v-card-text>
-                        {{data.value}}
-                    </v-card-text>
+                    <v-card-actions>
+                        <small>
+                            {{ new Date(data.created).toLocaleString() }}
+                        </small>
+                        <v-spacer></v-spacer>
+                        <v-btn flat color="secondary">Смотреть</v-btn>
+                    </v-card-actions>
+                    
                     <v-speed-dial 
                         absolute
                         v-model="fab[data._id]"
@@ -84,7 +87,7 @@
                             dark
                             small
                             color="red darken-2"
-                            @click.native="remove(data)"
+                            @click.native="commit('SHOW_MODAL', { news: data, options: { remove: true }})"
                         >
                             <v-icon>fas fa-times</v-icon>
                         </v-btn>
@@ -93,7 +96,8 @@
                 </v-card>
             </v-card-text> 
 
-            <news/>
+            <!-- <news v-on="$listeners"/> не работает-->
+            <news @removed="removed" @appended="appended"/>
         </v-card>
     </widget>
     
@@ -114,7 +118,8 @@
         },
         computed: {
             filter() {
-                return this.raw_data && Object.values(this.raw_data).filter(item => item.member === this.auth.member);
+                //debugger;
+                return this.raw_data.filter(item => item.member === this.auth.member);
             }
         },
         filters: {
@@ -123,9 +128,6 @@
             }
         },
         methods: {
-            remove(news) {
-                 //this.commit('SHOW_DIALOG', { dialog: 'news', data: { disabled: true, ...news }});
-            },
             onRemove(id) { ///////////////////////////
                 delete this.entities.news[id];
             },
@@ -145,8 +147,12 @@
                 return title_config;
             }
         },
+        watch: {
+            'fab': (val) => console.log('SHOW:', val)
+        },
         data() {
             return {
+                texts: {},
                 entity: 'news',
 
                 scroll_position: 0,
@@ -253,7 +259,7 @@
     }
 
     .scrollable {
-        overflow: auto; 
+        overflow-y: auto; 
         position: relative; 
         display: flex;
         flex-wrap: wrap;

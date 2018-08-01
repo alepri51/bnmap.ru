@@ -38,8 +38,8 @@
                     method: 'post', 
                     endpoint: 'signout.submit',
                     callback: () => {
+                        this.$router.replace('landing');
                         this.commit('SET_SIGNED_IN', false);
-                        //this.$router.replace('landing');
                     }    
                 });
             }

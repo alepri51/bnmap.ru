@@ -9,41 +9,39 @@
                 <v-card-text>
                     <v-form ref="form" class="form" lazy-validation @submit.prevent>
                         <v-text-field 
-                            :disabled="options.disabled"
-                            v-model="form.name"
-                            label="О чем вы мечтаете"
+                            :disabled="options.remove"
+                            v-model="form.caption"
+                            label="Заголовок"
                             hint="Например: хочу дом на берегу атлантического океана"
                             required
                             autofocus
                             color="primary"
                             :rules="[
-                                () => !!form.name || 'This field is required',
+                                () => !!form.caption || 'This field is required',
+                            ]"
+                            @keyup.enter="submit"
+                            validate-on-blur
+                        />
+                        <v-textarea 
+                            :disabled="options.remove"
+                            v-model="form.text"
+                            label="Текст"
+                            required
+                            color="primary"
+                            :rules="[
+                                () => !!form.text || 'This field is required',
                             ]"
                             @keyup.enter="submit"
                             validate-on-blur
                         />
                         <v-text-field 
-                            :disabled="options.disabled"
-                            v-model="form.value"
-                            label="Денежный эквивалент"
-                            type="number"
+                            :disabled="options.remove"
+                            v-model="form.tags"
+                            label="Тэги"
                             required
                             color="primary"
                             :rules="[
-                                () => !!form.value || 'This field is required',
-                            ]"
-                            @keyup.enter="submit"
-                            validate-on-blur
-                        />
-                        <v-text-field 
-                            :disabled="options.disabled"
-                            v-model="form.percent"
-                            label="Выделяемая доля"
-                            type="number"
-                            required
-                            color="primary"
-                            :rules="[
-                                () => !!form.percent || 'This field is required',
+                                () => !!form.tags || 'This field is required',
                             ]"
                             @keyup.enter="submit"
                             validate-on-blur
@@ -54,9 +52,9 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { news: void 0 })">Не сохранять</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { news: void 0 })">{{ options.remove ? 'Не удалять' : 'Не сохранять'}}</v-btn>
                 
-                <v-btn dark class="default-action" flat @click.native="submit">Сохранить</v-btn>
+                <v-btn dark :class="options.remove ? 'red darken-2' : 'green darken-2'" flat @click.native="submit">{{ options.remove ? 'Удалить' : 'Cохранить'}}</v-btn>
             </v-card-actions>
 
         </v-card>
@@ -87,25 +85,7 @@
         computed: {
         },
         methods: {
-            submit() {
-                //this.$refs.form.validate() && this.$store.actions.signin({ email: this.email, password: this.password });'
-                //debugger;
-                this.options.disabled || this.$refs.form.validate() ? 
-                    this.execute({ 
-                        method: this.options.disabled ? 'delete' : 'post', 
-                        endpoint: 'news.save',
-                        //payload: this.defaults, 
-                        payload: this.form, 
-                        callback: (response) => {
-                            if(!response.error) {
-                                this.commit('HIDE_MODAL', { news: void 0 })
-                                this.options.disabled && this.$emit('remove', this.defaults._id);
-                            }
-                        }
-                    })
-                    :
-                    this.commit('SHOW_SNACKBAR', {text: 'Не корректно введены данные' });
-            }
+            
         }
     }    
 </script>

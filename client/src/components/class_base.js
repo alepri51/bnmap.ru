@@ -26,6 +26,9 @@ export default {
         },
         commit(...args) {
             return this.$store.commit(...args);
+        },
+        registerComponent(name) {
+            this.commit('REGISTER_COMPONENT', name);
         }
     },
     computed: {

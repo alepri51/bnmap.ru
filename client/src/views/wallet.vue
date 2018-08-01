@@ -4,10 +4,10 @@
 
 
 <script>
-    import Layout from './../components/class_layout';
+    import Base from './../components/class_base';
 
     export default {
-        extends: Layout,
+        extends: Base,
 		components: { 
              dashboard: () => import('../components/dashboard') 
         },
@@ -28,31 +28,40 @@
                         "x": 1,
                         "y": 0,
                         "w": 6,
-                        "h": 10,
-                        "text": "news",
+                        "h": 3,
+                        "text": "donate",
                         "available": false,
-                        "comp": "news-feed"
-                    },
-                    
-                    {
-                        "id": 4,
-                        "x": 7,
-                        "y": 2,
-                        "w": 2,
-                        "h": 6,
-                        "text": "bio",
-                        "available": false,
-                        "comp": "calendar"
+                        "comp": "donate"
                     },
                     {
-                        "id": 3,
+                        "id": 2,
                         "x": 7,
                         "y": 0,
                         "w": 2,
                         "h": 2,
-                        "text": "balance",
+                        "text": "auth",
                         "available": false,
                         "comp": "auth-control"
+                    },
+                    {
+                        "id": 3,
+                        "x": 7,
+                        "y": 2,
+                        "w": 2,
+                        "h": 7,
+                        "text": "calendar",
+                        "available": false,
+                        "comp": "calendar"
+                    },
+                    {
+                        "id": 4,
+                        "x": 1,
+                        "y": 3,
+                        "w": 6,
+                        "h": 7,
+                        "text": "transactions",
+                        "available": false,
+                        "comp": "donate"
                     }
                 ]
 			}

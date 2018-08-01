@@ -1,7 +1,9 @@
 <template>
     <div v-if="signed_id" class="widget">
-        <slot/>
-        <div style="position: absolute; bottom: 4px; right: 8px; font-size: 10px" class="grey--text">{{name}}</div>
+        <div class="slot">
+            <slot/>
+        </div>
+        <div style="position: absolute; bottom: 6px; right: 10px; font-size: 10px" class="grey--text">{{name}}</div>
     </div>
     <v-card v-else class="restriction">
         <v-layout column justify-center align-center>
@@ -28,8 +30,12 @@
 <style scoped>
     .widget {
         width: 100%;
+        overflow: auto;
     }
 
+    .slot {
+        padding: 2px;        
+    }
     .widget div:first-child {
         height: 100%;
     }
@@ -38,5 +44,6 @@
         display: flex!important;
         flex-direction: column;
     }
+
 </style>
 

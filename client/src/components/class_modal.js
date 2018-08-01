@@ -4,20 +4,37 @@ export default {
     extends: Base,
     data() {
         return {
-            form: {}
+            form: {},
+            options: {}
+        }
+    },
+    methods: {
+        submit() {
+            this.options.remove || this.$refs.form.validate() ? 
+                this.execute({ 
+                    method: this.options.remove ? 'delete' : 'post', 
+                    endpoint: `${this.entity}.save`,
+                    payload: this.form, 
+                    callback: (response) => {
+                        if(!response.error) {
+                            this.commit('HIDE_MODAL', { [this.entity]: void 0 })
+                            this.options.remove && this.$emit('removed', this.form._id);
+                            !this.form._id && this.$emit('appended', this.form._id);
+                        }
+                    }
+                })
+                :
+                this.commit('SHOW_SNACKBAR', {text: 'Не корректно введены данные' });
         }
     },
     computed: {
         visible: { 
             get() {
-                //debugger;
-                let modal_data = this.state.modals[this.entity];
+                let { data: modal_data, options = {} } = this.state.modals[this.entity] || { data: void 0, options: void 0 };
+                this.options = options;
 
-                if(typeof modal_data === 'object') {
-                    Object.keys(modal_data).length ? this.form = JSON.parse(JSON.stringify(modal_data)) : this.form = JSON.parse(JSON.stringify(this.defaults || {}));
-                }
-                //this.form_data && typeof modal_data === 'object' && Object.keys(modal_data).length ? this.form_data = JSON.parse(JSON.stringify(modal_data)) : this.form_data = JSON.parse(JSON.stringify(this.defaults || {}));
-
+                typeof modal_data === 'object' && (Object.keys(modal_data).length ? this.form = JSON.parse(JSON.stringify(modal_data)) : this.form = JSON.parse(JSON.stringify(this.defaults || {})));
+                
                 return !!modal_data;
             },
             set: () => {}

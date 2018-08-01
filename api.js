@@ -221,7 +221,7 @@ class Signup extends API {
 
     async submit({name, email, password, referer}) {
         this.error = void 0;
-        
+
         let member = await db.findOne('member', { email });
 
         if(!member) {
@@ -323,7 +323,7 @@ class DBAccess extends SecuredAPI {
         return {
             name: 'some name',
             value: 100,
-            percent: 0
+            //percent: 0
         }
     }
 
@@ -386,6 +386,16 @@ class DBAccess extends SecuredAPI {
 class News extends DBAccess {
     constructor(...args) {
         super(...args);
+    }
+
+    defaults() {
+        let {value, percent = 99} = super.defaults();
+
+        return {
+            caption: 'Новая новость ' + new Date(),
+            text: '',
+            tags: '#новость'
+        }
     }
 
     accessGranted(payload) {
