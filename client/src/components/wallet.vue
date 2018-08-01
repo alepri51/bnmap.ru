@@ -15,13 +15,14 @@
             </v-card-text>
 
             <v-card-actions>
-                <v-btn dark color="red"><v-icon small class="mr-2" >fas fa-exclamation-circle</v-icon>Оплатить взнос</v-btn>
+                <v-btn dark color="red" @click="commit('SHOW_MODAL', { donate: void 0 })"><v-icon small class="mr-2" >fas fa-exclamation-circle</v-icon>Оплатить взнос</v-btn>
                 <v-btn dark color="green"><v-icon  small class="mr-2" >fas fa-dollar-sign</v-icon>Пополнить баланс</v-btn>
                 <v-spacer/>
                 <v-btn dark flat color="primary" @click="false"><v-icon small class="mr-2" >fas fa-hand-holding-usd</v-icon>Вывод средств</v-btn>
             </v-card-actions>
             </v-layout>
         </v-card>
+        <donate/>
     </widget>
 
 </template>
@@ -30,7 +31,10 @@
     import Widget from './class_widget';
     
     export default {
-        extends: Widget
+        extends: Widget,
+        components: {
+            donate: () => import('./modals/donate')
+        },
     }
 </script>
 

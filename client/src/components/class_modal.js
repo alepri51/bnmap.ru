@@ -5,8 +5,15 @@ export default {
     data() {
         return {
             form: {},
-            options: {}
+            options: {},
+            defaults: {}
         }
+    },
+    async activated() {
+        debugger;
+        let response = await this.execute({ method: 'post', endpoint: `${this.entity}.defaults` });
+
+        this.defaults = response.rest_data;
     },
     methods: {
         submit() {

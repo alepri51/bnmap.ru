@@ -52,7 +52,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { news: void 0 })">{{ options.remove ? 'Не удалять' : 'Не сохранять'}}</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { donate: void 0 })">{{ options.remove ? 'Не удалять' : 'Не сохранять'}}</v-btn>
                 
                 <v-btn dark :class="options.remove ? 'red darken-2' : 'green darken-2'" flat @click.native="submit">{{ options.remove ? 'Удалить' : 'Cохранить'}}</v-btn>
             </v-card-actions>
@@ -69,18 +69,18 @@
         extends: Modal,
         inheritAttrs: false,
         //props: ['options'],
-        /* data() {
+        data() {
             return {
                 //entity: 'news',
                 options: {},
                 defaults: {}
             }
-        }, */
+        },
         async created() {
-            
+            //debugger;
             let response = await this.execute({ endpoint: 'news.defaults' });
 
-            this.defaults = response ? response.rest_data : {};
+            this.defaults = response.rest_data;
         },
         computed: {
         },

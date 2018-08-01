@@ -26,7 +26,7 @@ app.use(cors());
 
 app.use(staticFileMiddleware);
 
-app.use(history({
+app.use('/\/$/', history({
     disableDotRule: false,
     verbose: true
 }));
@@ -45,7 +45,12 @@ if(cluster.isMaster) {
     });
 
 
+    //let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
     app.all('*', function(req, res, next) {
+        next();
+    });
+
+    app.use('/api', function(req, res, next) {
         next();
     });
 

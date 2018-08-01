@@ -182,6 +182,10 @@ class Auth extends API {
     constructor(...args) {
         super(...args);
     }
+
+    defaults() {
+        return {empty: true}
+    }
 }
 
 class Signin extends API {
@@ -417,6 +421,72 @@ class News extends DBAccess {
     }
 } 
 
+let BTC = {
+    exchange_rate: 0.001,
+    conveertToBtc(value, currency) {
+        return value * this.exchange_rate;
+    }
+}
+
+class Pricing extends DBAccess {
+    constructor(...args) {
+        super(...args);
+    }
+}
+
+class Product extends DBAccess {
+    constructor(...args) {
+        super(...args);
+    }
+}
+
+class Order extends DBAccess {
+    constructor(...args) {
+        super(...args);
+    }
+
+    create(payload) {
+        payload = {
+            product_id,
+            count,
+            address
+        }
+    }
+}
+
+class Donate extends Order {
+    constructor(...args) {
+        super(...args);
+    }
+
+    defaults() {
+        return {
+            caption: 'donate',
+            exchange_rate: BTC.exchange_rate,
+            сумма_в_долларах: 75,
+            сумма_в_BTC: BTC.conveertToBtc(75)
+        }
+    }
+
+    /* accessGranted(payload) {
+        return (payload._id && payload.member && payload.member === this.member) || !!!payload._id;
+    }
+
+    async beforeInsert(payload) {
+        payload.member = this.member;
+        return payload;
+    }
+
+    async transformData(data, req) {
+        return {
+            account: {
+                _id: data.member,
+                news: [data]
+            }
+        }
+    } */
+} 
+
 let classes = {
     API,
     Signin,
@@ -424,7 +494,8 @@ let classes = {
     Signout,
     Auth,
     NewsLayout,
-    News
+    News,
+    Donate
 }
 
 module.exports = Object.entries(classes).reduce((memo, item) => {

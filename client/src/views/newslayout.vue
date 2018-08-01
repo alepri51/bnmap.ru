@@ -1,5 +1,10 @@
 <template>
-	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent"/>
+	<dashboard v-if="signed_id" class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent"/>
+    <v-card v-else class="restriction">
+        <v-layout column justify-center align-center>
+            <h2 class="pa-2"><v-icon class="mr-2 shadow" color="red darken-2">fas fa-minus-circle</v-icon>ДОСТУП ОГРАНИЧЕН</h2>
+        </v-layout>
+    </v-card>
 </template>
 
 
@@ -16,8 +21,14 @@
                 console.log('NEWS LAYOUT RESIZE');
             }
         },
+        computed: {
+            signed_id() {
+                return typeof this.condition !== 'undefined' ? this.condition : this.state.signed_id;
+            }
+        },
 		data() {
 			return {
+                //condition: false,
 				layout: {
 					cols: 10,
 					rows: 15
@@ -61,6 +72,10 @@
 
 </script>
 
-<style>
-
+<style scoped>
+    .restriction {
+        display: flex!important;
+        flex-direction: column;
+        height: 100%;
+    }
 </style>

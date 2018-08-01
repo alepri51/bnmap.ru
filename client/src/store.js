@@ -69,7 +69,7 @@ export default new Vuex.Store({
             {
                 icon: '',
                 name: 'Финансы',
-                to: 'finance'
+                to: 'payment'
             }
         ]
     },
@@ -81,6 +81,7 @@ export default new Vuex.Store({
             state.entities = {}
         },
         INIT(state) {
+        
             state.api = axios.create({ 
                 baseURL: 'https://localhost:8000/api',
                 headers: { 'Cache-Control': 'no-cache' },
@@ -109,6 +110,7 @@ export default new Vuex.Store({
                         let vertical = error.message.length > 50;
                         this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
 
+                        debugger;
                         error.code === 403 && signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : router.replace('landing');
                         //error.code === 403 && signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : void 0;
                     }
@@ -247,9 +249,9 @@ export default new Vuex.Store({
                 :
                 {};
 
-                Object.keys(merge).length && (state.entities = merge);
+                Object.keys(merge).length && (Vue.set(state, 'entities',  merge));
             }
-            else !state.auth && (state.entities = {});
+            else !state.auth && (Vue.set(state, 'entities',  {}));
 
             console.log('NEWS:', state.entities.news);
         },
@@ -265,7 +267,6 @@ export default new Vuex.Store({
     },
     actions: {
         async execute({ commit, state }, { method, endpoint, payload, callback }) {
-            
             let response;
 
             let config = {
@@ -282,6 +283,7 @@ export default new Vuex.Store({
                 config.method === 'get' ? config.params = payload : config.data = payload;
 
                 response = await state.api(config);
+                
             }
             catch(err) {
                 console.log('ERROR', err);

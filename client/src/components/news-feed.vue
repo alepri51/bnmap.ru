@@ -97,8 +97,9 @@
             </v-card-text> 
 
             <!-- <news v-on="$listeners"/> не работает-->
-            <news @removed="removed" @appended="appended"/>
+            
         </v-card>
+        <news @removed="removed" @appended="appended"/>
     </widget>
     
          

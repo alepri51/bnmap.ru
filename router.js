@@ -30,6 +30,7 @@ router.all(patterns, async (req, res, next) => {
 
     let { token, auth, error } = object;
 
+    console.log('RESPONSE:', result);
     res.json({ token, auth, error, ...result } || {}).end();
 });
 

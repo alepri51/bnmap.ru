@@ -5,11 +5,11 @@
         </div>
         <div style="position: absolute; bottom: 6px; right: 10px; font-size: 10px" class="grey--text">{{name}}</div>
     </div>
-    <v-card v-else class="restriction">
+    <!-- <v-card v-else class="restriction">
         <v-layout column justify-center align-center>
             <h2 class="pa-2"><v-icon class="mr-2 shadow" color="red darken-2">fas fa-minus-circle</v-icon>ДОСТУП ОГРАНИЧЕН</h2>
         </v-layout>
-    </v-card>
+    </v-card> -->
 </template>
 
 <script>
