@@ -20,7 +20,7 @@
 			return {
 				layout: {
 					cols: 10,
-					rows: 10
+					rows: 15
 				},
 				components: [
                     {
@@ -28,7 +28,7 @@
                         "x": 1,
                         "y": 0,
                         "w": 6,
-                        "h": 10,
+                        "h": 15,
                         "text": "news",
                         "available": false,
                         "comp": "news-feed"
@@ -37,9 +37,9 @@
                     {
                         "id": 4,
                         "x": 7,
-                        "y": 2,
+                        "y": 3,
                         "w": 2,
-                        "h": 6,
+                        "h": 7,
                         "text": "bio",
                         "available": false,
                         "comp": "calendar"
@@ -49,7 +49,7 @@
                         "x": 7,
                         "y": 0,
                         "w": 2,
-                        "h": 2,
+                        "h": 3,
                         "text": "balance",
                         "available": false,
                         "comp": "auth-control"

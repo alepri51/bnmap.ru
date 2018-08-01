@@ -28,7 +28,7 @@
 }
 
 .chacheli-layout .chacheli {
-	padding: 5px;
+	padding: 4px;
 	position: absolute
 }
 

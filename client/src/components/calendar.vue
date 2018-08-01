@@ -1,10 +1,10 @@
 <template>
     <widget name="календарь">
         <v-card>
-            <v-card-title>
-                <h2 class="widget-caption"><v-icon color="primary" class="mr-2 shadow">fas fa-calendar-alt</v-icon>Календарь новостей:</h2>
-            </v-card-title>
-            <v-card-text >
+            <!-- <v-card-title>
+                <h2 class="widget-caption"><v-icon color="primary" class="mr-2 shadow">fas fa-calendar-alt</v-icon>Календарь:</h2>
+            </v-card-title> -->
+            <v-card-text class="pa-2">
                 <v-date-picker 
                     color="secondary"
                     full-width

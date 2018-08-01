@@ -68,8 +68,8 @@ export default new Vuex.Store({
             },
             {
                 icon: '',
-                name: 'Кошелек',
-                to: 'wallet'
+                name: 'Финансы',
+                to: 'finance'
             }
         ]
     },
