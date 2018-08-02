@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import io from 'socket.io-client';
 
 import axios from 'axios';
 import deepmerge from 'deepmerge';
@@ -10,6 +11,16 @@ import router from './router';
 Vue.use(Vuex);
 
 let requests_cache = new Cache();
+let api = void 0;
+
+/* const socket = io('wss://ws.blockchain.info/inv', {
+    transports: ['websocket']
+});
+
+socket.on('connect', () => {
+    console.log(socket.disconnected); // false
+}); */
+
 
 export default new Vuex.Store({
     strict: true,
@@ -82,7 +93,7 @@ export default new Vuex.Store({
         },
         INIT(state) {
         
-            state.api = axios.create({ 
+            api = axios.create({ 
                 baseURL: 'https://localhost:8000/api',
                 headers: { 'Cache-Control': 'no-cache' },
 	            adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter))
@@ -141,11 +152,11 @@ export default new Vuex.Store({
                 this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
             });
 
-            state.api.interceptors.request.use(onRequest, onError);
+            api.interceptors.request.use(onRequest, onError);
             
-            state.api.interceptors.response.use(onResponse, onError);
+            api.interceptors.response.use(onResponse, onError);
 
-            //state.api.get('auth', { params: {timestamp: new Date() / 1 } });
+            //api.get('auth', { params: {timestamp: new Date() / 1 } });
         },
         LOADING(state, value) {
             state.loading = value;
@@ -171,12 +182,12 @@ export default new Vuex.Store({
             state.referer = referer;
         },
         LOCATION(state, view) {
-            /* if(!state.api) {
+            /* if(!api) {
                 this.commit('INIT');
                 this.dispatch('execute', { endpoint: view, method: 'get' });
             } */
 
-            !state.api && this.commit('INIT');
+            !api && this.commit('INIT');
             this.dispatch('execute', { endpoint: view, method: 'get' });
 
             state.view = view;
@@ -282,7 +293,7 @@ export default new Vuex.Store({
 
                 config.method === 'get' ? config.params = payload : config.data = payload;
 
-                response = await state.api(config);
+                response = await api(config);
                 
             }
             catch(err) {
