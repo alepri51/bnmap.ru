@@ -76,11 +76,31 @@ model = (data) => {
     let schema = normalizer.schema;
 
     const _transaction = new schema.Entity('transaction', {}, { idAttribute: '_id' });
+    const _wallet = new schema.Entity('wallet', {}, { idAttribute: '_id' });
     const _news = new schema.Entity('news', {}, { idAttribute: '_id' });
+    
+    const _product = new schema.Entity('product', {}, { idAttribute: '_id' });
+
+    const _item = new schema.Entity('item', {
+        product: _product
+    }, {
+        idAttribute: value => value.product,
+        processStrategy: (value, parent, key) => {
+            //value.entity = 'member';
+            //value._id = value.product;
+            return value;
+        }
+    });
+
+    const _order = new schema.Entity('order', {
+        items: [_item]
+    }, { idAttribute: '_id' });
 
     const _member = new schema.Entity('member', {
         news: [_news],
-        transactions: [_transaction]
+        transactions: [_transaction],
+        wallets: [_wallet],
+        orders: [_order]
     }, { 
         idAttribute: '_id',
         processStrategy: (value, parent, key) => {

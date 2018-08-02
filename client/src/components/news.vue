@@ -32,23 +32,30 @@
                     
                     
                 >
-                    <v-card-media
-                        :src="(inx % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
-                        height="100px"
-                    >
-                    </v-card-media>
-                    <v-card-title class="primary--text">
-                        <h3>{{data.caption}}</h3>
-                    </v-card-title>
+                    <v-layout column>
+                        <v-card-media
+                            :src="(inx % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
+                            height="100px"
+                        >
+                        </v-card-media>
 
-                    <v-card-actions>
-                        <small>
-                            {{ new Date(data.created).toLocaleString() }}
-                        </small>
-                        <v-spacer></v-spacer>
-                        <v-btn flat color="secondary">Смотреть</v-btn>
-                    </v-card-actions>
-                    
+                        <v-card-title class="primary--text">
+                            <h3>{{data.caption}}</h3>
+                        </v-card-title>
+
+                        <v-card-text style="flex: 1">
+                            {{data.text}}
+                        </v-card-text>
+
+                        <v-card-actions>
+                            <small>
+                                {{ new Date(data.created).toLocaleString() }}
+                            </small>
+                            <v-spacer></v-spacer>
+                            <v-btn flat color="secondary">Смотреть</v-btn>
+                        </v-card-actions>
+                    </v-layout>
+
                     <v-speed-dial 
                         absolute
                         v-model="fab[data._id]"
@@ -149,12 +156,11 @@
             }
         },
         watch: {
-            'fab': (val) => console.log('SHOW:', val)
+            //'fab': (val) => console.log('SHOW:', val)
         },
         data() {
             return {
                 texts: {},
-                entity: 'news',
 
                 scroll_position: 0,
 

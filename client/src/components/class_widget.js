@@ -6,6 +6,9 @@ export default {
     components: {
         widget
     },
+    activated() {
+        this.state.auth && this.execute({ endpoint: this.entity, method: 'get' });
+    },
     methods: {
         removed(_id) {
             this.commit('ENTITY_REMOVE_BY_ID', { name: this.entity, _id });
@@ -23,5 +26,13 @@ export default {
         filter() {
             return this.raw_data; //переопределить в компоненте если надо фильтровать данные
         }
+    },
+    watch: {
+        'state.token': function (new_val, old_val) {
+            //debugger;
+            new_val && this.execute({ endpoint: this.entity, method: 'get' });
+            //JSON.stringify(new_val) !== JSON.stringify(old_val) && this.execute({ endpoint: this.entity, method: 'get' });
+        }
     }
+
 }

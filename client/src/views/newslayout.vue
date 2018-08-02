@@ -42,7 +42,7 @@
                         "h": 15,
                         "text": "news",
                         "available": false,
-                        "comp": "news-feed"
+                        "comp": "news"
                     },
                     
                     {

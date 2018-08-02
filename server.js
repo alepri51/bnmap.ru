@@ -22,7 +22,7 @@ const httpsListenPort = 8000;
 
 const app = express();
 
-app.use(cors());
+app.use('/api', cors());
 
 app.use(staticFileMiddleware);
 

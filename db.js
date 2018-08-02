@@ -10,7 +10,7 @@
 //await db.find('$имя_коллекции$', { _id: payload.member });
 
 //массив коллекций, создается при старте
-let collections = ['member', 'token', 'transaction', 'product', 'list', 'news', 'wallet'];
+let collections = ['member', 'token', 'order', 'product', 'list', 'news', 'wallet', 'price'];
 
 const cluster = require('cluster');
 const path = require('path');

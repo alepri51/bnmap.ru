@@ -4,10 +4,10 @@
 
 
 <script>
-    import Base from './../components/class_base';
+    import Layout from './../components/class_layout';
 
     export default {
-        extends: Base,
+        extends: Layout,
 		components: { 
              dashboard: () => import('../components/dashboard') 
         },
@@ -61,7 +61,7 @@
                         "h": 11,
                         "text": "transactions",
                         "available": false,
-                        "comp": "transactions"
+                        "comp": "order"
                     }
                 ]
 			}

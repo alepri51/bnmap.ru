@@ -267,57 +267,6 @@ class Signup extends API {
     }
 }
 
-class NewsLayout extends SecuredAPI {
-    constructor(...args) {
-        super(...args);
-        //use proxy to handle not auth
-    }
-
-    async default(params) {
-        //console.log(this.payload.member);
-        let wallet = await db.findOne('wallet', { member: this.member, default: true });
-        let transactions = await db.find('transaction', { $or: [{ to: wallet.address } , { from: wallet.address }] });
-        //let out_txs = await db.find('transaction', { from: wallet.address });
-
-        let sum = transactions.reduce((sum, tx) => {
-            sum[tx.currency] = sum[tx.currency] || 0;
-            tx.to === wallet.address ? sum[tx.currency] += tx.amount : sum[tx.currency] -= tx.amount;
-
-            return sum;
-        }, {});
-
-        /* let outcome = out_txs.reduce((sum, tx) => {
-            sum[tx.currency] = sum[tx.currency] || 0;
-            sum[tx.currency] += tx.amount;
-
-            return sum;
-        }, {});
-
-        let sum = Object.entries(outcome).reduce((sum, [currency, value]) => {
-            sum[currency] = income[currency] - value;
-            return sum;
-        }, {}); */
-
-        let news = await db.find('news', { member: this.member });
-
-        let result = model({
-            account: { 
-                _id: this.member,
-                balance: {
-                    ...sum 
-                }, 
-                news, 
-                transactions, 
-                params 
-            }
-        });
-
-        return result;
-
-        //return { balance:  { ...sum }, dreams, transactions: { in_txs, out_txs }, params };
-    }
-}
-
 class DBAccess extends SecuredAPI {
     constructor(...args) {
         super(...args);
@@ -387,9 +336,33 @@ class DBAccess extends SecuredAPI {
     }
 }
 
-class News extends DBAccess {
+///////////////////PROJECT SPECIFIC/////////////////////////
+class NewsLayout extends SecuredAPI { //LAYOUT
     constructor(...args) {
         super(...args);
+    }
+
+    async default(params) {
+        
+    }
+}
+
+class News extends DBAccess { //WIDGET AND DIALOG
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default() {
+        let news = await db.find('news', { member: this.member });
+
+        let result = model({
+            account: { 
+                _id: this.member,
+                news
+            }
+        });
+
+        return result;
     }
 
     defaults() {
@@ -421,9 +394,129 @@ class News extends DBAccess {
     }
 } 
 
+class Payment extends SecuredAPI { //LAYOUT
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default(params) {
+        
+    }
+}
+
+class Wallet extends DBAccess { //WIDGET
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default() {
+        let wallets = await db.find('wallet', { member: this.member });
+
+        let result = model({
+            account: { 
+                _id: this.member,
+                wallets
+            }
+        });
+
+        return result;
+    }
+
+}
+
+class Order extends DBAccess { //WIDGET
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default() {
+        let orders = await db.find('order', { member: this.member });
+        orders = orders.map(async order => {
+            order.items = order.items.map(async item => {
+                item.product = await db.findOne('product', { _id: item.product });
+
+                return item;
+            });
+
+            order.items = await Promise.all(order.items);
+            return order;
+        });
+
+        orders = await Promise.all(orders);
+
+        let result = model({
+            account: { 
+                _id: this.member,
+                orders
+            }
+        });
+
+        return result;
+    }
+}
+
+class Donate extends DBAccess { // DIALOG
+    constructor(...args) {
+        super(...args);
+    }
+
+    async defaults() {
+        let donate = await db.findOne('product', { group: 'donate' });
+        let wallet = await db.findOne('wallet', { member: this.member, default: true  });
+        let price = await db.findOne('price', { product: donate._id });
+        let sum = price.delivery.reduce((sum, item) => sum + item.sum, 0);
+
+        return {
+            address: wallet.address,
+            items: [
+                {
+                    product: donate,
+                    count: 1,
+                    cost: BTC.convertToBtc(sum)
+                }
+            ],
+            sum: BTC.convertToBtc(sum)
+        }
+    }
+
+    accessGranted(payload) {
+        return (payload._id && payload.member && payload.member === this.member) || !!!payload._id;
+    }
+
+    async insert(payload) {
+        payload.member = this.member;
+        payload.state = 'ожидание';
+        payload.name = 'Взнос';
+
+        this.order = JSON.parse(JSON.stringify(payload));
+
+        payload.items = payload.items.map(product => {
+            product.product = product.product._id
+
+            return product;
+        });
+        //создать список транзакций на какие кошельки сколько рассылать по прайсингу каждого товара
+
+        let order = await db.insert('order', { ...payload });
+        this.order = { ...this.order, ...order };
+        return order
+    }
+
+    async transformData(data, req) {
+        //data.products = await db.find('product', { _id: { $in: data.products.map(product => product.product) }});
+        //this.order._id = data._id;
+        return {
+            account: {
+                _id: data.member,
+                orders: [this.order]
+            }
+        }
+    }
+} 
+
 let BTC = {
     exchange_rate: 0.001,
-    conveertToBtc(value, currency) {
+    convertToBtc(value, currency) {
         return value * this.exchange_rate;
     }
 }
@@ -440,53 +533,6 @@ class Product extends DBAccess {
     }
 }
 
-class Order extends DBAccess {
-    constructor(...args) {
-        super(...args);
-    }
-
-    create(payload) {
-        payload = {
-            product_id,
-            count,
-            address
-        }
-    }
-}
-
-class Donate extends Order {
-    constructor(...args) {
-        super(...args);
-    }
-
-    defaults() {
-        return {
-            caption: 'donate',
-            exchange_rate: BTC.exchange_rate,
-            сумма_в_долларах: 75,
-            сумма_в_BTC: BTC.conveertToBtc(75)
-        }
-    }
-
-    /* accessGranted(payload) {
-        return (payload._id && payload.member && payload.member === this.member) || !!!payload._id;
-    }
-
-    async beforeInsert(payload) {
-        payload.member = this.member;
-        return payload;
-    }
-
-    async transformData(data, req) {
-        return {
-            account: {
-                _id: data.member,
-                news: [data]
-            }
-        }
-    } */
-} 
-
 let classes = {
     API,
     Signin,
@@ -494,8 +540,11 @@ let classes = {
     Signout,
     Auth,
     NewsLayout,
-    News,
-    Donate
+    News, //AS WIDGET & DIALOG
+    Payment,
+    Wallet,
+    Donate,
+    Order
 }
 
 module.exports = Object.entries(classes).reduce((memo, item) => {

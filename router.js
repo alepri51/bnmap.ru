@@ -14,7 +14,9 @@ let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:typ
 router.all(patterns, async (req, res, next) => {
     let {type, id, action} = req.params;
 
-    console.log('REQUEST:', { type, id, action });
+    console.log('---------------BEGIN-----------------');
+    console.log('REQUEST:', req.path);
+    //console.log('PARAMS:', { type, id, action });
 
     type = type.toLowerCase();
     !types[type] && (type = 'auth');
@@ -31,6 +33,8 @@ router.all(patterns, async (req, res, next) => {
     let { token, auth, error } = object;
 
     console.log('RESPONSE:', result);
+    console.log('----------------END------------------');
+
     res.json({ token, auth, error, ...result } || {}).end();
 });
 

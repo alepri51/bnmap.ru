@@ -9,11 +9,17 @@ export default {
             defaults: {}
         }
     },
-    async activated() {
-        debugger;
-        let response = await this.execute({ method: 'post', endpoint: `${this.entity}.defaults` });
+    /* async created() {
+        let response = await this.execute({ endpoint: `${this.entity}.defaults` });
 
-        this.defaults = response.rest_data;
+        this.defaults = response ? response.rest_data : {};
+    }, */
+    watch: {
+        'state.token': async function (new_val, old_val) {
+            //debugger;
+            let response = new_val && await this.execute({ endpoint: `${this.entity}.defaults` });
+            this.defaults = response ? response.rest_data : {};
+        }
     },
     methods: {
         submit() {
@@ -37,6 +43,7 @@ export default {
     computed: {
         visible: { 
             get() {
+                //debugger;
                 let { data: modal_data, options = {} } = this.state.modals[this.entity] || { data: void 0, options: void 0 };
                 this.options = options;
 

@@ -76,12 +76,7 @@
                 defaults: {}
             }
         }, */
-        async created() {
-            
-            let response = await this.execute({ endpoint: 'news.defaults' });
-
-            this.defaults = response ? response.rest_data : {};
-        },
+        
         computed: {
         },
         methods: {

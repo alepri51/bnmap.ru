@@ -110,9 +110,8 @@ export default new Vuex.Store({
                         let vertical = error.message.length > 50;
                         this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
 
-                        debugger;
+                        requests_cache.reset();
                         error.code === 403 && signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : router.replace('landing');
-                        //error.code === 403 && signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : void 0;
                     }
                     else console.error(error.code, error.message, error.data);
                     //Для упрощения доступа к ошибке
@@ -215,6 +214,7 @@ export default new Vuex.Store({
         },
         SET_AUTH(state, auth) {
             state.auth && JSON.stringify(state.auth) !== JSON.stringify(auth) && this.commit('CLEAR_CACHE');
+            //this.commit('CLEAR_CACHE');
             state.auth = auth;
         },
         SHOW_SNACKBAR(state, options) {
@@ -253,7 +253,7 @@ export default new Vuex.Store({
             }
             else !state.auth && (Vue.set(state, 'entities',  {}));
 
-            console.log('NEWS:', state.entities.news);
+            //console.log('NEWS:', state.entities.news);
         },
         //PROJECT SPECIFIC
         ACCOUNT(state, id) {

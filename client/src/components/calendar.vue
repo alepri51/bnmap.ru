@@ -14,7 +14,7 @@
                     :landscape="landscape" 
                     :reactive="reactive" 
                     flat 
-                    style="width:100%" class="elevation-0"
+                    style="" class="elevation-0"
                     :event-color="date => date[9] % 2 ? 'red' : 'blue'"
                     :events="events"
                     :allowed-dates="allowedDates"

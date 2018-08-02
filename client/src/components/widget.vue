@@ -1,5 +1,5 @@
 <template>
-    <div v-if="signed_id" class="widget">
+    <div class="widget">
         <div class="slot">
             <slot/>
         </div>
