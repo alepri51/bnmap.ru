@@ -27,8 +27,10 @@ if(cluster.isMaster) {
     }
 
     db.find = function (collection, query, options) {
+        let { sort } = options || {}
+        //sort = sort || {};
         return new Promise(function (resolve, reject) {
-            db[collection].find(query).sort({ created: 1 }).exec(function (err, results) {
+            db[collection].find(query).sort(sort).exec(function (err, results) {
                 err ? reject(err) : resolve(results);
             })
         });

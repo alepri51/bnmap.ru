@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
 
+const ms = require('./ms');
+
 const model = require('./model');
 
 /*
@@ -54,6 +56,7 @@ class API {
                 else return origMethod;
             }
         };
+
         return new Proxy(this, handler);
     }
 
@@ -117,7 +120,7 @@ class API {
         delete payload.iat;
         delete payload.exp;
 
-        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '10s'});
+        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '30s'});
         this.payload = payload;
     }
 
@@ -183,7 +186,19 @@ class Auth extends API {
         super(...args);
     }
 
-    defaults() {
+    async defaults() {
+        let lists = await db.find('list', {});
+        if(!lists.length){
+            let members = await db.find('member', { group: 'root' });
+
+            let list = {
+                group: 'root',
+                members
+            };
+
+            await db.insert('list', list);
+        }
+
         return {empty: true}
     }
 }
@@ -455,6 +470,22 @@ class Order extends DBAccess { //WIDGET
     }
 }
 
+let BTC = {
+    exchange_rate: 0.001,
+    convertToBtc(value, currency) {
+        return value * this.exchange_rate;
+    },
+    /* createOrder(amount) {
+        return {
+            id: await this.createPassword(16),
+            address: await this.createPassword(32),
+            rate: 0.001,
+            amount: convertToBtc(amount),
+            status: 'waiting'
+        }
+    } */
+}
+
 class Donate extends DBAccess { // DIALOG
     constructor(...args) {
         super(...args);
@@ -487,39 +518,76 @@ class Donate extends DBAccess { // DIALOG
         payload.member = this.member;
         payload.state = 'ожидание';
         payload.name = 'Взнос';
+        payload.group = 'donate';
 
         this.order = JSON.parse(JSON.stringify(payload));
+
+        let member = await db.findOne('member', { _id: this.member });
+        if(!member.referer) {
+            this.generateError({ code: 403, message: 'Вы не можете сделать взнос.'});
+            return;
+        }
+
+
+        let order = await db.findOne('order', { member: this.member, group: 'donate' }, { sort: { created: -1 }});
+
+        let donate = await db.findOne('product', { group: 'donate' });
+        let period = ms(donate.minPeriod);
+
+        let difference = period;
+
+        let now = Date.now();// / 1;
+        let allowed = !!order ? (order.created + period) < now : true;
+
+        if(!allowed) {
+            this.generateError({ code: 403, message: 'Взнос уже сделан. Следующий взнос возможен через ' + ms((order.created + period) - now, { long: true }) + ' период: ' + ms(period, { long: true }) });
+            return;
+        }
 
         payload.items = payload.items.map(product => {
             product.product = product.product._id
 
             return product;
         });
+
+        let delivery_roots = {
+            club: await db.findOne('member', { group: 'club' }),
+            referer: await db.findOne('member', { _id: member.referer })
+        }
+        
+        let list = await db.findOne('list', { _id: delivery_roots.referer.list });
+        let price = await db.findOne('price', { product: donate._id });
+        delivery_roots.referer.list = list;
+
+        let destinations = price.delivery.map(item => {
+            let path = item.destination.split('.');
+            let start = path.splice(0, 1).pop();
+            let result = {
+                member: delivery_roots[start].path(path.join('.')),
+                sum: item.sum
+            };
+            
+            return result;
+        });
+
         //создать список транзакций на какие кошельки сколько рассылать по прайсингу каждого товара
 
-        let order = await db.insert('order', { ...payload });
+        order = await db.insert('order', { ...payload });
         this.order = { ...this.order, ...order };
-        return order
+        return order;
     }
 
     async transformData(data, req) {
         //data.products = await db.find('product', { _id: { $in: data.products.map(product => product.product) }});
         //this.order._id = data._id;
-        return {
+        return data ? {
             account: {
                 _id: data.member,
                 orders: [this.order]
             }
-        }
+        } : {}
     }
 } 
-
-let BTC = {
-    exchange_rate: 0.001,
-    convertToBtc(value, currency) {
-        return value * this.exchange_rate;
-    }
-}
 
 class Pricing extends DBAccess {
     constructor(...args) {

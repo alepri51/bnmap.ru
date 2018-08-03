@@ -6,9 +6,9 @@ export default {
     components: {
         widget
     },
-    activated() {
+/*     activated() {
         this.state.auth && this.execute({ endpoint: this.entity, method: 'get' });
-    },
+    }, */
     methods: {
         removed(_id) {
             this.commit('ENTITY_REMOVE_BY_ID', { name: this.entity, _id });

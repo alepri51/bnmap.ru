@@ -16,8 +16,8 @@ export default {
             entity: this.$options._componentTag
         }
     },
-    beforeCreate() {
-        
+    activated() {
+        this.state.auth && this.execute({ endpoint: this.entity, method: 'get' });
     },
     methods: {
         //...mapStoreActions(),

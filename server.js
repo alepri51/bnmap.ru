@@ -47,6 +47,7 @@ if(cluster.isMaster) {
 
 
     //let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
+
     app.all('*', function(req, res, next) {
         next();
     });
@@ -57,12 +58,12 @@ if(cluster.isMaster) {
 
     app.use('/api', require('./router'));
 
-    const WebSocket = require("ws");
+    /* const WebSocket = require("ws");
     var socket = new WebSocket('wss://ws.blockchain.info/inv');
 
     socket.onopen = function(){
         //socket.send(JSON.stringify({ "op":"unconfirmed_sub" }));
-        socket.send(JSON.stringify({ "op":"addr_sub", "addr":"19XKrAAWRf6GDuAkQwcQRch3UxqNA838tG" }));
+        //socket.send(JSON.stringify({ "op":"addr_sub", "addr":"19XKrAAWRf6GDuAkQwcQRch3UxqNA838tG" }));
     };
 
     socket.onmessage = function(onmsg)
@@ -79,5 +80,34 @@ if(cluster.isMaster) {
                 //include a parameter with the amount in satoshis if you want
                 console.log('TX FROM:', outAdd, 'BTC:', amount);
             };
-    }
+    } */
 }
+
+Object.prototype.path = function(path) {
+    let object = this;
+
+    let splitted = path.split('.');
+    let res = splitted.reduce((obj, key) => {
+        return obj[key];
+
+    }, object);
+
+    return res;
+}
+
+let jObj = {
+    names: [
+        {
+            name: {
+                fn: 'uuu',
+                sns: [
+                    'one',
+                    'two'
+                ]
+            }
+        }
+    ]
+}
+
+//let ooo = jObj.path('names.0.name.sns.1')
+//console.log(ooo);
