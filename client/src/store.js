@@ -2,6 +2,25 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import io from 'socket.io-client';
 
+const BASE_URL = 'https://localhost:8000';
+
+debugger;
+const socket = io(BASE_URL);
+
+Vue.prototype.$socket = socket;
+
+socket.on('connect', () => {
+    console.log(socket.connected); // true
+});
+
+/* socket.on('update', (data) => {
+    console.log('SOCKET UPDATE DATA:', data);
+}); */
+
+socket.on('disconnect', (data) => {
+    console.log('SOCKET UPDATE DATA:', data);
+});
+
 import axios from 'axios';
 import deepmerge from 'deepmerge';
 import { cacheAdapterEnhancer, throttleAdapterEnhancer, Cache } from 'axios-extensions';
@@ -56,6 +75,7 @@ export default new Vuex.Store({
         auth: void 0,
         signed_id: false,
         entities: {},
+        defaults: {},
         snackbar: {
             visible: false,
             color: 'red darken-2',
@@ -74,8 +94,8 @@ export default new Vuex.Store({
             },
             {
                 icon: '',
-                name: 'Магазин',
-                to: 'shop'
+                name: 'Структура',
+                to: 'structure'
             },
             {
                 icon: '',
@@ -94,7 +114,7 @@ export default new Vuex.Store({
         INIT(state) {
         
             api = axios.create({ 
-                baseURL: 'https://localhost:8000/api',
+                baseURL: `${BASE_URL}/api`,
                 headers: { 'Cache-Control': 'no-cache' },
 	            adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter))
                 /* transformRequest: (data, headers) => {
@@ -104,6 +124,12 @@ export default new Vuex.Store({
 
             state.token = sessionStorage.getItem('token');
 
+/*             socket.on('update', (data) => {
+                console.log('SOCKET UPDATE DATA:', data);
+                debugger;
+                this.commit('SET_ENTITIES', { method: 'GET', ...data });
+            });
+ */
             let onRequest = (config => {
                 state.token && (config.headers.common.authorization = state.token);
                 return config;
@@ -114,7 +140,7 @@ export default new Vuex.Store({
                 let {token, auth, error, entities, map, result, entry, cached, ...rest} = response.data;
 
                 let signed_id = auth ? true : !!state.auth;
-                this.commit('SET_SIGNED_IN', signed_id);
+                
 
                 if(error) {
                     if(!error.system) {
@@ -128,6 +154,7 @@ export default new Vuex.Store({
                     //Для упрощения доступа к ошибке
                     response.error = error;
                 }
+                else this.commit('SET_SIGNED_IN', signed_id);
 
                 //оставшиеся данные
                 response.rest_data = { ...rest };
@@ -141,10 +168,11 @@ export default new Vuex.Store({
                     !cached && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
     
                     response.data.cached = !!response.config.cache;
-                    return response;
+                    //return response;
                 }
                 //else  router.replace('landing');
 
+                return response;
             });
             
             let onError = (error => {
@@ -170,6 +198,7 @@ export default new Vuex.Store({
             );
         },
         REGISTER_COMPONENT(state, name) {
+
             Vue.component(
                 name,
                 async () => import(`./components/${name}`).catch((err) => {

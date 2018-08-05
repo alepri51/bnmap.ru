@@ -14,13 +14,15 @@ export default {
 
         this.defaults = response ? response.rest_data : {};
     }, */
-    watch: {
+    /* watch: {
         'state.token': async function (new_val, old_val) {
             //debugger;
-            let response = new_val && await this.execute({ endpoint: `${this.entity}.defaults` });
-            this.defaults = response ? response.rest_data : {};
+            if(!this.defaults && new_val) {
+                let response = await this.execute({ endpoint: `${this.entity}.defaults` });
+                this.defaults = response.rest_data;
+            }
         }
-    },
+    }, */
     methods: {
         submit() {
             this.options.remove || this.$refs.form.validate() ? 

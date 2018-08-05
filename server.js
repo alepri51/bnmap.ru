@@ -6,7 +6,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const https = require('https');
 const path = require('path');
 const cluster = require('cluster');
-const io = require('socket.io-client');
 
 const express = require('express');
 const staticFileMiddleware = express.static('client/dist', {});
@@ -38,6 +37,7 @@ let httpsServer = https.createServer(credentials, app);
 
 if(cluster.isMaster) {
     httpsServer.listen(httpsListenPort);
+    
 
     console.log(`https server listen on ${httpsListenPort} port.`);
 
@@ -56,7 +56,7 @@ if(cluster.isMaster) {
         next();
     });
 
-    app.use('/api', require('./router'));
+    app.use('/api', require('./router')(require('socket.io')(httpsServer)));
 
     /* const WebSocket = require("ws");
     var socket = new WebSocket('wss://ws.blockchain.info/inv');
@@ -95,7 +95,7 @@ Object.prototype.path = function(path) {
     return res;
 }
 
-let jObj = {
+/* let jObj = {
     names: [
         {
             name: {
@@ -107,7 +107,7 @@ let jObj = {
             }
         }
     ]
-}
+} */
 
 //let ooo = jObj.path('names.0.name.sns.1')
 //console.log(ooo);

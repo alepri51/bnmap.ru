@@ -36,7 +36,7 @@
         <stepper/>
 
         <v-snackbar
-            @input="commit('HIDE_SNACKBAR')"
+            @input="$store.commit('HIDE_SNACKBAR')"
             :value="$store.state.snackbar.visible"
             :color="$store.state.snackbar.color"
             :timeout="$store.state.snackbar.timeout"
@@ -47,7 +47,7 @@
             <v-btn
                 dark
                 flat
-                @click="commit('HIDE_SNACKBAR')"
+                @click="$store.commit('HIDE_SNACKBAR')"
             >
                 {{ $store.state.snackbar.caption }}
             </v-btn>
@@ -59,7 +59,7 @@
     import Base from './components/class_base';
 
     export default {
-        extends: Base,
+        //extends: Base,
         name: 'App',
         components: {
             navigation: () => import('./components/navigation'),

@@ -4,21 +4,12 @@ const db = require('./db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
+const BTC = require('./btc');
 
 const ms = require('./ms');
 
 const model = require('./model');
 
-/*
-1. token !== null
-verify & decode
-cache private key in REDIS (now just plain json)
-check expiration & refresh if needed
-2. token === null
-
-return new token & auth & error every time
-
-*/
 let KEYS_CACHE = {};
 
 class APIError extends Error {
@@ -30,7 +21,9 @@ class APIError extends Error {
 }
 
 class API {
-    constructor(token, id) {
+    constructor(token, id, io) {
+
+        this.io = io;
         this.token = token;
         this.id = id;
         this.member = void 0;
@@ -120,7 +113,7 @@ class API {
         delete payload.iat;
         delete payload.exp;
 
-        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '30s'});
+        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '10s'});
         this.payload = payload;
     }
 
@@ -187,18 +180,6 @@ class Auth extends API {
     }
 
     async defaults() {
-        let lists = await db.find('list', {});
-        if(!lists.length){
-            let members = await db.find('member', { group: 'root' });
-
-            let list = {
-                group: 'root',
-                members
-            };
-
-            await db.insert('list', list);
-        }
-
         return {empty: true}
     }
 }
@@ -239,15 +220,19 @@ class Signup extends API {
     }
 
     async submit({name, email, password, referer}) {
+        //let members = await db.remove('member', { group: 'member' });
+
         this.error = void 0;
 
         let member = await db.findOne('member', { email });
 
         if(!member) {
+            
             let default_list = await db.findOne('list', { default: true });
             
             if(!default_list) {
                 let roots = await db.find('member', { group: "root" });
+
                 roots = roots.map((member, inx) => { 
                     member.position = inx;
                     return member._id;
@@ -257,24 +242,22 @@ class Signup extends API {
     
             referer = referer || default_list.members.slice(-1)[0];
 
+            referer = await db.findOne('member', { _id: referer });
+
+            let referer_list = await db.findOne('list', { _id: referer.list });
+
             let hash = this.hash(`${email}:${password}`);
             let {privateKey, publicKey} = await crypto.createKeyPair();
 
-            let member = await db.insert('member', { group: "member", referer, name, email, hash, publicKey, privateKey });
-            
-            let wallets = await db.findOne('wallet', { member: member._id, default: true });
-            if(!wallets) {
-                await db.insert('wallet', { member: member._id, address: await this.createPassword(64), default: true, name: 'Основной' });
-                await db.insert('wallet', { member: member._id, address: await this.createPassword(64), name: 'Резервный' });
-            }
+            let address = await BTC.getNewAddress();
+            let member = await db.insert('member', { group: "member", referer: referer._id, name, email, hash, address, list: void 0, publicKey, privateKey });
 
-            let from = await db.findOne('wallet', { member: member._id, default: true });
-            let to = await db.findOne('wallet', { member: referer, default: true });
+            let list_members = referer_list.members.slice(1);
+            list_members.push(member._id);
 
-            await db.insert('transaction', { from: from.address, to: to.address, currency: 'btc', amount: 0.01, date: new Date() });
-            await db.insert('transaction', { from: from.address, to: to.address, currency: 'bnc', amount: 1, date: new Date() });
-            await db.insert('transaction', { from: from.address, to: to.address, currency: 'usd', amount: 5, date: new Date() });
-            await db.insert('transaction', { from: to.address, to: from.address, currency: 'usd', amount: 1, date: new Date() });
+            let list = await db.insert('list', { members: list_members });
+            member = await db.remove('member', { _id: member.id });
+            member = await db.insert('member', { group: "member", referer: referer._id, name, email, hash, address, list: list._id, publicKey, privateKey });
 
             await this.generateJWT({ member });
         }
@@ -330,6 +313,10 @@ class DBAccess extends SecuredAPI {
         return data;
     }
 
+    afterSave(data, req) {
+
+    }
+
     async save(payload, req) {
         if(this.accessGranted(payload)) {
             let data = void 0;
@@ -343,7 +330,10 @@ class DBAccess extends SecuredAPI {
                     break;
             }
 
-            let normalized = model(await this.transformData(data, req));
+            let transformed = await this.transformData(data, req);
+            let normalized = model(transformed);
+
+            this.afterSave(data, normalized, req);
 
             return normalized;
         }
@@ -419,6 +409,16 @@ class Payment extends SecuredAPI { //LAYOUT
     }
 }
 
+class Structure extends SecuredAPI { //LAYOUT
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default(params) {
+        
+    }
+}
+
 class Wallet extends DBAccess { //WIDGET
     constructor(...args) {
         super(...args);
@@ -470,21 +470,17 @@ class Order extends DBAccess { //WIDGET
     }
 }
 
-let BTC = {
+/* let BTC = {
     exchange_rate: 0.001,
     convertToBtc(value, currency) {
         return value * this.exchange_rate;
     },
-    /* createOrder(amount) {
-        return {
-            id: await this.createPassword(16),
-            address: await this.createPassword(32),
-            rate: 0.001,
-            amount: convertToBtc(amount),
-            status: 'waiting'
-        }
-    } */
-}
+    async getNewAddress() {
+        let salt = bcrypt.genSaltSync(10);
+        return await crypto.createPassword(salt, 32);
+    }
+
+} */
 
 class Donate extends DBAccess { // DIALOG
     constructor(...args) {
@@ -492,21 +488,26 @@ class Donate extends DBAccess { // DIALOG
     }
 
     async defaults() {
+        let btc = new BTC({env: 'dev'});
+
         let donate = await db.findOne('product', { group: 'donate' });
-        let wallet = await db.findOne('wallet', { member: this.member, default: true  });
+        let member = await db.findOne('member', { _id: this.member });
         let price = await db.findOne('price', { product: donate._id });
         let sum = price.delivery.reduce((sum, item) => sum + item.sum, 0);
 
+        let txs = await btc.adHoc('getbalance');
+        console.log(txs);
+
         return {
-            address: wallet.address,
+            address: member.address,
             items: [
                 {
                     product: donate,
                     count: 1,
-                    cost: BTC.convertToBtc(sum)
+                    cost: await btc.convertToBtc(sum)
                 }
             ],
-            sum: BTC.convertToBtc(sum)
+            sum: await btc.convertToBtc(sum)
         }
     }
 
@@ -519,6 +520,7 @@ class Donate extends DBAccess { // DIALOG
         payload.state = 'ожидание';
         payload.name = 'Взнос';
         payload.group = 'donate';
+        payload.number = await this.createPassword(10);
 
         this.order = JSON.parse(JSON.stringify(payload));
 
@@ -580,12 +582,52 @@ class Donate extends DBAccess { // DIALOG
     async transformData(data, req) {
         //data.products = await db.find('product', { _id: { $in: data.products.map(product => product.product) }});
         //this.order._id = data._id;
+
         return data ? {
             account: {
                 _id: data.member,
                 orders: [this.order]
             }
         } : {}
+    }
+
+    afterSave(data, normalized, req) {
+        let result = data && {
+            account: {
+                _id: data.member,
+                orders: []
+            }
+        };
+
+        //console.log('EVENT:', `${data.member}:update:${this.class_name}`);
+
+        data && setTimeout(async () => {
+            let order = await db.update('order', { number: data.number }, { state: 'регистрация' });
+
+            result.account.orders = [order];
+            this.io.emit(`${data.member}:update:${this.class_name}`,  model(result));
+
+            order && setTimeout(async () => {
+                let order = await db.update('order', { number: data.number }, { state: 'подтверждение' });
+                
+                result.account.orders = [order];
+                this.io.emit(`${data.member}:update:${this.class_name}`,  model(result));
+
+                order && setTimeout(async () => {
+                    let order = await db.update('order', { number: data.number }, { state: 'распределение' });
+                    
+                    result.account.orders = [order];
+                    this.io.emit(`${data.member}:update:${this.class_name}`,  model(result));
+
+                    order && setTimeout(async () => {
+                        let order = await db.update('order', { number: data.number }, { state: 'выполнен' });
+                        
+                        result.account.orders = [order];
+                        this.io.emit(`${data.member}:update:${this.class_name}`,  model(result));
+                    }, 1000 * 10);
+                }, 1000 * 10);
+            }, 1000 * 10);
+        }, 1000 * 10);
     }
 } 
 
@@ -612,7 +654,8 @@ let classes = {
     Payment,
     Wallet,
     Donate,
-    Order
+    Order,
+    Structure
 }
 
 module.exports = Object.entries(classes).reduce((memo, item) => {

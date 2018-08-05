@@ -74,10 +74,11 @@
                         method: 'post', 
                         endpoint: 'signup.submit', 
                         payload: this.$data, 
-                        callback: (response) =>  {
+                        callback: (response) => {
+                            debugger;
                             if(!response.error) {
                                 this.commit('HIDE_MODAL', { signup: void 0 });
-                                this.state.view !== 'newslayout' ? this.$router.replace('newslayout') : this.commit('LOCATION', 'newslayout');
+                                this.$router.replace('newslayout');
                             }
                         }
                     })

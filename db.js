@@ -61,13 +61,19 @@ if(cluster.isMaster) {
     db.update = function (collection, query, data) {
         return new Promise(async function (resolve, reject) {
 
-            data.created = data.created || new Date() / 1;
-            data.updated = new Date() / 1;
+            if(data.$set) {
+                //data.$set.created = data.created || new Date() / 1;
+                data.$set.updated = new Date() / 1;
+            }
+            else {
+                data.created = data.created || new Date() / 1;
+                data.updated = new Date() / 1;
+            }
 
             let object = await db.findOne(collection, query);
             object && (data = {...object, ...data});
 
-            db[collection].update(query, data, { upsert: true }, async function (err, results, upsert) {
+            db[collection].update(query, data, { upsert: !!!data.$set }, async function (err, results, upsert) {
                 results = upsert ? await db.findOne(collection, { _id: upsert._id }) : await db.findOne(collection, query);
                 results && resolve(results);
             });

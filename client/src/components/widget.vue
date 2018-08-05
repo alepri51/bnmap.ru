@@ -17,10 +17,10 @@
 
     export default {
         props: ['name'],
-        extends: Base,
+        //extends: Base,
         computed: {
             signed_id() {
-                return typeof this.condition !== 'undefined' ? this.condition : this.state.signed_id;
+                return typeof this.condition !== 'undefined' ? this.condition : this.$store.state.signed_id;
                 //return typeof this.condition !== 'undefined' ? this.condition : !!(this.auth && this.auth.member);
             }
         }
