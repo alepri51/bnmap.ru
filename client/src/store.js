@@ -76,6 +76,7 @@ export default new Vuex.Store({
         signed_id: false,
         entities: {},
         defaults: {},
+        auth_state: void 0,
         snackbar: {
             visible: false,
             color: 'red darken-2',
@@ -148,7 +149,7 @@ export default new Vuex.Store({
                         this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
 
                         requests_cache.reset();
-                        error.code === 403 && signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : router.replace('landing');
+                        (error.data && error.data.expired) && (signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : router.replace('landing'));
                     }
                     else console.error(error.code, error.message, error.data);
                     //Для упрощения доступа к ошибке
@@ -172,6 +173,7 @@ export default new Vuex.Store({
                 }
                 //else  router.replace('landing');
 
+                token ? this.commit('SET_AUTH_STATE', 'AUTHORIZED') : (error && error.data.expired) ? this.commit('SET_AUTH_STATE', 'EXPIRED') : !state.auth && this.commit('SET_AUTH_STATE', 'UNAUTHORIZED');
                 return response;
             });
             
@@ -221,6 +223,10 @@ export default new Vuex.Store({
 
             state.view = view;
             state.notFound = false;
+        },
+        SET_AUTH_STATE(state, value) {
+            state.auth_state = value;
+            console.log('CURRENT AUTH STATE:', state.auth_state);
         },
         NOT_FOUND(state) {
             state.notFound = true;

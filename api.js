@@ -166,7 +166,7 @@ class SecuredAPI extends API {
         let self = this;
         if(!except && !this.auth) {
             return function(...args) { 
-                self.generateError({ code: 403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь', data: self.constructor.name });
+                self.generateError({ code: 403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь', data: {expired: true, class: self.constructor.name }});
             };
         }
 
@@ -495,8 +495,8 @@ class Donate extends DBAccess { // DIALOG
         let price = await db.findOne('price', { product: donate._id });
         let sum = price.delivery.reduce((sum, item) => sum + item.sum, 0);
 
-        let txs = await btc.adHoc('getbalance');
-        console.log(txs);
+        //let txs = await btc.adHoc('getbalance');
+        //console.log(txs);
 
         return {
             address: member.address,
