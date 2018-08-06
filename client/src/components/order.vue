@@ -14,7 +14,7 @@
                     <td>{{ new Date(props.item.created).toLocaleString() }}</td>
                     <td>{{ props.item._id }}</td>
                     <td>{{ props.item.name }}</td>
-                    <td class="text-xs-center"><v-btn v-if="props.item.state === 'ожидание'" small flat color="primary">Отменить</v-btn><span v-if="props.item.state !== 'ожидание'">{{ props.item.state }}</span></td>
+                    <td><v-btn v-if="props.item.state === 'ожидание'" small flat color="primary">Отменить</v-btn><span v-if="props.item.state !== 'ожидание'">{{ props.item.state }}</span></td>
                     <td class="text-xs-right">{{ props.item.sum }} BTC</td>
                     </template>
                 </v-data-table>

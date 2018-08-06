@@ -95,6 +95,14 @@ Object.prototype.path = function(path) {
     return res;
 }
 
+let price = {
+    cost: 100,
+    percent: void 0
+};
+
+//let { cost: sum, percent: sum } = price;
+//console.log(sum);
+
 /* let jObj = {
     names: [
         {

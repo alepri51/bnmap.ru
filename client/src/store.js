@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 
 const BASE_URL = 'https://localhost:8000';
 
-debugger;
+//debugger;
 const socket = io(BASE_URL);
 
 Vue.prototype.$socket = socket;

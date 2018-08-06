@@ -20,7 +20,7 @@ let proccedRequest = async function(req) {
     console.log('---------------BEGIN-----------------');
 
     type = type.toLowerCase();
-    !types[type] && (type = 'auth');
+    !types[type] && (type = 'unknown');
 
     let object = new types[type](req.headers.authorization, id, io);
 
