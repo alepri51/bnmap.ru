@@ -8,8 +8,8 @@ const ms = require('./ms');
 const { SecuredAPI } = require('../base_api');
 const { DBAccess } = require('../db_api');
 
-const BTC = require('../btc');
 
+//////////////////////////////////////////////
 class NewsLayout extends SecuredAPI { //LAYOUT
     constructor(...args) {
         super(...args);
@@ -138,13 +138,37 @@ class Order extends DBAccess { //WIDGET
     }
 }
 
+/* let sess = neo.driver.session();
+let res = sess.run('MATCH (n) RETURN n', void 0)
+    .then((res) => {
+        console.log(res);
+    });
+
+console.log(res); */
+
+/* var User = schema(neo, 'User');
+
+User.save({ name: 'Jon', city: 'Bergen' }, function(err, saved) {
+  if (err) throw err;
+
+  User.findAll(function(err, allUsers) {
+    // allUsers -> [{ name: 'Jon', city: 'Bergen', id: 0 }]
+  });
+  User.where({ city: 'Bergen' }, function(err, usersFromBergen) {
+    // usersFromBergen -> all user objects with city == bergen
+  });
+}) */
+
 class Donate extends DBAccess { // DIALOG
     constructor(...args) {
         super(...args);
     }
 
+    default() {
+
+    }
+
     async defaults() {
-        let btc = new BTC({env: 'dev'});
 
         let donate = await db.findOne('product', { group: 'donate' });
         let member = await db.findOne('member', { _id: this.member });

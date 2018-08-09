@@ -132,6 +132,7 @@ export default new Vuex.Store({
             });
  */
             let onRequest = (config => {
+                //state.token = sessionStorage.getItem('token');
                 state.token && (config.headers.common.authorization = state.token);
                 return config;
             });

@@ -1,110 +1,122 @@
 'use strict'
-//https://github.com/louischatriot/nedb
-
-//Как запросы сделать:
-//const db = require('./db');
-//await db.remove('$имя_коллекции$', { _id: payload._id })
-//await db.update('$имя_коллекции$', { _id: payload._id }, { ...payload }) 
-//await db.insert('$имя_коллекции$', { ...payload });
-//await db.findOne('$имя_коллекции$', { _id: payload.member });
-//await db.find('$имя_коллекции$', { _id: payload.member });
-
-//массив коллекций, создается при старте
-let collections = ['member', 'token', 'order', 'product', 'list', 'news', 'wallet', 'price'];
 
 const cluster = require('cluster');
 const path = require('path');
 
-const Datastore = require('nedb');
+const generate = require('nanoid/generate');
+
+const BTC = require('./api/btc');
+const btc = new BTC({env: 'dev'});
+
+const bolt_port = 32768;
+
+const neo = require('seraph')({
+    bolt: true,
+    server: `bolt://localhost:${bolt_port}`,
+    user: 'neo4j',
+    pass: '123'
+});
+
+const neoModel = require('seraph-model');
 
 if(cluster.isMaster) { 
 
-    let db = module.exports;
+    //let db = module.exports;
 
-    for (let inx in collections) {
-        let collection = collections[inx];
-        db[collection] = new Datastore({filename: path.join(__dirname, `nedb/_${collection}.db`), autoload: true});
+    //FIELDS
+    let member = {
+        name: String,
+        email: String,
+        hash: String,
+        referer: String,
+        ref: String
+    };
+    
+    let account = {
+        club_address: String,
+        wallet_address: String
     }
-
-    db.find = function (collection, query, options) {
-        let { sort } = options || {}
-        //sort = sort || {};
-        return new Promise(function (resolve, reject) {
-            db[collection].find(query).sort(sort).exec(function (err, results) {
-                err ? reject(err) : resolve(results);
-            })
-        });
-    };
-
-    db.findOne = function (collection, query, options) {
-        return new Promise(async function (resolve, reject) {
-            try {
-                let results = await db.find(collection, query, options);
-                resolve(results[0]);
+    
+    let Account = neoModel(neo, 'Аккаунт', member);
+    
+    let Member = neoModel(neo, 'Участник', member);
+    let RootMember = neoModel(neo, ['Участник', 'Основатель'], member);
+    let Club = neoModel(neo, ['Участник', 'Клуб'], member);
+    
+    let RootList = neoModel(neo, ['Список', 'Корневой список']);
+    RootList.compose(Member, 'members', 'позиция', { orderBy: 'email' });
+    
+    let List = neoModel(neo, 'Список');
+    List.compose(Member, 'members', 'позиция', { orderBy: 'email' });
+    
+    Club.compose(Account, 'account', 'настройки');
+    
+    RootMember.compose(RootList, 'list', 'список');
+    RootMember.compose(Account, 'account', 'настройки');
+    
+    Member.compose(List, 'list', 'список');
+    Member.compose(Account, 'account', 'настройки');
+    Member.compose(Member, 'referer', 'реферер');
+    
+    (async function() {
+        let clubs = await Club._findAll();
+        let club = !!!clubs.length && await Club._save({ 
+            name: 'Club', 
+            email: 'club@email.com', 
+            hash: '',
+            account: {
+                club_address: await btc.getNewAddress(),
+                wallet_address: ''
             }
-            catch (err) {
-                reject(err);
-            }
         });
-    };
-
-    db.remove = function (collection, query, options) {
-        return new Promise(async function (resolve, reject) {
-            let to_remove = await db.findOne(collection, query);
-            db[collection].remove(query, {multi: true}, function (err, results) {
-                err ? reject(err) : resolve(to_remove);
-            });
-
-        });
-    };
-
-    db.update = function (collection, query, data) {
-        return new Promise(async function (resolve, reject) {
-            let object = await db.findOne(collection, query);
-
-            if(data.$set) {
-                //data.$set.created = data.created || new Date() / 1;
-                data.$set.updated = new Date() / 1;
+    
+        let roots = await RootMember._findAll();
+        if(!!!roots.length) {
+            let rc = 7;
+            while(rc) {
+                await RootMember._save({ 
+                    name: 'Участник ' + rc, 
+                    email: rc + 'r@email.com', 
+                    hash: '',
+                    ref: generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6),
+                    account: {
+                        club_address: await btc.getNewAddress(),
+                        wallet_address: ''
+                    }
+                });
+    
+                rc--;
             }
-            else {
-                data.created = (object && object.created) || new Date() / 1;
-                data.updated = new Date() / 1;
-            }
+    
+            roots = await RootMember._findAll();
+        }
+    
+        let lists = await RootList._findAll();
+        if(!!!lists.length) {
+            let list = {
+                members: roots.sort((a, b) => a.email > b.email ? 1 : -1).map((member, inx) => {
+                    member._rel = { номер: inx + 1 }
+                    return member;
+                })
+            };
+            
+            list = await RootList._save(list);
+    
+            let last = list.members.pop();
+            last.list = list;
+            await RootMember._update(last);
+        }
+        
+    })();
 
-            object && (data = {...object, ...data});
-
-            db[collection].update(query, data, { upsert: !!!data.$set }, async function (err, results, upsert) {
-                results = upsert ? await db.findOne(collection, { _id: upsert._id }) : await db.findOne(collection, query);
-                results && resolve(results);
-            });
-
-        });
-    };
-
-    db.insert = function (collection, data) {
-        return new Promise(async function (resolve, reject) {
-            data.created = data.created || new Date() / 1;
-            data.updated = new Date() / 1;
-
-            db[collection].insert(data, function (err, inserted) {
-                err ? reject(err) : resolve(inserted);
-            });
-        });
-    };
-
-    /* db.throttleLead = function (fn, threshhold = 250, scope) {
-        let last;
-        return function(...args) {
-            const context = scope || this;
-            const now = +(new Date());
-
-            if (last && now > last + threshhold) {
-                last = now;
-                fn.apply(context, args);
-            } else if (!last) {
-                last = now;
-                fn.apply(context, args);
-            }
-        };
-    }; */
+    module.exports = {
+        Account,
+        Member,
+        RootMember,
+        Club,
+        RootList,
+        List,
+        btc,
+        generate
+    }
 }

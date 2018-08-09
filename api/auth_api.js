@@ -1,6 +1,7 @@
 'use strict';
 
-const db = require('../db');
+const { btc, generate, Account, Member, RootMember, Club, RootList, List } = require('../db');
+
 const bcrypt = require('bcryptjs');
 
 const { API } = require('./base_api');
@@ -40,27 +41,36 @@ class SignUp extends API {
         super(...args);
     }
 
-    async submit({name, email, password, referer}) {
-        let members = await db.remove('member', { group: 'member' });
+    async submit({ name, email, password, referer = 'BUWUMD', wallet_address }) {
+        
+        let member = await Member._findOne({ email });
+
+        //let members = await db.remove('member', { group: 'member' });
 
         this.error = void 0;
 
-        let member = await db.findOne('member', { email });
-
         if(!member) {
             
-            let default_list = await db.findOne('list', { default: true });
+            referer = await Member._findOne({ ref: referer }) || await RootMember._findOne({ ref: referer });;
             
-            if(!default_list) {
-                let roots = await db.find('member', { group: "root" });
 
-                roots = roots.map((member, inx) => { 
-                    member.position = inx;
-                    return member._id;
-                });
-                default_list = await db.insert('list', { default: true, members: roots});
-            }
+            member = await Member._save({ 
+                name, 
+                email, 
+                hash: this.hash(`${email}:${password}`),
+                referer,
+                ref: generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6),
+                account: {
+                    club_address: await btc.getNewAddress(),
+                    wallet_address
+                }
+            });
     
+            //member.referer = referer;
+            //member = await Member._update(member); //НЕ НАХОДИТ КОРЕНЬ
+
+            /* let root_list = await List.findOne('list', { default: true });
+            
             referer = referer || default_list.members.slice(-1)[0];
 
             referer = await db.findOne('member', { _id: referer });
@@ -78,7 +88,7 @@ class SignUp extends API {
             list_members.push(member._id);
 
             let list = await db.insert('list', { members: list_members });
-            member = await db.update('member', { _id: member._id }, { list: list._id });
+            member = await db.update('member', { _id: member._id }, { list: list._id }); */
             //member = await db.remove('member', { _id: member.id });
             //member = await db.insert('member', { group: "member", referer: referer._id, name, email, hash, address, list: list._id, publicKey, privateKey });
 

@@ -108,7 +108,7 @@ class API {
         delete payload.iat;
         delete payload.exp;
 
-        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '10s'});
+        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '1000s'});
         this.payload = payload;
     }
 
@@ -121,11 +121,6 @@ class API {
 
             let private_key = KEYS_CACHE[this.member];
 
-            /* !private_key && setImmediate( async () => {
-                let member = await db.findOne('member', { _id: payload.member });
-                KEYS_CACHE[this.member] = member.privateKey;
-            }); */
-
             this.signJWT(private_key, payload);
 
             return payload;
@@ -135,7 +130,6 @@ class API {
             this.revokeJWT(payload.jwtid);
             this.generateError({ code: 403, message: err.message, data: err.expiredAt, system: true });
         };
-
     }
 
     async revokeJWT(id) {

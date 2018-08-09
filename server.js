@@ -57,33 +57,9 @@ if(cluster.isMaster) {
     });
 
     app.use('/api', require('./router')(require('socket.io')(httpsServer)));
-
-    /* const WebSocket = require("ws");
-    var socket = new WebSocket('wss://ws.blockchain.info/inv');
-
-    socket.onopen = function(){
-        //socket.send(JSON.stringify({ "op":"unconfirmed_sub" }));
-        //socket.send(JSON.stringify({ "op":"addr_sub", "addr":"19XKrAAWRf6GDuAkQwcQRch3UxqNA838tG" }));
-    };
-
-    socket.onmessage = function(onmsg)
-    {
-        var response = JSON.parse(onmsg.data);
-        var getOuts = response.x.out;
-        var countOuts = getOuts.length; 
-        for(let i = 0; i < countOuts; i++)
-            {
-                //check every output to see if it matches specified address
-                var outAdd = response.x.out[i].addr;
-                var amount = response.x.out[i].value / 100000000;
-                //transaction received
-                //include a parameter with the amount in satoshis if you want
-                console.log('TX FROM:', outAdd, 'BTC:', amount);
-            };
-    } */
 }
 
-Object.prototype.path = function(path) {
+/* Object.prototype._path = function(path) {
     let object = this;
 
     let splitted = path.split('.');
@@ -93,7 +69,7 @@ Object.prototype.path = function(path) {
     }, object);
 
     return res;
-}
+} */
 
 let price = {
     cost: 100,
