@@ -26,7 +26,8 @@ class News extends DBAccess { //WIDGET AND DIALOG
     }
 
     async default() {
-        let news = await db.find('news', { member: this.member });
+        //let news = await db.find('news', { member: this.member });
+        let news = await db.Info._findAll();
 
         let result = model({
             account: { 
@@ -87,18 +88,49 @@ class Structure extends SecuredAPI { //LAYOUT
     }
 }
 
+class Hierarchy extends DBAccess { //WIDGET
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default(params) {
+        let member = await db.Member._findOne({ _id: this.member });
+        member.referals = member.referals || [];
+
+        let shrink = (referals => {
+            return referals.map(referal => {
+                let { _id, name, ref, email, referals } = referal;
+                referals = shrink(referals || []);
+
+                return { _id, name, ref, email, referals }
+            })
+        });
+
+        let referals = shrink(member.referals);
+        
+        let result = model({
+            account: { 
+                _id: this.member,
+                referals
+            }
+        });
+
+        return result;
+    }
+}
+
 class Wallet extends DBAccess { //WIDGET
     constructor(...args) {
         super(...args);
     }
 
     async default() {
-        let wallets = await db.find('wallet', { member: this.member });
+        let member = await db.Member._findOne({ _id: this.member });
 
         let result = model({
             account: { 
                 _id: this.member,
-                wallets
+                wallets: member.wallets
             }
         });
 
@@ -113,7 +145,7 @@ class Order extends DBAccess { //WIDGET
     }
 
     async default() {
-        let orders = await db.find('order', { member: this.member });
+        /* let orders = await db.find('order', { member: this.member });
         orders = orders.map(async order => {
             order.items = order.items.map(async item => {
                 item.product = await db.findOne('product', { _id: item.product });
@@ -134,30 +166,9 @@ class Order extends DBAccess { //WIDGET
             }
         });
 
-        return result;
+        return result; */
     }
 }
-
-/* let sess = neo.driver.session();
-let res = sess.run('MATCH (n) RETURN n', void 0)
-    .then((res) => {
-        console.log(res);
-    });
-
-console.log(res); */
-
-/* var User = schema(neo, 'User');
-
-User.save({ name: 'Jon', city: 'Bergen' }, function(err, saved) {
-  if (err) throw err;
-
-  User.findAll(function(err, allUsers) {
-    // allUsers -> [{ name: 'Jon', city: 'Bergen', id: 0 }]
-  });
-  User.where({ city: 'Bergen' }, function(err, usersFromBergen) {
-    // usersFromBergen -> all user objects with city == bergen
-  });
-}) */
 
 class Donate extends DBAccess { // DIALOG
     constructor(...args) {
@@ -170,17 +181,19 @@ class Donate extends DBAccess { // DIALOG
 
     async defaults() {
 
-        let donate = await db.findOne('product', { group: 'donate' });
-        let member = await db.findOne('member', { _id: this.member });
-        let price = await db.findOne('price', { product: donate._id });
-        let sum = price.delivery.reduce((sum, item) => sum + item.sum, 0);
+        let donate = await db.Product._findOne({ group: 'donate' });
+
+        let member = await db.Member._findOne({ _id: this.member });
+        //let price = await db.findOne('price', { product: donate._id });
+        //let sum = price.delivery.reduce((sum, item) => sum + item.sum, 0);
+        let sum = donate.price.amount;
 
         //let txs = await btc.adHoc('getbalance');
         //console.log(txs);
-        let converted = await btc.convertToBtc(sum);
+        let converted = await db.btc.convertToBtc(sum);
 
         return {
-            address: member.address,
+            address: member.wallets[0].club_address,
             items: [
                 {
                     product: donate,
@@ -331,5 +344,6 @@ module.exports = {
     Wallet,
     Donate,
     Order,
+    Hierarchy,
     Structure
 };

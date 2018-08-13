@@ -92,7 +92,8 @@ class API {
             auth: {
                 member: member._id,
                 email: member.email,
-                name: member.name
+                name: member.name,
+                ref: member.ref
             },
             key: member.publicKey
         };

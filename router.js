@@ -43,14 +43,29 @@ let proccedRequest = async function(req) {
 };
 
 let io = void 0;
+let current_request = void 0;
 
 router.all(patterns, async (req, res, next) => {
     if(req.method === 'OPTIONS') {
-        console.log('asdasd');
+        console.log("req.method === 'OPTIONS'");
     }
-    let response = await proccedRequest(req, io);
 
-    res.json(response).end();
+    try {
+        let response = await proccedRequest(req, io);
+        res.json(response).end();
+    }
+    catch(err) {
+        let error = {
+            code: err.code,
+            message: err.message,
+            data: {}
+        }
+        console.log('ERROR => ', err);
+
+        res.json({error}).end();
+    }
+
+    
 }); 
 
 let socketInitialize = function(sockets) {
@@ -83,6 +98,10 @@ let socketInitialize = function(sockets) {
       
     });
 }
+
+process.on('unhandledRejection', err => {
+    console.log('unhandledRejection => ', err);
+});
 
 module.exports = function(io) {
     socketInitialize(io);

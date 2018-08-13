@@ -41,9 +41,9 @@ if(cluster.isMaster) {
 
     console.log(`https server listen on ${httpsListenPort} port.`);
 
-    process.on('unhandledRejection', err => {
+    /* process.on('unhandledRejection', err => {
         console.log('unhandledRejection => ', err);
-    });
+    }); */
 
 
     //let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];

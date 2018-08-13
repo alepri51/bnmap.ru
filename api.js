@@ -2,7 +2,7 @@
 
 const { Unknown } = require('./api/base_api');
 const { SignIn, SignOut, SignUp } = require('./api/auth_api');
-const { NewsLayout,News, Payment, Wallet, Donate, Order, Structure } = require('./api/project/project_api');
+const { NewsLayout, News, Payment, Wallet, Donate, Order, Structure, Hierarchy } = require('./api/project/project_api');
 
 let classes = {
     SignIn,
@@ -15,6 +15,7 @@ let classes = {
     Wallet,
     Donate,
     Order,
+    Hierarchy,
     Structure
 }
 

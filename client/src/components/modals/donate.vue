@@ -9,7 +9,7 @@
                 <v-form ref="form" class="form" lazy-validation @submit.prevent/>
                 Уважаемый пользователь! 
                 <br>Для того что бы стать полноценным участником нашего клуба, 
-                <br>переведите с вашего кошелька <b class="red--text">{{ defaults.items && defaults.items[0].cost }} BTC (75$)</b> 
+                <br>переведите с вашего кошелька <b class="red--text">{{ defaults.items && defaults.items[0].cost }} <v-icon  small class="mr-2" >fab fa-btc</v-icon> (75$)</b> 
                 <br>на адрес: <b class="red--text">{{ defaults.address }}</b> 
                 <br>в течении <b class="red--text">15</b> минут.
                 <br>Если Вы не успеете за это время, то данная операция будет отменена.

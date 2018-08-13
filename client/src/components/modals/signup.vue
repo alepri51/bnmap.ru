@@ -8,35 +8,61 @@
             <v-card-text>
                 <v-card-text>
                     <v-form ref="form" class="form" lazy-validation @submit.prevent>
-                        <v-text-field v-model="name"
-                                        label="Name"
-                                        required
-                                        autofocus
-                                        color="primary"
-                                        :rules="[
-                                            () => !!name || 'This field is required',
-                                        ]"
-                                        @keyup.enter="submit"
-                        ></v-text-field>
-                        <v-text-field v-model="email"
-                                        label="Email"
-                                        required
-                                        color="primary"
-                                        :rules="[
-                                            () => !!email || 'This field is required',
-                                        ]"
-                                        @keyup.enter="submit"
-                        ></v-text-field>
-                        <v-text-field v-model="password"
-                                        label="Password"
-                                        type="password"
-                                        required
-                                        color="primary"
-                                        :rules="[
-                                            () => !!password || 'This field is required',
-                                        ]"
-                                        @keyup.enter="submit"
-                        ></v-text-field>
+                        <v-layout row wrap>
+                            <v-text-field v-model="referer"
+                                            label="Реферер"
+                                            required
+                                            autofocus
+                                            color="primary"
+                                            :rules="[
+                                                () => !!referer || 'This field is required',
+                                            ]"
+                                            @keyup.enter="submit"
+                                            class="ma-1"
+                            ></v-text-field>
+                            <v-text-field v-model="name"
+                                            label="Name"
+                                            required
+                                            color="primary"
+                                            :rules="[
+                                                () => !!name || 'This field is required',
+                                            ]"
+                                            @keyup.enter="submit"
+                                            class="ma-1"
+                            ></v-text-field>
+                            <v-flex xs12>
+                                <v-text-field v-model="wallet_address"
+                                                label="Wallet"
+                                                required
+                                                color="primary"
+                                                :rules="[
+                                                    () => !!wallet_address || 'This field is required',
+                                                ]"
+                                                @keyup.enter="submit"
+                                ></v-text-field>
+                            </v-flex>
+                            <v-text-field v-model="email"
+                                            label="Email"
+                                            required
+                                            color="primary"
+                                            :rules="[
+                                                () => !!email || 'This field is required',
+                                            ]"
+                                            @keyup.enter="submit"
+                                            class="ma-1"
+                            ></v-text-field>
+                            <v-text-field v-model="password"
+                                            label="Password"
+                                            type="password"
+                                            required
+                                            color="primary"
+                                            :rules="[
+                                                () => !!password || 'This field is required',
+                                            ]"
+                                            @keyup.enter="submit"
+                                            class="ma-1"
+                            ></v-text-field>
+                        </v-layout>
                     </v-form>
                     <small>*indicates required field</small>
                 </v-card-text>
@@ -57,17 +83,23 @@
     
     export default {
         extends: Modal,
-        data: () => {
+        data: (v) => {
             return {
                 //entity: 'signup',
+                referer: '',
                 name: '',
                 email: '',
-                password: ''
+                password: '',
+                wallet_address: ''
             }
+        },
+        created() {
+            //debugger;
+            this.referer = this.state.referer;
         },
         methods: {
             submit() {
-                this.$data.referer = this.$store.state.referer;
+                //this.$data.referer = this.$store.state.referer;
 
                 this.$refs.form.validate() ? 
                     this.execute({ 
