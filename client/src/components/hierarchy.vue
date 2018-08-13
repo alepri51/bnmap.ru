@@ -6,7 +6,7 @@
                     <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-sitemap</v-icon>Иерархия:</h2>
                 </v-card-title>
                 <v-card-text>
-                    <v-expansion-panel inset class="elevation-1">
+                    <v-expansion-panel inset class="elevation-1" expand>
                         <v-expansion-panel-content
                             v-for="(item, i) in filter"
                             :key="i"
@@ -16,7 +16,7 @@
                                 {{item.name}} (email: {{item.email}})
                             </div>
 
-                            <v-expansion-panel inset>
+                            <v-expansion-panel inset expand>
                                 <v-expansion-panel-content
                                     v-for="(sref, j) in item.referals" :key="j"
                                 >
