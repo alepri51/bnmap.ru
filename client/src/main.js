@@ -9,8 +9,8 @@ import store from './store';
 
 import 'vuetify/dist/vuetify.min.css';
 
-import 'devextreme/dist/css/dx.common.css';
-import 'devextreme/dist/css/dx.material.blue.light.css';
+//import 'devextreme/dist/css/dx.common.css';
+//import 'devextreme/dist/css/dx.material.blue.light.css';
 
 import './../public/custom.css';
 

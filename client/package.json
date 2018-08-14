@@ -7,31 +7,21 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "@bosket/core": "^0.4.4",
-    "@bosket/tools": "^0.4.4",
-    "@bosket/vue": "^0.4.4",
     "@xkeshi/vue-qrcode": "^1.0.0",
     "axios": "^0.18.0",
     "axios-extensions": "^3.0.3",
     "axios-mock-adapter": "^1.15.0",
-    "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "deepmerge": "^2.1.1",
-    "devextreme": "^18.1.5",
-    "devextreme-vue": "^18.1.4-alpha.7",
     "prerender-spa-plugin": "^3.2.1",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
-    "toposort": "^1.0.7",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
-    "vued3tree": "^3.6.1",
+    "vue2vis": "0.0.15",
     "vuetify": "^1.1.9",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@vue/cli-service": "^3.0.0-rc.10",
-    "babel-plugin-transform-imports": "^1.4.1",
-    "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.1"
+    "@vue/cli-service": "^3.0.0-rc.10"
   }
 }
