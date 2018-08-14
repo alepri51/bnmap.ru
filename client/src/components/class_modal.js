@@ -9,20 +9,6 @@ export default {
             defaults: {}
         }
     },
-    /* async created() {
-        let response = await this.execute({ endpoint: `${this.entity}.defaults` });
-
-        this.defaults = response ? response.rest_data : {};
-    }, */
-    /* watch: {
-        'state.token': async function (new_val, old_val) {
-            //debugger;
-            if(!this.defaults && new_val) {
-                let response = await this.execute({ endpoint: `${this.entity}.defaults` });
-                this.defaults = response.rest_data;
-            }
-        }
-    }, */
     methods: {
         submit() {
             this.options.remove || this.$refs.form.validate() ? 

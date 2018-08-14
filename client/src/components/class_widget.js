@@ -28,9 +28,10 @@ export default {
         }
     },
     watch: {
-        'state.token': function (new_val, old_val) {
+        'state.auth_state': function (new_val, old_val) {
             //debugger;
-            new_val && this.execute({ endpoint: this.entity, method: 'get' });
+            //console.log('DEFAULT:', this.entity);
+            //new_val === 'AUTHORIZED' && this.execute({ endpoint: this.entity, method: 'get' });
             //JSON.stringify(new_val) !== JSON.stringify(old_val) && this.execute({ endpoint: this.entity, method: 'get' });
         }
     }

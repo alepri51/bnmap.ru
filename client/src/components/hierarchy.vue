@@ -1,37 +1,14 @@
 <template>
-    <widget name="auth">
+    <widget name="иерархия">
         <v-card>
             <v-layout column fill-height>
                 <v-card-title>
                     <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-sitemap</v-icon>Иерархия:</h2>
                 </v-card-title>
-                <v-card-text>
-                    <v-expansion-panel inset class="elevation-1">
-                        <v-expansion-panel-content
-                            v-for="(item, i) in filter"
-                            :key="i"
-                        >
-                            <div slot="header">
-                                <v-icon small color="primary">fas fa-user</v-icon>
-                                {{item.name}} (email: {{item.email}})
-                            </div>
-
-                            <v-expansion-panel inset>
-                                <v-expansion-panel-content
-                                    v-for="(sref, j) in item.referals" :key="j"
-                                >
-                                    <div slot="header">
-                                        <v-icon small color="primary">fas fa-user</v-icon>
-                                        {{sref.name}} (email: {{sref.email}})
-                                    </div>
-
-                                </v-expansion-panel-content>
-
-                            </v-expansion-panel>
-
-                        </v-expansion-panel-content>
-                    </v-expansion-panel>
-                    
+                <v-card-text >
+                    <!-- <tree-view :model="model" category="list" :selection="selection" :onSelect="onSelect"></tree-view> -->
+                    <tree style="height: 700px" :data="filter" node-text="title" layoutType="euclidean" type="tree" :radius="5" :zoomable="true"></tree>
+                                       
                 </v-card-text>
             </v-layout>
         </v-card>
@@ -41,13 +18,50 @@
 
 <script>
     import Widget from './class_widget';
-    
+    //import Tree from './tree';
+    import { tree } from 'vued3tree';
+    import { TreeView } from "@bosket/vue"
+
     export default {
         extends: Widget,
+        components: {
+            tree,
+            "tree-view": TreeView
+        },
+        data() {
+            return {
+                selection: [],
+                onSelect: function(newSelection) { this.selection = newSelection },
+                model: [
+                    { name: "One" },
+                    { label: "Two" },
+                    { label: "Three", list: [
+                        { label: "Four" },
+                        { label: "Five" }
+                    ] }
+                ]
+            }
+        },
         computed: {
             filter() {
-                //debugger;
-                return this.raw_data || {};
+                
+                debugger;
+                let construct = (arr => {
+                    return arr.map((element, inx) => {
+                        element.children = construct(element.referals);
+                        //element.title = `${inx + 1}. ${element.name} (email: ${element.email}) - ${element.ref}`;
+                        element.title = `${element.name}\r\n${element.ref}`;
+                        element.size = inx * 10;
+                        return element;
+                    });
+                });
+                
+                let data = construct(this.raw_data);
+
+                return {
+                    title: 'Вы',
+                    children: data
+                };
             }
         },
     }

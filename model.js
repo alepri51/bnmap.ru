@@ -29,13 +29,15 @@ let model = (data = {}) => {
     }, { idAttribute: '_id' });
 
     const _hierarchy = new schema.Entity('hierarchy', {}, { idAttribute: '_id' });
+    const _list = new schema.Entity('list', {}, { idAttribute: '_id' });
 
     const _member = new schema.Entity('member', {
         news: [_news],
         transactions: [_transaction],
         wallets: [_wallet],
         orders: [_order],
-        referals: [_hierarchy]
+        referals: [_hierarchy],
+        list: [_list]
     }, { 
         idAttribute: '_id',
         processStrategy: (value, parent, key) => {

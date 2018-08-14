@@ -13,20 +13,16 @@
 export default {
     data() {
         return {
+            loaded: false,
             events: {},
             entity: this.$options._componentTag
         }
     },
     async created() {
-        /* console.log('EVENT:',`${this.auth.member}:update:${this.entity}`);
-        this.auth && this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
-            console.log('SOCKET UPDATE DATA:', data);
-            
-            this.commit('SET_ENTITIES', { method: 'GET', ...data });
-        }); */
-
-        console.log('CREATE:', `${this.auth.member}:update:${this.entity}`);
-
+        //debugger;
+        this.load();
+        /* console.log('CREATED:', `${this.auth.member}:update:${this.entity}`);
+        
         let response = await this.execute({ endpoint: `${this.entity}.defaults` });
         this.defaults = response.rest_data;
 
@@ -40,68 +36,42 @@ export default {
             });
 
             this.events.update = update.id;
-        }
-
-    },
-    async activated() {
-        //this.state.auth && this.execute({ endpoint: this.entity, method: 'get' });
-
-        /* if(!this.defaults && this.state.auth) {
-            let response = await this.execute({ endpoint: `${this.entity}.defaults` });
-            this.defaults = response.rest_data;
-
-            this.$socket.off(this.events.update);
-            this.events = {};
-
-            let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
-                console.log('SOCKET UPDATE DATA:', data);
-                
-                this.commit('SET_ENTITIES', { method: 'GET', ...data });
-            });
-
-            this.events.update = update.id
         } */
+
     },
     watch: {
         'state.auth.member': async function (new_val, old_val) {
-            console.log('MEMBER:', `${this.auth.member}:update:${this.entity}`);
-
-            let response = await this.execute({ method: 'post', endpoint: `${this.entity}.defaults` });
-            this.defaults = response.rest_data;
-
-            if(new_val) {
-                this.$socket.off(this.events.update);
-
-                let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
-                    console.log('SOCKET UPDATE DATA:', data);
-                    
-                    this.commit('SET_ENTITIES', { method: 'GET', ...data });
-                });
-
-                this.events.update = update.id;
-            }
-            /* if(this.defaults) {
-                console.log('DEFAULTS:', this.entity);
-
-                let response = await this.execute({ endpoint: `${this.entity}.defaults` });
-                this.defaults = response.rest_data;
-            }
-
-            if(!this.events.update) {
-                console.log('EVENT:', `${this.auth.member}:update:${this.entity}`);
-
-                let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
-                    console.log('SOCKET UPDATE DATA:', data);
-                    
-                    this.commit('SET_ENTITIES', { method: 'GET', ...data });
-                });
-
-                this.events.update = update.id;
-            } */
+            //debugger;
+            this.loaded = false;
+            this.load();
         }
     },
     methods: {
-    
+        async load() {
+            //debugger;
+            if(!this.loaded) {
+                console.log('MEMBER:', `${this.auth.member}:update:${this.entity}`);
+
+                await this.execute({ endpoint: `${this.entity}` });
+
+                let response = await this.execute({ method: 'post', endpoint: `${this.entity}.defaults` });
+                this.defaults = response.rest_data;
+
+                if(this.auth.member) {
+                    this.$socket.off(this.events.update);
+
+                    let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
+                        console.log('SOCKET UPDATE DATA:', data);
+                        
+                        this.commit('SET_ENTITIES', { method: 'GET', ...data });
+                    });
+
+                    this.events.update = update.id;
+                }
+
+                this.loaded = true;
+            }
+        },
         //...mapStoreActions(),
         execute(...args) {
             return this.$store._actions.execute[0](...args);
