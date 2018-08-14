@@ -174,7 +174,7 @@ export default new Vuex.Store({
                 }
                 //else  router.replace('landing');
 
-                token ? this.commit('SET_AUTH_STATE', 'AUTHORIZED') : (error && error.data.expired) ? this.commit('SET_AUTH_STATE', 'EXPIRED') : !state.auth && this.commit('SET_AUTH_STATE', 'UNAUTHORIZED');
+                token ? state.auth && state.auth.member ? this.commit('SET_AUTH_STATE', 'AUTHORIZED') : this.commit('SET_AUTH_STATE', 'UNAUTHORIZED') : (error && error.data.expired) ? this.commit('SET_AUTH_STATE', 'EXPIRED') : !state.auth && this.commit('SET_AUTH_STATE', 'UNAUTHORIZED');
                 return response;
             });
             
@@ -201,7 +201,6 @@ export default new Vuex.Store({
             );
         },
         REGISTER_COMPONENT(state, name) {
-
             Vue.component(
                 name,
                 async () => import(`./components/${name}`).catch((err) => {
@@ -220,14 +219,14 @@ export default new Vuex.Store({
             } */
 
             !api && this.commit('INIT');
-            this.dispatch('execute', { endpoint: view, method: 'get' });
+            //this.dispatch('execute', { endpoint: view, method: 'get' });
 
             state.view = view;
             state.notFound = false;
         },
         SET_AUTH_STATE(state, value) {
             state.auth_state = value;
-            console.log('CURRENT AUTH STATE:', state.auth_state);
+            //console.log('CURRENT AUTH STATE:', state.auth_state);
         },
         NOT_FOUND(state) {
             state.notFound = true;
@@ -267,7 +266,7 @@ export default new Vuex.Store({
         SHOW_SNACKBAR(state, options) {
             state.snackbar.visible = true;
             Object.assign(state.snackbar, options);
-            console.log(state.snackbar);
+            //console.log(state.snackbar);
         },
         HIDE_SNACKBAR(state) {
             state.snackbar.visible = false;
@@ -314,6 +313,8 @@ export default new Vuex.Store({
     },
     actions: {
         async execute({ commit, state }, { method, endpoint, payload, callback }) {
+            console.log('REQUEST:', endpoint);
+
             let response;
 
             let config = {

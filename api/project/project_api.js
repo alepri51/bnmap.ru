@@ -83,8 +83,43 @@ class Structure extends SecuredAPI { //LAYOUT
         super(...args);
     }
 
+    async defaults(params) {
+
+    }
+
     async default(params) {
+        let member = await db.Member._findOne({ _id: this.member });
+
+        let referals = await db.Member._query('MATCH (:`Участник` {_id: {id}})-[:реферал*]-(node:Участник)', { id: this.member });
         
+        referals.forEach((element, inx, arr) => {
+            element.referals && (element.referals = element.referals.map(referal => {
+                return arr.find(ref => ref._id === referal._id);;
+            }));
+        })
+
+        referals = referals.filter(ref => ref.referer && ref.referer._id === this.member);
+
+        let shrink = (referals => {
+            return referals.map(referal => {
+                let { _id, name, ref, email, referals, _rel } = referal;
+                referals = shrink(referals || []);
+
+                return { _id, name, ref, email, referals, _rel }
+            });
+        });
+
+        referals = shrink(referals);
+        
+        let result = model({
+            account: { 
+                _id: this.member,
+                referals,
+                list: shrink(member.list.members)
+            }
+        });
+
+        return result;
     }
 }
 
@@ -94,8 +129,15 @@ class Hierarchy extends DBAccess { //WIDGET
     }
 
     async default(params) {
-        let member = await db.Member._findOne({ _id: this.member });
-        member.referals = member.referals || [];
+        /* let referals = await db.Member._query('MATCH (:`Участник` {_id: {id}})-[:реферал*]-(node:Участник)', { id: this.member }, { computeLevels: 100 });
+        
+        referals.forEach((element, inx, arr) => {
+            element.referals && (element.referals = element.referals.map(referal => {
+                return arr.find(ref => ref._id === referal._id);;
+            }));
+        })
+
+        referals = referals.filter(ref => ref.referer._id === this.member);
 
         let shrink = (referals => {
             return referals.map(referal => {
@@ -103,10 +145,10 @@ class Hierarchy extends DBAccess { //WIDGET
                 referals = shrink(referals || []);
 
                 return { _id, name, ref, email, referals }
-            })
+            });
         });
 
-        let referals = shrink(member.referals);
+        referals = shrink(referals);
         
         let result = model({
             account: { 
@@ -115,7 +157,7 @@ class Hierarchy extends DBAccess { //WIDGET
             }
         });
 
-        return result;
+        return result; */
     }
 }
 

@@ -1,11 +1,11 @@
 <template>
-    <widget name="auth">
+    <widget name="QR">
         <v-card>
             <v-layout column fill-height>
                 <v-card-title>
                     <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-qrcode</v-icon>ссылка для друзей:</h2>
                 </v-card-title>
-                <v-card-text>
+                <v-card-text style="text-align: center">
                     <qrcode :value="`https://atlantclub.com/?ref=${this.auth.ref}`" :options="{ size: 100 }"></qrcode>
                     <div>
                         <v-btn color="primary" flat small :href="`http://localhost:8080/landing?ref=${this.auth.ref}`" target="_blank">

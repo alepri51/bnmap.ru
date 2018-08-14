@@ -9,8 +9,8 @@
                 <v-divider/>
 
                 <v-card-text style="flex: 1">
-                    <div class="subheading"><v-icon small class="mr-1 green--text">fab fa-btc</v-icon>Наименование: {{filter.wallet_address}}</div>
-                    <div class="subheading"><v-icon small class="mr-1 green--text">fab fa-btc</v-icon>Адрес: {{filter.club_address}}</div>
+                    <div ><v-icon small class="mr-1 green--text">fas fa-wallet</v-icon>Личный кошелек: {{filter.wallet_address}}</div>
+                    <div ><v-icon small class="mr-1 primary--text">fab fa-btc</v-icon>Клубный кошелек: {{filter.club_address}}</div>
                 </v-card-text>
 
                 <v-card-actions>

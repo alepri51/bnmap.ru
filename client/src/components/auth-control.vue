@@ -7,7 +7,7 @@
                 <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-user</v-icon>{{auth.name}}</h2>
             </v-card-title>
 
-            <small class="ml-3">{{$store.state.auth_state === 'EXPIRED' ? 'СЕССИЯ ПРОСРОЧЕНА' : 'ВХОД ПРОИЗВЕДЕН'}}</small>
+            <small class="ml-3">{{$store.state.auth_state === 'EXPIRED' ? 'СЕССИЯ ПРОСРОЧЕНА' : $store.state.auth_state === 'AUTHORIZED' ? 'ВХОД ПРОИЗВЕДЕН' : 'ВХОД НЕ ВЫПОЛНЕН'}}</small>
             
             <v-card-text>
                 <div class="widget-caption"><v-icon small class="mr-1 green--text">fas fa-dollar-sign</v-icon>Баланс: 0 USD</div>
