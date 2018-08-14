@@ -92,14 +92,16 @@ class Structure extends SecuredAPI { //LAYOUT
 
         let referals = await db.Member._query('MATCH (:`Участник` {_id: {id}})-[:реферал*]-(node:Участник)', { id: this.member });
         
+        referals.push(member);
+
         referals.forEach((element, inx, arr) => {
             element.referals && (element.referals = element.referals.map(referal => {
                 return arr.find(ref => ref._id === referal._id);;
             }));
         })
 
-        referals = referals.filter(ref => ref.referer && ref.referer._id === this.member);
-        referals.push(member);
+        //referals = referals.filter(ref => (ref._id === this.member) || (ref.referer && ref.referer._id === this.member));
+        referals = referals.filter(ref => ref._id === this.member);
 
         let shrink = (referals => {
             return referals.map(referal => {
@@ -110,8 +112,8 @@ class Structure extends SecuredAPI { //LAYOUT
             });
         });
 
-        //referals = shrink(referals);
-        referals = shrink([member]);
+        referals = shrink(referals);
+        //referals = shrink([member]);
         
         let result = model({
             account: { 

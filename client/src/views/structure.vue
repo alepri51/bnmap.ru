@@ -19,23 +19,23 @@
 		data() {
 			return {
 				layout: {
-					cols: 15,
+					cols: 10,
 					rows: 15
 				},
 				components: [
                     {
                         "id": 1,
-                        "x": 13,
-                        "y": 3,
+                        "x": 1,
+                        "y": 8,
                         "w": 2,
-                        "h": 12,
-                        "text": "donate",
+                        "h": 7,
+                        "text": "qr",
                         "available": false,
                         "comp": "qrcode"
                     },
                     {
                         "id": 2,
-                        "x": 13,
+                        "x": 7,
                         "y": 0,
                         "w": 2,
                         "h": 3,
@@ -45,21 +45,21 @@
                     },
                     {
                         "id": 3,
-                        "x": 0,
+                        "x": 1,
                         "y": 0,
                         "w": 2,
-                        "h": 15,
-                        "text": "calendar",
+                        "h": 8,
+                        "text": "list",
                         "available": false,
                         "comp": "list"
                     },
                     {
                         "id": 4,
-                        "x": 2,
+                        "x": 3,
                         "y": 0,
-                        "w": 11,
+                        "w": 4,
                         "h": 15,
-                        "text": "transactions",
+                        "text": "hier",
                         "available": false,
                         "comp": "hierarchy"
                     }

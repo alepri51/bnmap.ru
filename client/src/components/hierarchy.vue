@@ -50,7 +50,7 @@
                                 color:'#388E3C',
                                 highlight:'#388E3C',
                                 hover: '#388E3C',
-                                inherit: 'none',
+                                inherit: 'both',
                                 opacity:1.0
                             },
                             shadow:true,
