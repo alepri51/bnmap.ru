@@ -8,7 +8,7 @@
                 <network style="flex: 1" class="pa-3"
                     ref="network"
                     :nodes="filter.nodes"
-                    :edges="network.edges"
+                    :edges="filter.edges"
                     :options="network.options"
                 ></network>
                 <!-- <v-card-text >
@@ -34,51 +34,83 @@
         data()  {
             return {
                 network: {
-                    nodes: [
-                        { id: 1, label: 'Node 1' },
-                        { id: 2, label: 'Node 2' },
-                        { id: 3, label: 'Node 3' },
-                        { id: 4, label: 'Node 4' },
-                        { id: 5, label: 'Node 5' },
-                    ],
-                    edges: [
-                        { id: 1, from: 1, to: 3 },
-                        { id: 2, from: 1, to: 2 },
-                        { id: 3, from: 2, to: 4 },
-                        { id: 4, from: 2, to: 5 },
-                        { id: 5, from: 3, to: 3 },
-                    ],
                     options: {
                         edges: {
+                            arrows: {
+                                to:     {enabled: true, scaleFactor: 0.5, type: 'arrow'},
+                                from:   {enabled: true, scaleFactor: 0.5, type: 'circle'}
+                            },
+                            arrowStrikethrough: false,
                             smooth: {
-                                type: 'cubicBezier',
+                                type: 'discrete',
                                 forceDirection: 'vertical',
-                                roundness: 0.4
-                            }
+                                //roundness: 0.1,
+                            },
+                            color: {
+                                color:'#388E3C',
+                                highlight:'#388E3C',
+                                hover: '#388E3C',
+                                inherit: 'none',
+                                opacity:1.0
+                            },
+                            shadow:true,
                         },
                         layout: {
                             hierarchical: {
-                                direction: 'UD'
+                                direction: 'UD',
+                                sortMethod: 'directed'
                             }
                         },
                         physics:false,
                         nodes: {
+                            shadow:true,
                             shape: 'icon', 
                             icon: {
                                 face: 'FontAwesome',
                                 code: '\uf007',
                                 color: '#303F9F'
-                            } 
-                            
-                        },
-                    },
+                            },
+                            font: {
+                                face: 'Roboto Condensed',
+                                color: '#303F9F',
+                                multi: 'html'
+                            }
+                        }
+                    }
                 }
             }
         },
         computed: {
             filter() {
                 debugger;
-                return this.raw_data || {};
+                let reduce = (arr => {
+                    return arr.reduce((memo, item) => {
+                        memo.nodes.push({
+                            id: item._id,
+                            label: '<b>' + item.name + '</b>'
+                        });
+
+                        if(item.referals.length) {
+                            item.referals.forEach(element => {
+                                memo.edges.push({
+                                    from: item._id,
+                                    to: element._id
+                                    
+                                });
+                            });
+
+                            let reduced = reduce(item.referals);
+                            memo.nodes = memo.nodes.concat(reduced.nodes);
+                            memo.edges = memo.edges.concat(reduced.edges);
+                        }
+
+                        return memo;
+                    }, { nodes: [], edges: []})
+                });
+
+                let data = reduce(this.raw_data);
+
+                return data || {};
             }
         },
     }

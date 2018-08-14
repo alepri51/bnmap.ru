@@ -99,6 +99,7 @@ class Structure extends SecuredAPI { //LAYOUT
         })
 
         referals = referals.filter(ref => ref.referer && ref.referer._id === this.member);
+        referals.push(member);
 
         let shrink = (referals => {
             return referals.map(referal => {
@@ -109,7 +110,8 @@ class Structure extends SecuredAPI { //LAYOUT
             });
         });
 
-        referals = shrink(referals);
+        //referals = shrink(referals);
+        referals = shrink([member]);
         
         let result = model({
             account: { 
