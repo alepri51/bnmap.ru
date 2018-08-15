@@ -29,6 +29,7 @@ let model = (data = {}) => {
     }, { idAttribute: '_id' });
 
     const _hierarchy = new schema.Entity('hierarchy', {}, { idAttribute: '_id' });
+    
     const _list = new schema.Entity('list', {}, { idAttribute: '_id' });
 
     const _member = new schema.Entity('member', {

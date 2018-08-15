@@ -72,16 +72,7 @@ let socketInitialize = function(sockets) {
     io = sockets;
 
     sockets.on('connection', (socket) => {
-        //io = socket;
-        /* socket.broadcast.emit('new message', {
-            username: socket.username,
-            message: data
-        });
-
-        socket.emit('login', {
-            numUsers: numUsers
-        }); */
-
+     
         socket.on('request', async (data, cb) => {
             let { type, id, action, authorization, body, method = 'GET' } = data;
             let req = {

@@ -114,6 +114,33 @@ class Structure extends SecuredAPI { //LAYOUT
 
         referals = shrink(referals);
         //referals = shrink([member]);
+
+        let reduce = (arr => {
+            return arr.reduce((memo, item) => {
+                memo.nodes.push({
+                    id: item._id,
+                    label: '<b>' + item.name + '</b>'
+                });
+
+                if(item.referals.length) {
+                    item.referals.forEach(element => {
+                        memo.edges.push({
+                            from: item._id,
+                            to: element._id
+                            
+                        });
+                    });
+
+                    let reduced = reduce(item.referals);
+                    memo.nodes = memo.nodes.concat(reduced.nodes);
+                    memo.edges = memo.edges.concat(reduced.edges);
+                }
+
+                return memo;
+            }, { nodes: [], edges: []})
+        });
+
+        //referals = reduce(referals);
         
         let result = model({
             account: { 

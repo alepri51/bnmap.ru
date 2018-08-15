@@ -1,5 +1,5 @@
 <template>
-	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent"/>
+	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent" @select-node="onSelectNode"/>
 </template>
 
 
@@ -8,12 +8,18 @@
 
     export default {
         extends: Layout,
-		components: { 
+		components: {
              dashboard: () => import('../components/dashboard') 
         },
         methods: {
             onResize() {
                 console.log('NEWS LAYOUT RESIZE');
+            },
+            onSelectNode(...args) {
+                //debugger;
+                console.log(args);
+                //this.entities = 
+                //this.commit('SET_COMMON_DATA', { active_referal: })
             }
         },
 		data() {
@@ -42,6 +48,16 @@
                         "text": "auth",
                         "available": false,
                         "comp": "auth-control"
+                    },
+                    {
+                        "id": 5,
+                        "x": 7,
+                        "y": 3,
+                        "w": 2,
+                        "h": 3,
+                        "text": "info",
+                        "available": false,
+                        "comp": "ref-info"
                     },
                     {
                         "id": 3,

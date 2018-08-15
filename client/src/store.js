@@ -103,7 +103,8 @@ export default new Vuex.Store({
                 name: 'Финансы',
                 to: 'payment'
             }
-        ]
+        ],
+        common_data: {}
     },
     mutations: {
         CLEAR_CACHE(state) {
@@ -300,6 +301,9 @@ export default new Vuex.Store({
             else !state.auth && (Vue.set(state, 'entities',  {}));
 
             //console.log('NEWS:', state.entities.news);
+        },
+        SET_COMMON_DATA(state, data) {
+            Vue.set(state, 'common_data', data);
         },
         //PROJECT SPECIFIC
         ACCOUNT(state, id) {

@@ -10,6 +10,11 @@
                     :nodes="filter.nodes"
                     :edges="filter.edges"
                     :options="network.options"
+                                        
+                    v-on="$listeners"
+                    @select-node="onSelectNode"
+                    @deselect-node="onDeselectNode"
+                    @after-drawing.once="onInitRedraw"
                 ></network>
                 <!-- <v-card-text >
                     
@@ -31,20 +36,32 @@
         components: {
             network: Network
         },
+        methods: {
+            onSelectNode(e) {
+                let referal = this.filter.nodes.find(node => node.id === e.nodes[0]);
+                this.commit('SET_COMMON_DATA', { active_referal: referal});
+            },
+            onDeselectNode(e) {
+                this.commit('SET_COMMON_DATA', { active_referal: void 0});
+            },
+            onInitRedraw() {
+                this.$refs.network.fit();
+            }
+        },
         data()  {
             return {
                 network: {
                     options: {
                         edges: {
                             arrows: {
-                                to:     {enabled: true, scaleFactor: 0.5, type: 'arrow'},
-                                from:   {enabled: true, scaleFactor: 0.5, type: 'circle'}
+                                to: {enabled: true, scaleFactor: 0.5, type: 'arrow'},
+                                from: {enabled: true, scaleFactor: 0.5, type: 'circle'}
                             },
                             arrowStrikethrough: false,
                             smooth: {
+                                enabled: true,
                                 type: 'discrete',
-                                forceDirection: 'vertical',
-                                //roundness: 0.1,
+                                roundness: 0.5
                             },
                             color: {
                                 color:'#388E3C',
@@ -53,15 +70,15 @@
                                 inherit: 'both',
                                 opacity:1.0
                             },
-                            shadow:true,
+                            shadow: true
                         },
                         layout: {
                             hierarchical: {
                                 direction: 'UD',
                                 sortMethod: 'directed'
                             }
-                        },
-                        physics:false,
+                        }, 
+                        physics:false, 
                         nodes: {
                             shadow:true,
                             shape: 'icon', 
@@ -82,12 +99,14 @@
         },
         computed: {
             filter() {
-                debugger;
+                //debugger;
                 let reduce = (arr => {
                     return arr.reduce((memo, item) => {
                         memo.nodes.push({
                             id: item._id,
-                            label: '<b>' + item.name + '</b>'
+                            label: '<b>' + item.name + '</b>',
+                            ref: item.ref,
+                            email: item.email
                         });
 
                         if(item.referals.length) {
@@ -110,7 +129,7 @@
 
                 let data = reduce(this.raw_data);
 
-                return data || {};
+                return data || {nodes: [], edges: []};
             }
         },
     }
