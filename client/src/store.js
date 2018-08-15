@@ -316,8 +316,8 @@ export default new Vuex.Store({
         },
         ENTITY_REMOVE_BY_ID(state, { name, _id}) {
             //debugger;
-            //delete state.entities[name][_id];
-            Vue.delete(state.entities[name], _id);
+            delete state.entities[name][_id];
+            //Vue.delete(state.entities[name], _id);
         }
     },
     actions: {

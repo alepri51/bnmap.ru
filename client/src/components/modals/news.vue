@@ -34,6 +34,7 @@
                             validate-on-blur
                         />
                         <v-combobox
+                            :disabled="options.remove"
                             v-model="form.tags"
                             label="Новостные тэги"
                             chips

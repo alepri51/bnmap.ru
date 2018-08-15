@@ -11,6 +11,7 @@ export default {
     }, */
     methods: {
         removed(_id) {
+            //debugger;
             this.commit('ENTITY_REMOVE_BY_ID', { name: this.entity, _id });
         },
         appended(_id) {
@@ -21,6 +22,7 @@ export default {
     },
     computed: {
         raw_data() {
+            debugger;
             return this.$store.state.entities[this.entity] ? Object.values(this.$store.state.entities[this.entity]) : [];
         },
         filter() {

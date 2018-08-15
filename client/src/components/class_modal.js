@@ -26,7 +26,7 @@ export default {
                             this.options.remove && this.$emit('removed', this.form._id);
                             !this.form._id && this.$emit('appended', this.form._id);
 
-                            !this.options.remove && this.commit('MUTATE_ENTITY', { entity: this.entity, id: this.form._id, data: {...this.form} });
+                            !this.options.remove && this.form._id && this.commit('MUTATE_ENTITY', { entity: this.entity, id: this.form._id, data: {...this.form} });
                         }
                     }
                 })

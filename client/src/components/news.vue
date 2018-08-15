@@ -131,10 +131,10 @@
             container && (container.scrollTop = this.scroll_position);
         },
         computed: {
-            /* filter() {
-                //debugger;
-                return this.raw_data.filter(item => item.member === this.auth.member);
-            } */
+            filter() {
+                debugger;
+                return this.raw_data;
+            }
         },
         filters: {
             mine(value) {
