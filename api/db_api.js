@@ -46,7 +46,8 @@ class DBAccess extends SecuredAPI {
 
     async delete(payload) {
         payload = await this.beforeDelete(payload);
-        let deleted = await db[this.constructor.name]._query('MATCH (node {_id: {id}}) DETACH DELETE node', { id: payload._id });
+        let deleted = payload;
+        await db[this.constructor.name]._query('MATCH (node {_id: {id}}) DETACH DELETE node', { id: payload._id });
         return deleted;
     }
 

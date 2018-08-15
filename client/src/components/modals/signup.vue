@@ -107,7 +107,7 @@
                         endpoint: 'signup.submit', 
                         payload: this.$data, 
                         callback: (response) => {
-                            debugger;
+                            //debugger;
                             if(!response.error) {
                                 this.commit('HIDE_MODAL', { signup: void 0 });
                                 this.$router.replace('newslayout');

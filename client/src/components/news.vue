@@ -39,18 +39,20 @@
                         >
                         </v-card-media>
 
-                        <v-card-title class="primary--text">
-                            <h3>{{data.caption}}</h3>
+                        <v-card-title class="primary--text pb-1" >
+                            <h3 style="flex: 1; max-height: 160px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{data.caption}}</h3>
                         </v-card-title>
 
-                        <v-card-text style="flex: 1">
+                        <v-card-text style="flex: 1; max-height: 160px; overflow: hidden;">
                             {{data.text}}
                         </v-card-text>
 
-                        <div class="ml-2">
+                        <v-spacer/>
+                        <div class="pl-2 pt-3 pr-2">
                             <v-icon small class="mr-1 accent--text">fas fa-tags</v-icon>
                             <small v-for="(tag, inx) in data.tags" :key="inx">{{tag}}{{ inx === data.tags.length - 1 ? '' : ', '}}</small>
                         </div>
+             
 
                         <v-card-actions>
                             <small>
@@ -132,7 +134,7 @@
         },
         computed: {
             filter() {
-                debugger;
+                //debugger;
                 return this.raw_data;
             }
         },

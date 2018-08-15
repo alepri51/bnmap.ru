@@ -22,7 +22,7 @@ export default {
     },
     computed: {
         raw_data() {
-            debugger;
+            //debugger;
             return this.$store.state.entities[this.entity] ? Object.values(this.$store.state.entities[this.entity]) : [];
         },
         filter() {

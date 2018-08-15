@@ -43,7 +43,7 @@ export default {
         'state.auth.member': async function (new_val, old_val) {
             //debugger;
             this.loaded = false;
-            this.load();
+            new_val && this.load();
         }
     },
     methods: {

@@ -306,7 +306,8 @@ export default new Vuex.Store({
         SET_COMMON_DATA(state, data) {
             Vue.set(state, 'common_data', data);
         },
-        'MUTATE_ENTITY'(state, payload) {
+        MUTATE_ENTITY(state, payload) {
+            //debugger;
             let { entity, id, data } = payload;
             state.entities[entity] && Vue.set(state.entities[entity], id, data);
         },
@@ -316,8 +317,9 @@ export default new Vuex.Store({
         },
         ENTITY_REMOVE_BY_ID(state, { name, _id}) {
             //debugger;
-            delete state.entities[name][_id];
-            //Vue.delete(state.entities[name], _id);
+            //delete state.entities[name][_id];
+            Vue.delete(state.entities[name], _id);
+            Vue.nextTick();
         }
     },
     actions: {
