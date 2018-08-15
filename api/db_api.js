@@ -1,6 +1,7 @@
 'use strict';
 
 const model = require('../model');
+const db = require('../db');
 
 const { SecuredAPI } = require('./base_api');
 
@@ -27,7 +28,7 @@ class DBAccess extends SecuredAPI {
 
     async insert(payload) {
         payload = await this.beforeInsert(payload);
-        return await db.insert(this.class_name, { ...payload });
+        return await db[this.constructor.name]._update({ ...payload });
     }
 
     async beforeUpdate(payload) {
@@ -36,7 +37,7 @@ class DBAccess extends SecuredAPI {
 
     async update(payload) {
         payload = await this.beforeUpdate(payload)
-        return await db.update(this.class_name, { _id: payload._id }, { ...payload });
+        return await db[this.constructor.name]._update({ ...payload });
     }
 
     async beforeDelete(payload) {

@@ -28,11 +28,11 @@
 
     <v-toolbar-items v-if="!$store.state.auth">
         <v-btn flat @click="commit('SHOW_MODAL', { signup: void 0 })" color="primary">
-            <v-icon small class="mr-1">fas fa-user-plus</v-icon>Регистрация
+            <!-- <v-icon small class="mr-1">fas fa-user-plus</v-icon> -->Стать своим
         </v-btn>
 
         <v-btn flat @click="commit('SHOW_MODAL', { signin: void 0 })" color="primary">
-            <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon>вход
+            <!-- <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon> -->Я свой
         </v-btn>
     </v-toolbar-items>
 

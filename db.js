@@ -9,7 +9,7 @@ const generate = require('nanoid/generate');
 const BTC = require('./api/btc');
 const btc = new BTC({env: 'dev'});
 
-const bolt_port = 32768;
+const bolt_port = 32771;
 //const bolt_port = 32774;
 
 const neo = require('seraph')({
@@ -106,7 +106,25 @@ if(cluster.isMaster) {
     };
 
     let Info = neoModel(neo, 'Информация', info);
-    Info.compose(Member, 'author', 'автор');
+
+    let news = {
+        tags: Array,
+        ...info
+    };
+
+    let News = neoModel(neo, ['Информация', 'Новость'], news);
+    News.compose(Member, 'author', 'автор');
+
+    let event = {
+        event_date: Date,
+        ...info
+    };
+
+    let Event = neoModel(neo, ['Информация', 'Событие'], event);
+
+    let Message = neoModel(neo, ['Информация', 'Сообщение'], info);
+    Message.compose(Member, 'from', 'от');
+    Message.compose(Member, 'to', 'кому');
 
     (async function() {
 
@@ -160,24 +178,41 @@ if(cluster.isMaster) {
         });
 
 
+
         let clubs = await Club._findAll();
-        let club = !!!clubs.length && await Club._save({ 
-            name: 'Club', 
-            email: 'club@email.com', 
-            hash: '',
-            wallets: [
-                {
-                    club_address: await btc.getNewAddress(),
-                    wallet_address: ''
-                }
-            ]
-        });
+        if(!!!clubs.length) {
+            let club_address = generate('1234567890abcdef', 32);
+
+            try {
+                club_address = await btc.getNewAddress();
+            }
+            catch(err) {}
+
+            let club = await Club._save({ 
+                name: 'Club', 
+                email: 'club@email.com', 
+                hash: '',
+                wallets: [
+                    {
+                        club_address,
+                        wallet_address: generate('1234567890abcdef', 32)
+                    }
+                ]
+            });
+        }
     
         let roots = await RootMember._findAll();
         if(!!!roots.length) {
             let rc = 7;
             while(rc) {
                 let {privateKey, publicKey} = await crypto.createKeyPair();
+
+                let club_address = generate('1234567890abcdef', 32);
+
+                try {
+                    club_address = await btc.getNewAddress();
+                }
+                catch(err) {}
 
                 await RootMember._save({ 
                     name: 'Участник ' + rc, 
@@ -188,8 +223,8 @@ if(cluster.isMaster) {
                     privateKey,
                     wallets: [
                         {
-                            club_address: await btc.getNewAddress(),
-                            wallet_address: ''
+                            club_address,
+                            wallet_address: generate('1234567890abcdef', 32)
                         }
                     ]
                 });
@@ -219,6 +254,8 @@ if(cluster.isMaster) {
     })();
 
     module.exports = {
+        btc,
+        generate,
         Wallet,
         Member,
         RootMember,
@@ -227,7 +264,8 @@ if(cluster.isMaster) {
         List,
         Product,
         Info,
-        btc,
-        generate
+        Message,
+        News,
+        Event
     }
 }

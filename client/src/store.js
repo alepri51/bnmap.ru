@@ -276,6 +276,7 @@ export default new Vuex.Store({
             if(entities) {
                 let merge = Object.keys(entities).length ? deepmerge(state.entities, entities || {}, {
                     arrayMerge: function (destination, source, options) {
+                        //debugger;
                         //ALL ARRAYS MUST BE SIMPLE IDs HOLDER AFTER NORMALIZE
                         if(method.toUpperCase() === 'DELETE') {
                             if(destination.length) {
@@ -304,6 +305,10 @@ export default new Vuex.Store({
         },
         SET_COMMON_DATA(state, data) {
             Vue.set(state, 'common_data', data);
+        },
+        'MUTATE_ENTITY'(state, payload) {
+            let { entity, id, data } = payload;
+            state.entities[entity] && Vue.set(state.entities[entity], id, data);
         },
         //PROJECT SPECIFIC
         ACCOUNT(state, id) {

@@ -34,7 +34,7 @@
                 >
                     <v-layout column>
                         <v-card-media
-                            :src="(inx % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
+                            :src="data.media || (inx % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
                             height="100px"
                         >
                         </v-card-media>
@@ -47,10 +47,16 @@
                             {{data.text}}
                         </v-card-text>
 
+                        <div class="ml-2">
+                            <v-icon small class="mr-1 accent--text">fas fa-tags</v-icon>
+                            <small v-for="(tag, inx) in data.tags" :key="inx">{{tag}}{{ inx === data.tags.length - 1 ? '' : ', '}}</small>
+                        </div>
+
                         <v-card-actions>
                             <small>
-                                {{ new Date(data.created).toLocaleString() }}
+                                {{ new Date(data.date).toLocaleString() }}
                             </small>
+
                             <v-spacer></v-spacer>
                             <v-btn flat color="secondary">Смотреть</v-btn>
                         </v-card-actions>
@@ -125,10 +131,10 @@
             container && (container.scrollTop = this.scroll_position);
         },
         computed: {
-            filter() {
+            /* filter() {
                 //debugger;
                 return this.raw_data.filter(item => item.member === this.auth.member);
-            }
+            } */
         },
         filters: {
             mine(value) {

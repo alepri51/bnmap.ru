@@ -31,10 +31,26 @@
                             :rules="[
                                 () => !!form.text || 'This field is required',
                             ]"
-                            @keyup.enter="submit"
                             validate-on-blur
                         />
-                        <v-text-field 
+                        <v-combobox
+                            v-model="form.tags"
+                            label="Новостные тэги"
+                            chips
+                            clearable
+                            multiple
+                        >
+                            <template slot="selection" slot-scope="data">
+                                <v-chip
+                                    :selected="data.selected"
+                                    close
+                                    @input="form.tags.splice(form.tags.indexOf(data.item), 1)"
+                                >
+                                    <span>{{ data.item }}</span>
+                                </v-chip>
+                            </template>
+                        </v-combobox>
+                        <!-- <v-text-field 
                             :disabled="options.remove"
                             v-model="form.tags"
                             label="Тэги"
@@ -45,7 +61,7 @@
                             ]"
                             @keyup.enter="submit"
                             validate-on-blur
-                        />
+                        /> -->
                     </v-form>
                     <small>*Требуемые для заполнения поля</small>
                 </v-card-text>

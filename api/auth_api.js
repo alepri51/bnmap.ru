@@ -1,6 +1,6 @@
 'use strict';
 
-const { btc, generate, Account, Member, RootMember, Club, RootList, List } = require('../db');
+const { btc, generate, Account, Member, RootMember, Club, RootList, List, Message } = require('../db');
 
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto2');
@@ -53,7 +53,7 @@ class SignUp extends API {
         if(!member) {
             referer = await Member._findOne({ ref: referer });
             
-            let root = referer || await Member._query('MATCH (member:Участник)-[pos:позиция {номер: {n}}]-(:`Корневой список`)', { n: 7 }, { varName: 'member' });
+            let root = referer || await Member._query('MATCH (node:Участник)-[pos:позиция {номер: {n}}]-(:`Корневой список`)', { n: 7 });
             Array.isArray(root) && (root = root[0]);
 
             if(referer) {
@@ -85,10 +85,24 @@ class SignUp extends API {
                     return member;
                 });
 
+                //СОХРАНЕНИЕ НОВОГО СПИСКА, ЗДЕСТЬ ЧТО ТО НЕ ТАК
                 let list = await List._save({members});
 
                 member.list = list;
                 await Member._update(member);
+
+                let club = await Club._findAll();
+                club = club.pop();
+
+                let message = {
+                    caption: `${member.name}, приветствуем в нашем клубе!`,
+                    text: 'Добро пожаловать!',
+                    date: Date.now(),
+                    from: club,
+                    to: member
+                };
+
+                await Message._save(message);
 
                 referer.referals = referer.referals || [];
                 referer.referals.push(member);

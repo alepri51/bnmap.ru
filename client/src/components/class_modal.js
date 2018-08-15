@@ -11,16 +11,22 @@ export default {
     },
     methods: {
         submit() {
-            this.options.remove || this.$refs.form.validate() ? 
+            let validated = this.options.remove || this.$refs.form.validate();
+
+            //validated && !this.options.remove && this.commit('MUTATE_ENTITY', { entity: this.entity, id: this.form._id, data: {...this.form} });
+
+            validated ? 
                 this.execute({ 
                     method: this.options.remove ? 'delete' : 'post', 
                     endpoint: `${this.entity}.save`,
                     payload: this.form, 
                     callback: (response) => {
                         if(!response.error) {
-                            this.commit('HIDE_MODAL', { [this.entity]: void 0 })
+                            this.commit('HIDE_MODAL', { [this.entity]: void 0 });
                             this.options.remove && this.$emit('removed', this.form._id);
                             !this.form._id && this.$emit('appended', this.form._id);
+
+                            !this.options.remove && this.commit('MUTATE_ENTITY', { entity: this.entity, id: this.form._id, data: {...this.form} });
                         }
                     }
                 })

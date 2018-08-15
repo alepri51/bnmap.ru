@@ -27,7 +27,9 @@ class News extends DBAccess { //WIDGET AND DIALOG
 
     async default() {
         //let news = await db.find('news', { member: this.member });
-        let news = await db.Info._findAll();
+        //let news = await db.Info._findAll();
+        //let news = await db.Message._query('MATCH (:`Участник` {_id: {id}})-[:кому]-(node:Информация)', { id: this.member });
+        let news = await db.News._findAll();
 
         let result = model({
             account: { 
@@ -43,18 +45,19 @@ class News extends DBAccess { //WIDGET AND DIALOG
         let {value, percent = 99} = super.defaults();
 
         return {
-            caption: 'Новая новость ' + new Date(),
-            text: '',
-            tags: '#новость'
+            caption: 'Заголовок' + new Date(),
+            text: 'Текст новости',
+            tags: ['новость'],
+            date: Date.now()
         }
     }
 
     accessGranted(payload) {
-        return (payload._id && payload.member && payload.member === this.member) || !!!payload._id;
+        return (payload._id && payload.author && payload.author._id === this.member) || !!!payload._id;
     }
 
     async beforeInsert(payload) {
-        payload.member = this.member;
+        payload.author = { _id: this.member };
         return payload;
     }
 
