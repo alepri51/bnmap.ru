@@ -99,7 +99,7 @@ class Structure extends SecuredAPI { //LAYOUT
 
         referals.forEach((element, inx, arr) => {
             element.referals && (element.referals = element.referals.map(referal => {
-                return arr.find(ref => ref._id === referal._id);;
+                return arr.find(ref => ref._id === referal._id);
             }));
         })
 
@@ -144,6 +144,9 @@ class Structure extends SecuredAPI { //LAYOUT
         });
 
         //referals = reduce(referals);
+        member.list.members = member.list.members.map(member => {
+            !member._rel.номер 
+        });
         
         let result = model({
             account: { 

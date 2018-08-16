@@ -129,7 +129,7 @@ class API {
         catch(err) {
             console.log('ERROR:', err);
             this.revokeJWT(payload.jwtid);
-            this.generateError({ code: 403, message: err.message, data: err.expiredAt, system: true });
+            this.generateError({ code: 403, message: err.message, data: { expired: err.name === 'TokenExpiredError' }, system: true });
         };
     }
 
@@ -166,7 +166,7 @@ class SecuredAPI extends API {
         let self = this;
         if(!except && !this.auth) {
             return function(...args) { 
-                self.generateError({ code: 403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь', data: {expired: true, class: self.constructor.name }});
+                self.generateError({ code: 403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь.', data: { expired: true, class: self.constructor.name }});
             };
         }
 

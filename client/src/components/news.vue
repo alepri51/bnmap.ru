@@ -135,7 +135,7 @@
         computed: {
             filter() {
                 //debugger;
-                return this.raw_data;
+                return this.raw_data.sort((a, b) => b.date - a.date);
             }
         },
         filters: {
@@ -144,8 +144,11 @@
             }
         },
         methods: {
-            onRemove(id) { ///////////////////////////
-                delete this.entities.news[id];
+            appended(_id) {
+                debugger;
+                //prevent scrolling down by default as in class_widget
+                //let container = this.$el.querySelector("#scrollable");
+                //container && (container.scrollTop = container.scrollHeight);
             },
             onScroll(e) {
                 this.scroll_position = e.target.scrollTop;

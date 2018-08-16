@@ -6,16 +6,17 @@ export default {
     components: {
         widget
     },
-/*     activated() {
-        this.state.auth && this.execute({ endpoint: this.entity, method: 'get' });
-    }, */
+    created() {
+        //this.state.auth && this.execute({ endpoint: this.entity, method: 'get' });
+        this.load();
+    },
     methods: {
         removed(_id) {
             //debugger;
             this.commit('ENTITY_REMOVE_BY_ID', { name: this.entity, _id });
         },
         appended(_id) {
-            //debugger;
+            debugger;
             let container = this.$el.querySelector("#scrollable");
             container && (container.scrollTop = container.scrollHeight);
         }
@@ -30,11 +31,8 @@ export default {
         }
     },
     watch: {
-        'state.auth_state': function (new_val, old_val) {
-            //debugger;
-            //console.log('DEFAULT:', this.entity);
-            //new_val === 'AUTHORIZED' && this.execute({ endpoint: this.entity, method: 'get' });
-            //JSON.stringify(new_val) !== JSON.stringify(old_val) && this.execute({ endpoint: this.entity, method: 'get' });
+        'state.sign': async function (new_val, old_val) {
+            await this.execute({ endpoint: `${this.entity}` });
         }
     }
 

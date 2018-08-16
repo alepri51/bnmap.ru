@@ -73,7 +73,11 @@ export default new Vuex.Store({
         }, */
         token: void 0,
         auth: void 0,
-        signed_id: false,
+        sign: {
+            AUTHORIZED: false,
+            EXPIRED: false,
+            UNAUTHORIZED: true
+        },
         entities: {},
         defaults: {},
         auth_state: void 0,
@@ -142,27 +146,67 @@ export default new Vuex.Store({
 
                 let {token, auth, error, entities, map, result, entry, cached, ...rest} = response.data;
 
-                let signed_id = auth ? true : !!state.auth;
+                //оставшиеся данные
+                response.rest_data = { ...rest };
+
+                let sign = {
+                    AUTHORIZED: false,
+                    EXPIRED: false,
+                    UNAUTHORIZED: false
+                };
+
+                auth && auth.member ? sign.AUTHORIZED = true : state.token && !token  ? sign.EXPIRED = true : sign.UNAUTHORIZED = true;
+
+                !cached && token && this.commit('SET_TOKEN', token);
+                auth && this.commit('SET_AUTH', auth);
+
+                if(error) {
+                    let vertical = error.message.length > 50;
+                    !error.system ? this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical }) : console.error(error.code, error.message, error.data);
+
+                    !error.system && !sign.UNAUTHORIZED && this.commit('SHOW_MODAL', { signin: void 0 });
+
+                    response.error = error;
+                }
+
+                response.data.cached = !!response.config.cache;
+                this.commit('SET_SIGN', sign);
                 
+                Object.keys(entities || {}).length && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
+
+                return response;
+            });
+
+            /* let onResponse = (response => {
+
+                let {token, auth, error, entities, map, result, entry, cached, ...rest} = response.data;
+
+                let signed_state = auth && auth.member ? 'AUTHORIZED' : state.token && !token  ? 'EXPIRED' : 'UNAUTHORIZED';
+
+                //let signed_id = auth ? true : !!state.auth;
+                
+                signed_state === 'UNAUTHORIZED' && requests_cache.reset();
+                //signed_state === 'EXPIRED' ? this.commit('SHOW_MODAL', { signin: void 0 }) : error && router.replace('landing');
 
                 if(error) {
                     if(!error.system) {
                         let vertical = error.message.length > 50;
                         this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
 
-                        requests_cache.reset();
-                        (error.data && error.data.expired) && (signed_id ? this.commit('SHOW_MODAL', { signin: void 0 }) : router.replace('landing'));
+                        //signed_state === 'UNAUTHORIZED' && requests_cache.reset();
+                        //signed_state === 'EXPIRED' ? this.commit('SHOW_MODAL', { signin: void 0 }) : router.replace('landing');
                     }
                     else console.error(error.code, error.message, error.data);
                     //Для упрощения доступа к ошибке
                     response.error = error;
-                }
-                else this.commit('SET_SIGNED_IN', signed_id);
+                };
+                
+                this.commit('SET_AUTH_STATE', signed_state);
 
                 //оставшиеся данные
                 response.rest_data = { ...rest };
 
-                if(signed_id) {
+                if(signed_state === 'AUTHORIZED') {
                     auth && this.commit('SET_AUTH', auth);
                     !cached && this.commit('SET_TOKEN', token);
     
@@ -175,9 +219,9 @@ export default new Vuex.Store({
                 }
                 //else  router.replace('landing');
 
-                token ? state.auth && state.auth.member ? this.commit('SET_AUTH_STATE', 'AUTHORIZED') : this.commit('SET_AUTH_STATE', 'UNAUTHORIZED') : (error && error.data.expired) ? this.commit('SET_AUTH_STATE', 'EXPIRED') : !state.auth && this.commit('SET_AUTH_STATE', 'UNAUTHORIZED');
+                //token ? state.auth && state.auth.member ? this.commit('SET_AUTH_STATE', 'AUTHORIZED') : this.commit('SET_AUTH_STATE', 'UNAUTHORIZED') : (error && error.data.expired) ? this.commit('SET_AUTH_STATE', 'EXPIRED') : !state.auth && this.commit('SET_AUTH_STATE', 'UNAUTHORIZED');
                 return response;
-            });
+            }); */
             
             let onError = (error => {
                 //Promise.reject(error);
@@ -214,20 +258,11 @@ export default new Vuex.Store({
             state.referer = referer;
         },
         LOCATION(state, view) {
-            /* if(!api) {
-                this.commit('INIT');
-                this.dispatch('execute', { endpoint: view, method: 'get' });
-            } */
-
             !api && this.commit('INIT');
-            //this.dispatch('execute', { endpoint: view, method: 'get' });
+            this.dispatch('execute', { endpoint: view, method: 'get' });
 
             state.view = view;
             state.notFound = false;
-        },
-        SET_AUTH_STATE(state, value) {
-            state.auth_state = value;
-            //console.log('CURRENT AUTH STATE:', state.auth_state);
         },
         NOT_FOUND(state) {
             state.notFound = true;
@@ -247,13 +282,15 @@ export default new Vuex.Store({
         HIDE_MODALS(state) {
             state.modals = {};
         },
-        SET_SIGNED_IN(state, signed_id) {
-            state.signed_id = signed_id;
-            if(!signed_id) {
-                this.commit('SET_AUTH', void 0);
-                this.commit('HIDE_MODALS');
-                this.commit('CLEAR_CACHE');
+        SET_SIGN(state, value) {
+            JSON.stringify(state.sign) !== JSON.stringify(value) && (state.sign = value);
+            if(value.AUTHORIZED) {
+                //this.commit('SET_AUTH', void 0);
+                //this.commit('HIDE_MODALS');
+                //this.commit('CLEAR_CACHE');
+                requests_cache.reset();
             }
+            //console.log('CURRENT AUTH STATE:', state.auth_state);
         },
         SET_TOKEN(state, token) {
             token ? sessionStorage.setItem('token', token) : sessionStorage.removeItem('token');
@@ -273,6 +310,7 @@ export default new Vuex.Store({
             state.snackbar.visible = false;
         },
         SET_ENTITIES(state, { entities, map, result, entry, method }) {
+            //debugger;
             if(entities) {
                 let merge = Object.keys(entities).length ? deepmerge(state.entities, entities || {}, {
                     arrayMerge: function (destination, source, options) {
@@ -297,11 +335,13 @@ export default new Vuex.Store({
                 :
                 {};
 
-                Object.keys(merge).length && (Vue.set(state, 'entities',  merge));
+                //Object.keys(merge).length && Vue.set(state, 'entities',  merge);
+                if(Object.keys(merge).length)
+                    Vue.set(state, 'entities',  merge);
             }
-            else !state.auth && (Vue.set(state, 'entities',  {}));
+            //else !state.auth && (Vue.set(state, 'entities',  {}));
 
-            //console.log('NEWS:', state.entities.news);
+            console.log('NEWS:', state.entities.news);
         },
         SET_COMMON_DATA(state, data) {
             Vue.set(state, 'common_data', data);

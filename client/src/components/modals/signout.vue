@@ -33,13 +33,17 @@
         },
         methods: {
             submit() {
+                this.commit('SET_TOKEN', void 0);
+                //this.commit('CLEAR_CACHE');
 
                 this.execute({ 
                     method: 'post', 
                     endpoint: 'signout.submit',
                     callback: () => {
+                        
+                        this.commit('HIDE_MODAL', { [this.entity]: void 0 });
+                        
                         this.$router.replace('landing');
-                        this.commit('SET_SIGNED_IN', false);
                     }    
                 });
             }

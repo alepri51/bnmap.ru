@@ -22,11 +22,11 @@
     export default {
         extends: Widget,
         data: () => ({
-            
-            
+                        
         }),
         computed: {
             filter() {
+                console.log('LIST:', this.raw_data);
                 return this.raw_data.sort((a, b) => a._rel.номер - b._rel.номер);
             }
         },

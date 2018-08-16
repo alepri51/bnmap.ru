@@ -15,7 +15,7 @@
         >
             <v-card hover class="ma-4" :width="400">
                 <v-card-text class="text-lg-center">
-                    <v-icon style="font-size:72px" color="accent">fas fa-magic</v-icon>
+                    <v-icon style="font-size:72px" color="accent" class="shadow">fas fa-magic</v-icon>
                 </v-card-text>
 
                 <v-card-title primary-title >
@@ -36,7 +36,7 @@
 
             <v-card hover class="ma-4" :width="400">
                 <v-card-text class="text-lg-center">
-                    <v-icon style="font-size:72px" color="primary">fas fa-filter</v-icon>
+                    <v-icon style="font-size:72px" color="primary" class="shadow">fas fa-filter</v-icon>
                 </v-card-text>
 
                 <v-card-title primary-title >

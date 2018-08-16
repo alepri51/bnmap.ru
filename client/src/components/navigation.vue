@@ -7,7 +7,7 @@
       <span class="secondary--text">Новостройки</span>
     </v-toolbar-title>
 
-    <v-tabs v-if="$store.state.auth"
+    <v-tabs v-if="authorized"
         class="ml-2"
         v-model="active"
         slider-color="secondary"
@@ -26,7 +26,7 @@
 
     <v-spacer/>
 
-    <v-toolbar-items v-if="!$store.state.auth">
+    <v-toolbar-items v-if="!authorized">
         <v-btn flat @click="commit('SHOW_MODAL', { signup: void 0 })" color="primary">
             <!-- <v-icon small class="mr-1">fas fa-user-plus</v-icon> -->Стать своим
         </v-btn>
@@ -36,7 +36,7 @@
         </v-btn>
     </v-toolbar-items>
 
-    <v-toolbar-items v-if="$store.state.auth">
+    <v-toolbar-items v-if="authorized">
         <!-- <v-btn flat replace to="account"  color="primary" >
             <v-icon small class="mr-1">fas fa-user-circle</v-icon>{{$store.state.auth.name}}
         </v-btn> -->

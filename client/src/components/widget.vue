@@ -19,10 +19,6 @@
         props: ['name'],
         //extends: Base,
         computed: {
-            signed_id() {
-                return typeof this.condition !== 'undefined' ? this.condition : this.$store.state.signed_id;
-                //return typeof this.condition !== 'undefined' ? this.condition : !!(this.auth && this.auth.member);
-            }
         }
     }
 </script>

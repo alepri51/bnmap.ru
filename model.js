@@ -29,7 +29,7 @@ let model = (data = {}) => {
     }, { idAttribute: '_id' });
 
     const _hierarchy = new schema.Entity('hierarchy', {}, { idAttribute: '_id' });
-    
+
     const _list = new schema.Entity('list', {}, { idAttribute: '_id' });
 
     const _member = new schema.Entity('member', {
@@ -53,7 +53,7 @@ let model = (data = {}) => {
 
     const db = new schema.Entity('database', {
         account: _member,
-        auth: _auth,
+        //auth: _auth,
         error: _error,
         defaults: {_defaults}
     }, { idAttribute: 'api' });

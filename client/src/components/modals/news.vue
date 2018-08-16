@@ -40,12 +40,14 @@
                             chips
                             clearable
                             multiple
+                            
                         >
                             <template slot="selection" slot-scope="data">
-                                <v-chip
+                                <v-chip small
                                     :selected="data.selected"
                                     close
                                     @input="form.tags.splice(form.tags.indexOf(data.item), 1)"
+                                    class="accent white--text"
                                 >
                                     <span>{{ data.item }}</span>
                                 </v-chip>
@@ -98,6 +100,6 @@
         },
         methods: {
             
-        }
+        },
     }    
 </script>
