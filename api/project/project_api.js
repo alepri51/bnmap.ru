@@ -91,7 +91,7 @@ class Structure extends SecuredAPI { //LAYOUT
     }
 
     async default(params) {
-        let member = await db.Member._findOne({ _id: this.member });
+        let member = await db.Member._findOne({ _id: this.member }, { computeLevels: 10 });
 
         let referals = await db.Member._query('MATCH (:`Участник` {_id: {id}})-[:реферал*]-(node:Участник)', { id: this.member });
         
@@ -143,11 +143,18 @@ class Structure extends SecuredAPI { //LAYOUT
             }, { nodes: [], edges: []})
         });
 
-        //referals = reduce(referals);
         member.list.members = member.list.members.map(member => {
-            !member._rel.номер 
+            !member._rel.номер && (member._rel.номер = 0);
+            return member;
         });
         
+        member.list.members.sort((a, b) => a._rel.номер - b._rel.номер);
+
+        member.list.members.every((member, inx, arr) => {
+            member._rel.номер !== inx && (arr[0]._rel.номер = inx);
+            return member._rel.номер === inx;
+        });
+
         let result = model({
             account: { 
                 _id: this.member,

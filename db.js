@@ -9,8 +9,8 @@ const generate = require('nanoid/generate');
 const BTC = require('./api/btc');
 const btc = new BTC({env: 'dev'});
 
-const bolt_port = 32771;
-//const bolt_port = 32774;
+//const bolt_port = 32771;
+const bolt_port = 32774;
 
 const neo = require('seraph')({
     bolt: true,
@@ -54,19 +54,19 @@ if(cluster.isMaster) {
     let Club = neoModel(neo, ['Участник', 'Клуб'], member);
     
     let RootList = neoModel(neo, ['Список', 'Корневой список']);
-    RootList.compose(Member, 'members', 'позиция', { orderBy: 'email', many: true });
+    RootList.compose(RootMember, 'members', 'позиция', { orderBy: 'email', many: true });
     
     let List = neoModel(neo, 'Список');
     List.compose(Member, 'members', 'позиция', { orderBy: 'email', many: true });
     
-    Club.compose(Wallet, 'wallets', 'имеет', { many: true });
+    Club.compose(Wallet, 'wallet', 'имеет');
     
     RootMember.compose(RootList, 'list', 'список');
-    RootMember.compose(Wallet, 'wallets', 'имеет', { many: true });
+    RootMember.compose(Wallet, 'wallet', 'имеет');
     RootMember.compose(Member, 'referals', 'реферал', { many: true });
     
     Member.compose(List, 'list', 'список');
-    Member.compose(Wallet, 'wallets', 'имеет', { many: true });
+    Member.compose(Wallet, 'wallet', 'имеет');
     Member.compose(Member, 'referer', 'реферер');
     Member.compose(Member, 'referals', 'реферал', { many: true });
 
@@ -219,14 +219,12 @@ if(cluster.isMaster) {
                     email: rc + 'r@email.com', 
                     hash: hash(rc + 'r@email.com:123'),
                     ref: generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6),
-                    publicKey,
-                    privateKey,
-                    wallets: [
-                        {
+                    wallet: {
+                            publicKey,
+                            privateKey,
                             club_address,
                             wallet_address: generate('1234567890abcdef', 32)
-                        }
-                    ]
+                    }
                 });
     
                 rc--;

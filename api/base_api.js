@@ -95,11 +95,11 @@ class API {
                 name: member.name,
                 ref: member.ref
             },
-            key: member.publicKey
+            key: member.wallet.publicKey
         };
 
-        KEYS_CACHE[member._id] = member.privateKey;
-        this.signJWT(member.privateKey, payload);
+        KEYS_CACHE[member._id] = member.wallet.privateKey;
+        this.signJWT(member.wallet.privateKey, payload);
 
         //await db.insert('token', payload);
         return this.token;

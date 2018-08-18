@@ -69,14 +69,12 @@ class SignUp extends API {
                     hash: this.hash(`${email}:${password}`),
                     referer,
                     ref: generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6),
-                    publicKey,
-                    privateKey,
-                    wallets: [
-                        {
+                    wallet: {
+                            publicKey,
+                            privateKey,
                             club_address: await btc.getNewAddress(),
                             wallet_address
-                        }
-                    ]
+                    }
                 });
 
                 members.push(member);
@@ -106,7 +104,7 @@ class SignUp extends API {
 
                 referer.referals = referer.referals || [];
                 referer.referals.push(member);
-                
+
                 await Member._update(referer);
 
                 await this.generateJWT({ member });
