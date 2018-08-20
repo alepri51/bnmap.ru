@@ -25,6 +25,15 @@ class News extends DBAccess { //WIDGET AND DIALOG
         super(...args);
     }
 
+    checkSecurity(name, method) {
+        let allow = super.checkSecurity(name, method);
+        if(name === 'save') {
+            allow = allow && this.auth.group === 'admins';
+        }
+
+        return allow;
+    }
+
     async default() {
         //let news = await db.find('news', { member: this.member });
         //let news = await db.Info._findAll();
@@ -54,6 +63,7 @@ class News extends DBAccess { //WIDGET AND DIALOG
 
     accessGranted(payload) {
         return (payload._id && payload.author && payload.author._id === this.member) || !!!payload._id;
+        //return false;
     }
 
     async beforeInsert(payload) {
@@ -77,7 +87,16 @@ class Payment extends SecuredAPI { //LAYOUT
     }
 
     async default(params) {
-        
+        let member = await db.Member._findOne({ _id: this.member });
+
+        let result = model({
+            account: {
+                _id: member._id,
+                wallet: member.wallet
+            }
+        });
+
+        return result;
     }
 }
 
@@ -91,11 +110,12 @@ class Structure extends SecuredAPI { //LAYOUT
     }
 
     async default(params) {
-        let member = await db.Member._findOne({ _id: this.member }, { computeLevels: 10 });
+        let member = await db.Member._findOne({ _id: this.member });
 
-        let referals = await db.Member._query('MATCH (:`Участник` {_id: {id}})-[:реферал*]-(node:Участник)', { id: this.member });
+        /* let referals = await db.Member._query('MATCH (:`Участник` {_id: {id}})-[:реферал*0..1]-(node:Участник)', { id: this.member });
+        referals = member.referals;
         
-        referals.push(member);
+        //referals.push(member);
 
         referals.forEach((element, inx, arr) => {
             element.referals && (element.referals = element.referals.map(referal => {
@@ -103,22 +123,21 @@ class Structure extends SecuredAPI { //LAYOUT
             }));
         })
 
-        //referals = referals.filter(ref => (ref._id === this.member) || (ref.referer && ref.referer._id === this.member));
         referals = referals.filter(ref => ref._id === this.member);
 
         let shrink = (referals => {
             return referals.map(referal => {
                 let { _id, name, ref, email, referals, _rel } = referal;
-                referals = shrink(referals || []);
+                referals = referals && referals.length >= 1 && referals[0] && shrink(referals);
 
-                return { _id, name, ref, email, referals, _rel }
+                return referals ? { _id, name, ref, email, referals, _rel } : { _id, name, ref, email, _rel }
             });
         });
 
-        referals = shrink(referals);
+        referals = shrink(referals); */
         //referals = shrink([member]);
 
-        let reduce = (arr => {
+        /* let reduce = (arr => {
             return arr.reduce((memo, item) => {
                 memo.nodes.push({
                     id: item._id,
@@ -148,19 +167,37 @@ class Structure extends SecuredAPI { //LAYOUT
             return member;
         });
         
+        
         member.list.members.sort((a, b) => a._rel.номер - b._rel.номер);
 
         member.list.members.every((member, inx, arr) => {
             member._rel.номер !== inx && (arr[0]._rel.номер = inx);
             return member._rel.номер === inx;
-        });
+        }); */
 
-        let result = model({
+        //member.list.members = member.list.members.sort((a, b) => a._rel.номер - b._rel.номер);
+        
+/*         let result = model({
             account: { 
                 _id: this.member,
                 referals,
-                list: shrink(member.list.members)
+                list: member.list.members
             }
+        });
+ */
+        member.list = member.list.members;
+        member.referals = [
+            {
+                _id: member._id,
+                name: member.name,
+                referals: member.referals
+            }
+        ];
+
+        delete member.wallet;
+
+        let result = model({
+            account: member
         });
 
         return result;
@@ -170,6 +207,30 @@ class Structure extends SecuredAPI { //LAYOUT
 class Hierarchy extends DBAccess { //WIDGET
     constructor(...args) {
         super(...args);
+    }
+
+    async referals(params) {
+        let member = await db.Member._findOne({ _id: parseInt(params.id) });
+
+        if(member.referals) {
+            delete member.list;
+            
+            member.referals = [
+                {
+                    _id: member._id,
+                    name: member.name,
+                    referals: member.referals
+                }
+            ];
+
+            delete member.wallet;
+
+            let result = model({
+                account: member
+            });
+
+            return result;
+        }
     }
 
     async default(params) {

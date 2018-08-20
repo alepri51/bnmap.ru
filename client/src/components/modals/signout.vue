@@ -34,7 +34,7 @@
         methods: {
             submit() {
                 this.commit('SET_TOKEN', void 0);
-                //this.commit('CLEAR_CACHE');
+                this.commit('CLEAR_CACHE');
 
                 this.execute({ 
                     method: 'post', 

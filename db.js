@@ -39,7 +39,8 @@ if(cluster.isMaster) {
         email: String,
         hash: String,
         referer: String,
-        ref: String
+        ref: String,
+        group: String
     };
     
     let wallet = {
@@ -192,12 +193,10 @@ if(cluster.isMaster) {
                 name: 'Club', 
                 email: 'club@email.com', 
                 hash: '',
-                wallets: [
-                    {
+                wallet: {
                         club_address,
                         wallet_address: generate('1234567890abcdef', 32)
                     }
-                ]
             });
         }
     
@@ -224,7 +223,8 @@ if(cluster.isMaster) {
                             privateKey,
                             club_address,
                             wallet_address: generate('1234567890abcdef', 32)
-                    }
+                    },
+                    group: 'admins'
                 });
     
                 rc--;
@@ -236,8 +236,8 @@ if(cluster.isMaster) {
         let lists = await RootList._findAll();
         if(!!!lists.length) {
             let list = {
-                members: roots.sort((a, b) => a.email > b.email ? 1 : -1).map((member, inx) => {
-                    member._rel = { номер: inx + 1 }
+                members: roots.sort((a, b) => a.email > b.email ? 1 : 0).map((member, inx) => {
+                    member._rel = { номер: inx + 1 };
                     return member;
                 })
             };

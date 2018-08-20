@@ -5,7 +5,9 @@
                 <v-card-title>
                     <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-sitemap</v-icon>Иерархия:</h2>
                 </v-card-title>
-                <network style="flex: 1" class="pa-3"
+                <v-divider/>
+                <tree :model="filter" :selection="selection" @selected="onSelect" />
+                <!-- <network style="flex: 1" class="pa-3"
                     ref="network"
                     :nodes="filter.nodes"
                     :edges="filter.edges"
@@ -15,7 +17,7 @@
                     @select-node="onSelectNode"
                     @deselect-node="onDeselectNode"
                     @after-drawing.once="onInitRedraw"
-                ></network>
+                ></network> -->
                 <!-- <v-card-text >
                     
                 </v-card-text> -->
@@ -30,14 +32,22 @@
     import '../../public/css/font-awesome.min.css';
 
     import { Timeline, Graph2d, Network } from 'vue2vis';
+    import tree from "./tree";
 
     export default {
         extends: Widget,
         components: {
-            network: Network
+            //network: Network
+            tree
         },
         methods: {
+            onSelect(model) {
+                //debugger;
+                this.selection = model;
+                this.commit('SET_COMMON_DATA', { active_referal: model});
+            },
             onSelectNode(e) {
+                //debugger
                 let referal = this.filter.nodes.find(node => node.id === e.nodes[0]);
                 this.commit('SET_COMMON_DATA', { active_referal: referal});
             },
@@ -50,6 +60,23 @@
         },
         data()  {
             return {
+                selection: {},
+                tree: 
+                    {
+                    label: "A cool folder",
+                    children: [
+                        {
+                            label: "A cool sub-folder 1",
+                            children: [
+                                { label: "A cool sub-sub-folder 1" },
+                                { label: "A cool sub-sub-folder 2" }
+                            ]
+                        },
+                        { 
+                            label: "This one is not that cool" 
+                        }
+                    ]
+                },
                 network: {
                     options: {
                         edges: {
@@ -100,6 +127,10 @@
         computed: {
             filter() {
                 //debugger;
+                return this.raw_data[0] || {};
+            }
+            /* filter() {
+                //debugger;
                 let reduce = (arr => {
                     return arr.reduce((memo, item) => {
                         memo.nodes.push({
@@ -109,7 +140,7 @@
                             email: item.email
                         });
 
-                        if(item.referals.length) {
+                        if(item.referals && item.referals.length) {
                             item.referals.forEach(element => {
                                 memo.edges.push({
                                     from: item._id,
@@ -130,8 +161,8 @@
                 let data = reduce(this.raw_data);
 
                 return data || {nodes: [], edges: []};
-            }
-        },
+            }*/
+        }, 
     }
 </script>
 

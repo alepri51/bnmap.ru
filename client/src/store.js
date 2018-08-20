@@ -310,8 +310,8 @@ export default new Vuex.Store({
             state.snackbar.visible = false;
         },
         SET_ENTITIES(state, { entities, map, result, entry, method }) {
-            //debugger;
             if(entities) {
+                //debugger;
                 let merge = Object.keys(entities).length ? deepmerge(state.entities, entities || {}, {
                     arrayMerge: function (destination, source, options) {
                         //debugger;

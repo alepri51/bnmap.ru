@@ -4,7 +4,7 @@
             <v-layout column fill-height >
                 <v-card-title>
                     
-                    <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-user</v-icon><span v-html="active.label"></span></h2>
+                    <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-user</v-icon><span v-html="active.name"></span></h2>
                 </v-card-title>
                 <v-card-text>
                     <div>email: <b class="accent--text">{{active.email}}</b></div>

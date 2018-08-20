@@ -93,7 +93,8 @@ class API {
                 member: member._id,
                 email: member.email,
                 name: member.name,
-                ref: member.ref
+                ref: member.ref,
+                group: member.group
             },
             key: member.wallet.publicKey
         };
@@ -159,13 +160,17 @@ class SecuredAPI extends API {
 
     }
 
+    checkSecurity(name, method) {
+        return this.auth;
+    }
+
     security(name, method) {
         let exceptions = ['generateError'];
         let except = exceptions.includes(name); //AVOID STACK OVERFLOW DUE RECURSION
 
         let self = this;
-        if(!except && !this.auth) {
-            return function(...args) { 
+        if(!except && !this.checkSecurity(name, method)) {
+            return function(...args) {
                 self.generateError({ code: 403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь.', data: { expired: true, class: self.constructor.name }});
             };
         }

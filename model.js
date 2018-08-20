@@ -29,23 +29,21 @@ let model = (data = {}) => {
     }, { idAttribute: '_id' });
 
     const _hierarchy = new schema.Entity('hierarchy', {}, { idAttribute: '_id' });
+    _hierarchy.define({ referals: [_hierarchy] });
 
     const _list = new schema.Entity('list', {}, { idAttribute: '_id' });
 
     const _member = new schema.Entity('member', {
         news: [_news],
         transactions: [_transaction],
-        wallets: [_wallet],
+        wallet: _wallet,
         orders: [_order],
-        referals: [_hierarchy],
-        list: [_list]
-    }, { 
-        idAttribute: '_id',
-        processStrategy: (value, parent, key) => {
-            //value.entity = 'member';
-            return value;
-        }
-    });
+        list: [_list],
+        referals: [_hierarchy]
+    }, { idAttribute: '_id' });
+
+    //_member.define({ referals: [_member] });
+    //_member.define({ list: [_member] });
 
     const _auth = new schema.Entity('auth', {}, { idAttribute: 'id' });
     const _error = new schema.Entity('error', {}, { idAttribute: 'code' });
@@ -60,7 +58,7 @@ let model = (data = {}) => {
 
     let map = {};
 
-    let mapping = (schema) => {
+    /* let mapping = (schema) => {
         let entries = Object.entries(schema);
         entries.forEach(entry => {
             let from = entry[0];
@@ -76,7 +74,7 @@ let model = (data = {}) => {
     }
 
     mapping(db.schema);
-    map.database = 'database';
+    map.database = 'database'; */
 
     let normalized = normalizer.normalize(data, db);
     normalized = {...normalized, entry: 'database', map};

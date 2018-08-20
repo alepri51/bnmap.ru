@@ -5,6 +5,7 @@
                 <v-card-title>
                     <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-qrcode</v-icon>ссылка для друзей:</h2>
                 </v-card-title>
+                <v-divider/>
                 <v-card-text style="text-align: center">
                     <qrcode :value="`https://atlantclub.com/?ref=${this.auth.ref}`" :options="{ size: 100 }"></qrcode>
                     <div>

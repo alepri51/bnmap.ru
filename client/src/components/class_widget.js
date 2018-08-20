@@ -32,7 +32,8 @@ export default {
     },
     watch: {
         'state.sign': async function (new_val, old_val) {
-            await this.execute({ endpoint: `${this.entity}` });
+            //debugger;
+            new_val.AUTHORIZED && await this.execute({ endpoint: `${this.entity}` });
         }
     }
 

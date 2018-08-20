@@ -3,7 +3,7 @@
         <v-card width="100%">
             <v-card-title style="position: relative">
                 <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
-                <v-btn
+                <v-btn v-if="auth.group === 'admins'"
                     absolute
                     right
                     fab
@@ -64,7 +64,7 @@
                         </v-card-actions>
                     </v-layout>
 
-                    <v-speed-dial 
+                    <v-speed-dial v-if="auth.group === 'admins'"
                         absolute
                         v-model="fab[data._id]"
                         
