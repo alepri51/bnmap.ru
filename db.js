@@ -9,8 +9,8 @@ const generate = require('nanoid/generate');
 const BTC = require('./api/btc');
 const btc = new BTC({env: 'dev'});
 
-//const bolt_port = 32771;
-const bolt_port = 32774;
+const bolt_port = 32771;
+//const bolt_port = 32774;
 
 const neo = require('seraph')({
     bolt: true,
@@ -126,6 +126,22 @@ if(cluster.isMaster) {
     let Message = neoModel(neo, ['Информация', 'Сообщение'], info);
     Message.compose(Member, 'from', 'от');
     Message.compose(Member, 'to', 'кому');
+
+    let orderItem = {
+    };
+
+    let OrderItem = neoModel(neo, 'Элемент заказа', orderItem);
+
+    let order = {
+        state: String,
+        name: String,
+        group: String,
+        number: String,
+        date: Date
+    };
+
+    let Order = neoModel(neo, ['Документ', 'Заказ'], order);
+    Order.compose(OrderItem, 'items', 'состоит', { many: true });
 
     (async function() {
 

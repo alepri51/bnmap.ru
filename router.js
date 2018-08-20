@@ -58,7 +58,8 @@ router.all(patterns, async (req, res, next) => {
         let error = {
             code: err.code,
             message: err.message,
-            data: {}
+            data: {},
+            system: true
         }
         console.log('ERROR => ', err);
 

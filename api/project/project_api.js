@@ -87,7 +87,7 @@ class Payment extends SecuredAPI { //LAYOUT
     }
 
     async default(params) {
-        let member = await db.Member._findOne({ _id: this.member });
+        /* let member = await db.Member._findOne({ _id: this.member });
 
         let result = model({
             account: {
@@ -96,7 +96,7 @@ class Payment extends SecuredAPI { //LAYOUT
             }
         });
 
-        return result;
+        return result; */
     }
 }
 
@@ -112,84 +112,29 @@ class Structure extends SecuredAPI { //LAYOUT
     async default(params) {
         let member = await db.Member._findOne({ _id: this.member });
 
-        /* let referals = await db.Member._query('MATCH (:`Участник` {_id: {id}})-[:реферал*0..1]-(node:Участник)', { id: this.member });
-        referals = member.referals;
         
-        //referals.push(member);
-
-        referals.forEach((element, inx, arr) => {
-            element.referals && (element.referals = element.referals.map(referal => {
-                return arr.find(ref => ref._id === referal._id);
-            }));
-        })
-
-        referals = referals.filter(ref => ref._id === this.member);
-
-        let shrink = (referals => {
-            return referals.map(referal => {
-                let { _id, name, ref, email, referals, _rel } = referal;
-                referals = referals && referals.length >= 1 && referals[0] && shrink(referals);
-
-                return referals ? { _id, name, ref, email, referals, _rel } : { _id, name, ref, email, _rel }
-            });
-        });
-
-        referals = shrink(referals); */
-        //referals = shrink([member]);
-
-        /* let reduce = (arr => {
-            return arr.reduce((memo, item) => {
-                memo.nodes.push({
-                    id: item._id,
-                    label: '<b>' + item.name + '</b>'
-                });
-
-                if(item.referals.length) {
-                    item.referals.forEach(element => {
-                        memo.edges.push({
-                            from: item._id,
-                            to: element._id
-                            
-                        });
-                    });
-
-                    let reduced = reduce(item.referals);
-                    memo.nodes = memo.nodes.concat(reduced.nodes);
-                    memo.edges = memo.edges.concat(reduced.edges);
-                }
-
-                return memo;
-            }, { nodes: [], edges: []})
-        });
-
         member.list.members = member.list.members.map(member => {
             !member._rel.номер && (member._rel.номер = 0);
             return member;
         });
         
         
-        member.list.members.sort((a, b) => a._rel.номер - b._rel.номер);
+        member.list.members = member.list.members.sort((a, b) => a._rel.номер - b._rel.номер);
 
         member.list.members.every((member, inx, arr) => {
             member._rel.номер !== inx && (arr[0]._rel.номер = inx);
             return member._rel.номер === inx;
-        }); */
-
-        //member.list.members = member.list.members.sort((a, b) => a._rel.номер - b._rel.номер);
-        
-/*         let result = model({
-            account: { 
-                _id: this.member,
-                referals,
-                list: member.list.members
-            }
         });
- */
+        
+        let { name, email, ref } = member;
+
         member.list = member.list.members;
         member.referals = [
             {
                 _id: member._id,
-                name: member.name,
+                name, 
+                email, 
+                ref,
                 referals: member.referals
             }
         ];
@@ -234,35 +179,7 @@ class Hierarchy extends DBAccess { //WIDGET
     }
 
     async default(params) {
-        /* let referals = await db.Member._query('MATCH (:`Участник` {_id: {id}})-[:реферал*]-(node:Участник)', { id: this.member }, { computeLevels: 100 });
         
-        referals.forEach((element, inx, arr) => {
-            element.referals && (element.referals = element.referals.map(referal => {
-                return arr.find(ref => ref._id === referal._id);;
-            }));
-        })
-
-        referals = referals.filter(ref => ref.referer._id === this.member);
-
-        let shrink = (referals => {
-            return referals.map(referal => {
-                let { _id, name, ref, email, referals } = referal;
-                referals = shrink(referals || []);
-
-                return { _id, name, ref, email, referals }
-            });
-        });
-
-        referals = shrink(referals);
-        
-        let result = model({
-            account: { 
-                _id: this.member,
-                referals
-            }
-        });
-
-        return result; */
     }
 }
 
@@ -274,10 +191,19 @@ class Wallet extends DBAccess { //WIDGET
     async default() {
         let member = await db.Member._findOne({ _id: this.member });
 
+        delete member.list;
+        delete member.referals;
+
+        let { _id } = member;
+        let { club_address, wallet_address } = member.wallet;
+
         let result = model({
-            account: { 
-                _id: this.member,
-                wallets: member.wallets
+            account: {
+                _id, 
+                wallet: {
+                    club_address, 
+                    wallet_address
+                }
             }
         });
 
@@ -340,7 +266,7 @@ class Donate extends DBAccess { // DIALOG
         let converted = await db.btc.convertToBtc(sum);
 
         return {
-            address: member.wallets[0].club_address,
+            address: member.wallet.club_address,
             items: [
                 {
                     product: donate,
@@ -365,9 +291,9 @@ class Donate extends DBAccess { // DIALOG
 
         this.order = JSON.parse(JSON.stringify(payload));
 
-        let member = await db.findOne('member', { _id: this.member });
+        let member = await db.Member._findOne({ _id: this.member });
         if(!member.referer) {
-            this.generateError({ code: 403, message: 'Вы не можете сделать взнос.'});
+            this.generateError({ code: 400, message: 'Вы не можете сделать взнос.'});
             return;
         }
 
@@ -383,7 +309,7 @@ class Donate extends DBAccess { // DIALOG
         let allowed = !!order ? (order.created + period) < now : true;
 
         if(!allowed) {
-            this.generateError({ code: 403, message: 'Взнос уже сделан. Следующий взнос возможен через ' + ms((order.created + period) - now, { long: true }) + ' период: ' + ms(period, { long: true }) });
+            this.generateError({ code: 400, message: 'Взнос уже сделан. Следующий взнос возможен через ' + ms((order.created + period) - now, { long: true }) + ' период: ' + ms(period, { long: true }) });
             return;
         }
 

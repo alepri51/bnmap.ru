@@ -48,13 +48,19 @@ export default {
         },
     },
     watch: {
+        'state.sign': async function (new_val, old_val) {
+            if(!this.visible && new_val.AUTHORIZED) {
+                let response = await this.execute({ method: 'post', endpoint: `${this.entity}.defaults` });
+                !response.error && (this.defaults = response.rest_data);
+            }
+    },
         'visible': async function (new_val, old_val) {
             //debugger;
 
-            if(this.sign.AUTHORIZED && new_val) {
+            /* if(this.sign.AUTHORIZED && new_val) {
                 let response = await this.execute({ method: 'post', endpoint: `${this.entity}.defaults` });
-                this.defaults = response.rest_data;
-            }
+                !response.error && (this.defaults = response.rest_data);
+            } */
         }
     }
 }

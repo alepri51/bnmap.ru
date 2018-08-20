@@ -164,7 +164,7 @@ export default new Vuex.Store({
                     let vertical = error.message.length > 50;
                     !error.system ? this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical }) : console.error(error.code, error.message, error.data);
 
-                    !error.system && !sign.UNAUTHORIZED && this.commit('SHOW_MODAL', { signin: void 0 });
+                    !error.system && error.code === 403 && !sign.UNAUTHORIZED && this.commit('SHOW_MODAL', { signin: void 0 });
 
                     response.error = error;
                 }
