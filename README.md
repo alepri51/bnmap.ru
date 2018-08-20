@@ -1,6 +1,4 @@
-# Project Title
-
-ATLANT Club
+# ATLANT Club
 
 ### Installing
 
@@ -10,9 +8,10 @@ git clone <dir>
 cd <dir>
 npm install
 npm run start
-
+```
+#### client
+```
 cd <dir>/client
 npm install
 npm run serve
 ```
-#### client
