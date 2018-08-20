@@ -1,7 +1,7 @@
 # RU
-git clone <dir>
-cd <dir>
-npm install
+*git clone <dir>
+*cd <dir>
+*npm install
 npm run start
 cd <dir>/client
 npm install
