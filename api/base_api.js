@@ -161,7 +161,11 @@ class SecuredAPI extends API {
     }
 
     checkSecurity(name, method) {
-        return this.auth;
+        let authError = function(...args) {
+            this.generateError({ code: 403, message: 'Отказано в доступе. Возможно Ваша сессия завершилась.', data: { expired: true, class: this.constructor.name }});
+        };
+
+        return !this.auth && authError;
     }
 
     security(name, method) {
@@ -169,11 +173,16 @@ class SecuredAPI extends API {
         let except = exceptions.includes(name); //AVOID STACK OVERFLOW DUE RECURSION
 
         let self = this;
-        if(!except && !this.checkSecurity(name, method)) {
+        if(!except) {
+            let redirect = this.checkSecurity(name, method);
+            method = redirect || method;
+        }
+
+        /* if(!except && !this.checkSecurity(name, method)) {
             return function(...args) {
                 self.generateError({ code: 403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь.', data: { expired: true, class: self.constructor.name }});
             };
-        }
+        } */
 
         return method;
     }

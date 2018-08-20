@@ -117,6 +117,9 @@ export default new Vuex.Store({
             //debugger;
             state.entities = {}
         },
+        RESET_CACHE(state) {
+            requests_cache.reset();
+        },
         INIT(state) {
         
             api = axios.create({ 
@@ -283,14 +286,11 @@ export default new Vuex.Store({
             state.modals = {};
         },
         SET_SIGN(state, value) {
-            JSON.stringify(state.sign) !== JSON.stringify(value) && (state.sign = value);
-            if(value.AUTHORIZED) {
-                //this.commit('SET_AUTH', void 0);
-                //this.commit('HIDE_MODALS');
-                //this.commit('CLEAR_CACHE');
-                requests_cache.reset();
-            }
-            //console.log('CURRENT AUTH STATE:', state.auth_state);
+            if(JSON.stringify(state.sign) !== JSON.stringify(value)) {
+                state.sign = value;
+
+                //ivalue.AUTHORIZED && requests_cache.reset();
+            } 
         },
         SET_TOKEN(state, token) {
             token ? sessionStorage.setItem('token', token) : sessionStorage.removeItem('token');
@@ -299,6 +299,7 @@ export default new Vuex.Store({
         SET_AUTH(state, auth) {
             state.auth && JSON.stringify(state.auth) !== JSON.stringify(auth) && this.commit('CLEAR_CACHE');
             //this.commit('CLEAR_CACHE');
+            JSON.stringify(state.auth) !== JSON.stringify(auth) && requests_cache.reset();
             state.auth = auth;
         },
         SHOW_SNACKBAR(state, options) {

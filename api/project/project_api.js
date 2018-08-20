@@ -26,12 +26,17 @@ class News extends DBAccess { //WIDGET AND DIALOG
     }
 
     checkSecurity(name, method) {
-        let allow = super.checkSecurity(name, method);
+        let accessDeniedError = function(...args) {
+            this.generateError({ code: 400, message: 'Вам отказано в доступе. Возможно Ваша учетная запись не обладает достаточным уровнем привелегий для выполнения запрошенной операции', data: { class: this.constructor.name }});
+        };
+
+        method = super.checkSecurity(name, method);
+
         if(name === 'save') {
-            allow = allow && this.auth.group === 'admins';
+            method = method || (this.auth.group !== 'admins' && accessDeniedError);
         }
 
-        return allow;
+        return method;
     }
 
     async default() {

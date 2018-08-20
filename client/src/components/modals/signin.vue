@@ -70,7 +70,9 @@
                         payload: this.$data, 
                         callback: (response) => {
                             if(!response.error) {
+                                this.commit('RESET_CACHE');
                                 this.commit('HIDE_MODAL', { signin: void 0 });
+                                
                                 //this.state.view !== 'newslayout' ? this.state.signed_in ? this.commit('LOCATION', this.state.view) : this.$router.replace('newslayout') : this.commit('LOCATION', 'newslayout');
                                 //debugger;
                                 //this.state.signed_in ? this.commit('LOCATION', this.state.view) : this.$router.replace('newslayout');

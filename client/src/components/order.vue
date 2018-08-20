@@ -28,9 +28,9 @@
         lg12
         
       >
-        <v-card class="ma-2">
+        <v-card class="ma-2" hover>
           <v-card-title><h4>{{ props.item.number }}</h4></v-card-title>
-          <v-divider></v-divider>
+          <!-- <v-divider></v-divider> -->
         </v-card>
       </v-flex>
 
