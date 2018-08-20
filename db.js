@@ -130,7 +130,7 @@ if(cluster.isMaster) {
     let orderItem = {
     };
 
-    let OrderItem = neoModel(neo, 'Элемент заказа', orderItem);
+    let OrderItem = neoModel(neo, 'Элемент', orderItem);
 
     let order = {
         state: String,
@@ -142,6 +142,10 @@ if(cluster.isMaster) {
 
     let Order = neoModel(neo, ['Документ', 'Заказ'], order);
     Order.compose(OrderItem, 'items', 'состоит', { many: true });
+    Order.compose(Member, 'member', 'участник');
+
+    OrderItem.compose(Order, 'order', 'принадлежит');
+    OrderItem.compose(Product, 'product', 'продукт');
 
     (async function() {
 
@@ -280,6 +284,8 @@ if(cluster.isMaster) {
         Info,
         Message,
         News,
-        Event
+        Event,
+        Order,
+        OrderItem
     }
 }

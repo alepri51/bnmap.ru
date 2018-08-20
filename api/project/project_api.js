@@ -218,6 +218,23 @@ class Order extends DBAccess { //WIDGET
     }
 
     async default() {
+        let orders = await db.Order._query('MATCH (node:Заказ)--(:Участник {_id:{id}}) ', { id: this.member }, { orderBy: 'node.date DESC' });
+        
+        orders = orders.map(order => {
+            delete order.member;
+
+            return order;
+        });
+
+        let result = model({
+            account: { 
+                _id: this.member,
+                orders
+            }
+        });
+
+        return result;
+
         /* let orders = await db.find('order', { member: this.member });
         orders = orders.map(async order => {
             order.items = order.items.map(async item => {
@@ -283,43 +300,55 @@ class Donate extends DBAccess { // DIALOG
     }
 
     async insert(payload) {
-        payload.member = this.member;
-        payload.state = 'ожидание';
-        payload.name = 'Взнос';
-        payload.group = 'donate';
-        payload.number = await this.createPassword(10);
-
-        this.order = JSON.parse(JSON.stringify(payload));
-
         let member = await db.Member._findOne({ _id: this.member });
         if(!member.referer) {
             this.generateError({ code: 400, message: 'Вы не можете сделать взнос.'});
             return;
         }
 
+        payload.member = member;
+        payload.state = 'ожидание';
+        payload.name = 'Взнос';
+        payload.group = 'donate';
+        payload.number = await this.createPassword(10);
+        payload.date = Date.now();
 
-        let order = await db.findOne('order', { member: this.member, group: 'donate' }, { sort: { created: -1 }});
+        this.order = JSON.parse(JSON.stringify(payload));
 
-        let donate = await db.findOne('product', { group: 'donate' });
+
+        //let order = await db.Order._findOne({ member: this.member, group: 'donate' }, { orderBy: 'node.date DESC' });
+        let order = await db.Order._query('MATCH (node:Заказ {group:"donate"})--(:Участник {_id:{id}}) ', { id: this.member }, { orderBy: 'node.date DESC' });
+        order = order.length ? order[0] : void 0;
+        //let news = await db.Message._query('MATCH (:`Участник` {_id: {id}})-[:кому]-(node:Информация)', { id: this.member });
+
+        let donate = await db.Product._findOne({ group: 'donate' });
         let period = ms(donate.minPeriod);
 
         let difference = period;
 
         let now = Date.now();// / 1;
-        let allowed = !!order ? (order.created + period) < now : true;
+        let allowed = !!order ? (order.date + period) < now : true;
 
         if(!allowed) {
-            this.generateError({ code: 400, message: 'Взнос уже сделан. Следующий взнос возможен через ' + ms((order.created + period) - now, { long: true }) + ' период: ' + ms(period, { long: true }) });
+            this.generateError({ code: 400, message: 'Взнос уже сделан. Следующий взнос возможен через ' + ms((order.date + period) - now, { long: true }) + ' период: ' + ms(period, { long: true }) });
             return;
         }
 
         payload.items = payload.items.map(product => {
-            product.product = product.product._id
+            product.product = donate
 
             return product;
         });
 
-        let delivery_roots = {
+        order = await db.Order._save(payload);
+
+        /* payload.items = payload.items.map(product => {
+            product.product = product.product._id
+
+            return product;
+        }); */
+
+        /* let delivery_roots = {
             club: await db.findOne('member', { group: 'club' }),
             referer: await db.findOne('member', { _id: member.referer })
         }
@@ -337,12 +366,12 @@ class Donate extends DBAccess { // DIALOG
             };
             
             return result;
-        });
+        }); */
 
         //создать список транзакций на какие кошельки сколько рассылать по прайсингу каждого товара
 
-        order = await db.insert('order', { ...payload });
-        this.order = { ...this.order, ...order };
+        //order = await db.insert('order', { ...payload });
+        //this.order = { ...this.order, ...order };
         return order;
     }
 
