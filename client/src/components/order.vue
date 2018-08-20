@@ -28,11 +28,12 @@
         lg12
         
       >
-        <v-card >
+        <v-card class="ma-2">
           <v-card-title><h4>{{ props.item.number }}</h4></v-card-title>
           <v-divider></v-divider>
         </v-card>
       </v-flex>
+
     </v-data-iterator>
        </v-card>
 
