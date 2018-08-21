@@ -5,7 +5,11 @@
                 <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Транзакции:</h2>
             </v-card-title>
             <v-divider/>
-            <scrollable :items="filter" xs12 sm12 md6 lg3>
+            <scrollable :items="filter" xs12 sm6 md4 lg3 :pagitation="{
+                    rowsPerPage: -1,
+                    sortBy: 'date',
+                    descending: true
+                }">
                 <v-card 
                     slot-scope="props"
                     hover
@@ -21,7 +25,7 @@
 
                     <v-card-text v-show="!details[props.item._id]">
                         Состояние: <b>{{ props.item.state }}</b>
-                        ID: <b>{{ props.item._id }}</b>
+                        <!-- ID: <b>{{ props.item._id }}</b> -->
                     </v-card-text>
 
                     <v-card-text v-show="details[props.item._id]">
@@ -31,11 +35,13 @@
                     <v-spacer/>
 
                     <v-card-actions>
+                        <small class="">{{ new Date(props.item.date).toLocaleString() }}</small>
                         <v-spacer/>
-                        <v-btn small flat color="primary" @click="toggle(props.item._id)">Подробней</v-btn>
+                        <v-btn icon small flat color="primary" @click="$set(details, props.item._id, !details[props.item._id])">
+                            <v-icon small>{{ details[props.item._id] ? 'fas fa-compress' : 'fas fa-expand' }}</v-icon>
+                        </v-btn>
                     </v-card-actions>
 
-                    <small class="pl-3 pr-3 pb-2">{{ new Date(props.item.date).toLocaleString() }}</small>
 
                 </v-card>
             </scrollable>

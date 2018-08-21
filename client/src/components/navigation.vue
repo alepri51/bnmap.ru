@@ -28,22 +28,22 @@
 
     <v-toolbar-items v-if="!authorized">
         <v-btn flat @click="commit('SHOW_MODAL', { signup: void 0 })" color="primary">
-            <!-- <v-icon small class="mr-1">fas fa-user-plus</v-icon> -->Стать своим
+            <v-icon small class="mr-1">fas fa-user-plus</v-icon>РЕГИСТРАЦИЯ
         </v-btn>
 
         <v-btn flat @click="commit('SHOW_MODAL', { signin: void 0 })" color="primary">
-            <!-- <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon> -->Я свой
+            <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon>Войти
         </v-btn>
     </v-toolbar-items>
 
     <v-toolbar-items v-if="authorized">
-        <!-- <v-btn flat replace to="account"  color="primary" >
+        <v-btn flat replace to="account"  color="primary" >
             <v-icon small class="mr-1">fas fa-user-circle</v-icon>{{$store.state.auth.name}}
-        </v-btn> -->
+        </v-btn>
 
-        <!-- <v-btn flat @click="commit('SHOW_DIALOG', { dialog: 'signout' })" color="primary">
+        <v-btn flat @click="commit('SHOW_MODAL', { signout: void 0 })" color="primary">
             Выход<v-icon small class="ml-1">fas fa-sign-out-alt</v-icon>
-        </v-btn> -->
+        </v-btn>
     </v-toolbar-items>
 
   </v-toolbar>

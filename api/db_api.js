@@ -73,7 +73,7 @@ class DBAccess extends SecuredAPI {
             }
 
             let transformed = await this.transformData(data, req);
-            let normalized = model(transformed);
+            let normalized = model(transformed || {});
 
             this.afterSave(data, normalized, req);
 

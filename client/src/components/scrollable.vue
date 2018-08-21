@@ -33,15 +33,15 @@
 <script>
     
     export default {
-        props: ['items'],
+        props: ['items', 'pagination'],
         data() {
             return {
                 scroll_position: 0,
-                pagination: {
+                /* pagination: {
                     rowsPerPage: -1,
                     sortBy: 'date',
                     descending: true
-                },
+                }, */
             }
 
         },

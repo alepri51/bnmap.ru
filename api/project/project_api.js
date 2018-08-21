@@ -73,6 +73,7 @@ class News extends DBAccess { //WIDGET AND DIALOG
 
     async beforeInsert(payload) {
         payload.author = { _id: this.member };
+        payload.date = Date.now();
         return payload;
     }
 
@@ -407,20 +408,24 @@ class Donate extends DBAccess { // DIALOG
         //data.products = await db.find('product', { _id: { $in: data.products.map(product => product.product) }});
         //this.order._id = data._id;
 
-        let _id = data.member._id;
+        if(data) {
+            let _id = data.member._id;
 
-        data.member = {
-            _id
-        };
+            data.member = {
+                _id
+            };
 
-        let orders = [data];
+            let orders = [data];
 
-        return data ? {
-            account: {
-                _id,
-                orders
-            }
-        } : {}
+            return data ? {
+                account: {
+                    _id,
+                    orders
+                }
+            } : {}
+        }
+
+        
     }
 
     afterSave(data, normalized, req) {

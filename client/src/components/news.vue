@@ -18,7 +18,11 @@
             </v-card-title>
             <v-divider/>
 
-            <scrollable :items="filter" xs12 sm12 md8 lg6>
+            <scrollable :items="filter" xs12 sm12 md8 lg6 :pagitation="{
+                    rowsPerPage: -1,
+                    sortBy: 'date',
+                    descending: true
+                }">
                 <v-card 
                     slot-scope="props"
                     @mouseover="onHover(props.item._id)" 
@@ -31,9 +35,14 @@
                     <div style="display: flex; height: 100%">
                         <v-flex xs5 class="pa-0">
                             <v-card-media
+                                height="100%"  
+                            >
+                                <youtube video-id="XEzx09lIj_0" :player-width="100"></youtube>
+                            </v-card-media>
+                            <!-- <v-card-media
                                 :src="props.item.media || (props.item._id % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
                                 height="100%"  
-                            />
+                            /> -->
                         </v-flex>
                         <v-flex xs7 >
                             <v-layout column d-flex fill-height style="height: 114%">
@@ -120,12 +129,18 @@
 <script>
     import Widget from './class_widget';
     import scrollable from './scrollable';
+    
+    import Vue from 'vue'
+    import VueYoutube from 'vue-youtube'
+
+    Vue.use(VueYoutube);
 
     export default {
         extends: Widget,
         components: {
             news: () => import('./modals/news'),
-            scrollable
+            scrollable,
+            //youtube
         },
         activated() {
             let container = this.$el.querySelector("#scrollable");
