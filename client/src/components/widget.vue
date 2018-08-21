@@ -26,7 +26,7 @@
 <style scoped>
     .widget {
         width: 100%;
-        overflow: auto;
+        /* overflow: auto; */
     }
 
     .slot {

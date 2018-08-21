@@ -40,8 +40,10 @@ export default {
 
     },
     watch: {
-        'state.sign': async function (new_val, old_val) {
+        'auth.member': async function (new_val, old_val) {
             if(this.auth.member) {
+                console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
+
                 this.$socket.off(this.events.update);
 
                 let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
@@ -55,7 +57,7 @@ export default {
         }
     },
     methods: {
-        async load() {
+        /* async load() {
             //debugger;
             if(!this.sign.AUTHORIZED) return;
 
@@ -78,7 +80,7 @@ export default {
                 this.events.update = update.id;
             }
 
-        },
+        }, */
         //...mapStoreActions(),
         execute(...args) {
             return this.$store._actions.execute[0](...args);

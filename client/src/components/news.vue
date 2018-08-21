@@ -1,6 +1,6 @@
 <template>
     <widget name="новости">
-        <v-card width="100%">
+        <v-card >
             <v-card-title style="position: relative">
                 <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
                 <v-btn v-if="auth.group === 'admins'"
@@ -18,184 +18,55 @@
             </v-card-title>
             <v-divider/>
 
-            <v-container fluid grid-list-xl fill-height class="pl-3 pr-3 pt-0 pb-0 mt-3 mb-3" style="overflow: auto" id="scrollable">
-                <v-data-iterator 
-                    :items="filter"
-                    :pagination.sync="pagination"
-                    content-tag="v-layout"
-                    wrap
-                    fill-height
-                    justify-center
-                    align-content-start
-
-                    style="height: 100%"
-
-                    hide-actions
-                >
-                    <v-flex
-                        slot="item"
-                        slot-scope="props"
-                        xs12
-                        sm12
-                        md6
-                        lg4
-                        
-                    >
-                        <v-card 
-                            
-                            @mouseover="onHover(props.item._id)" 
-                            @mouseout="value[props.item._id] = false" 
-                            hover 
-                            v-scroll:#scrollable="onScroll"
-                            :height="200"
-                            
-                            
-                        >
-
-                            <div style="display: flex; height: 100%">
-                                <v-flex xs5 class="pa-0">
-                                    <v-card-media
-                                        :src="props.item.media || (props.item._id % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
-                                        height="100%"
-                                        
-                                    />
-                                </v-flex>
-                                <v-flex xs7 >
-                                    <v-layout column d-flex fill-height style="height: 114%">
-                                        <v-card-title class="primary--text pb-1" >
-                                            <h3 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{props.item.caption}}</h3>
-                                        </v-card-title>
-
-                                        <v-card-text style="overflow: hidden;">
-                                            {{props.item.text}}
-                                        </v-card-text>
-        
-                                        <div class="pl-2 pt-3 pr-2">
-                                            <v-icon small class="mr-1 accent--text">fas fa-tags</v-icon>
-                                            <small v-for="(tag, inx) in props.item.tags" :key="inx">{{tag}}{{ inx === props.item.tags.length - 1 ? '' : ', '}}</small>
-                                        </div>
-
-                                        <!-- <v-spacer/> -->
-
-                                        <v-card-actions>
-                                            <small>
-                                                {{ new Date(props.item.date).toLocaleString() }}
-                                            </small>
-
-                                            <v-spacer></v-spacer>
-                                            <v-btn flat color="secondary">Смотреть</v-btn>
-                                        </v-card-actions>
-                                    </v-layout>
-                                </v-flex>
-                            </div>
-
-
-                                
-                    
-
-
-                            <!-- <v-layout column>
-                                
-                            </v-layout> -->
-
-                            <v-speed-dial v-if="auth.group === 'admins'"
-                                absolute
-                                v-model="fab[props.item._id]"
-                                
-                                :bottom="bottom"
-                                :right="right"
-                                :left="left"
-                                :direction="direction"
-                                :open-on-hover="hover"
-                                :transition="transition"
-                                v-show="props.item._id === active"
-                            >
-                                <v-btn
-                                    slot="activator"
-                                    v-model="fab[props.item._id]"
-                                    :style="fab[props.item._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
-                                    dark
-                                    fab
-                                    small
-                                    
-                                >
-                                    <v-icon>fas fa-chevron-down</v-icon>
-                                    <v-icon>fas fa-chevron-up</v-icon>
-                                </v-btn>
-                                <v-btn
-                                    fab
-                                    dark
-                                    small
-                                    color="green darken-2"
-                                    @click="commit('SHOW_MODAL', { news: props.item })"
-                                >
-                                    <v-icon>fas fa-pen</v-icon>
-                                </v-btn>
-                                <v-btn
-                                    fab
-                                    dark
-                                    small
-                                    color="red darken-2"
-                                    @click.native="commit('SHOW_MODAL', { news: props.item, options: { remove: true }})"
-                                >
-                                    <v-icon>fas fa-times</v-icon>
-                                </v-btn>
-                            </v-speed-dial>
-                            
-                        </v-card>
-                    </v-flex>
-                </v-data-iterator>
-            </v-container>
-
-            <!-- <v-card-text class="scrollable" id="scrollable">
+            <scrollable :items="filter" xs12 sm12 md8 lg6>
                 <v-card 
-                    v-for="(data, inx) in filter"
-                    :key="data._id"
-
-                    class="ma-2" 
-                    @mouseover="onHover(data._id)" 
-                    @mouseout="value[data._id] = false" 
+                    slot-scope="props"
+                    @mouseover="onHover(props.item._id)" 
+                    @mouseout="value[props.item._id] = false" 
                     hover 
-                    v-scroll:#scrollable="onScroll"
-                    :width="300"
-                    
-                    
+                    :height="200"
+                    style="min-width: 300px;"
                 >
-                    <v-layout column>
-                        <v-card-media
-                            :src="data.media || (inx % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
-                            height="100px"
-                        >
-                        </v-card-media>
 
-                        <v-card-title class="primary--text pb-1" >
-                            <h3 style="flex: 1; max-height: 160px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{data.caption}}</h3>
-                        </v-card-title>
+                    <div style="display: flex; height: 100%">
+                        <v-flex xs5 class="pa-0">
+                            <v-card-media
+                                :src="props.item.media || (props.item._id % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
+                                height="100%"  
+                            />
+                        </v-flex>
+                        <v-flex xs7 >
+                            <v-layout column d-flex fill-height style="height: 114%">
+                                <v-card-title class="primary--text pb-1" >
+                                    <h3 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{props.item.caption}}</h3>
+                                </v-card-title>
 
-                        <v-card-text style="flex: 1; max-height: 160px; overflow: hidden;">
-                            {{data.text}}
-                        </v-card-text>
+                                <v-card-text style="overflow: hidden;">
+                                    {{props.item.text}}
+                                </v-card-text>
 
-                        <v-spacer/>
-                        <div class="pl-2 pt-3 pr-2">
-                            <v-icon small class="mr-1 accent--text">fas fa-tags</v-icon>
-                            <small v-for="(tag, inx) in data.tags" :key="inx">{{tag}}{{ inx === data.tags.length - 1 ? '' : ', '}}</small>
-                        </div>
-             
+                                <div class="pl-2 pt-3 pr-2">
+                                    <v-icon small class="mr-1 accent--text">fas fa-tags</v-icon>
+                                    <small v-for="(tag, inx) in props.item.tags" :key="inx">{{tag}}{{ inx === props.item.tags.length - 1 ? '' : ', '}}</small>
+                                </div>
 
-                        <v-card-actions>
-                            <small>
-                                {{ new Date(data.date).toLocaleString() }}
-                            </small>
+                                <!-- <v-spacer/> -->
 
-                            <v-spacer></v-spacer>
-                            <v-btn flat color="secondary">Смотреть</v-btn>
-                        </v-card-actions>
-                    </v-layout>
+                                <v-card-actions>
+                                    <small>
+                                        {{ new Date(props.item.date).toLocaleString() }}
+                                    </small>
+
+                                    <v-spacer></v-spacer>
+                                    <v-btn flat color="secondary">Смотреть</v-btn>
+                                </v-card-actions>
+                            </v-layout>
+                        </v-flex>
+                    </div>
 
                     <v-speed-dial v-if="auth.group === 'admins'"
                         absolute
-                        v-model="fab[data._id]"
+                        v-model="fab[props.item._id]"
                         
                         :bottom="bottom"
                         :right="right"
@@ -203,12 +74,12 @@
                         :direction="direction"
                         :open-on-hover="hover"
                         :transition="transition"
-                        v-show="data._id === active"
+                        v-show="props.item._id === active"
                     >
                         <v-btn
                             slot="activator"
-                            v-model="fab[data._id]"
-                            :style="fab[data._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
+                            v-model="fab[props.item._id]"
+                            :style="fab[props.item._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
                             dark
                             fab
                             small
@@ -222,7 +93,7 @@
                             dark
                             small
                             color="green darken-2"
-                            @click="commit('SHOW_MODAL', { news: data })"
+                            @click="commit('SHOW_MODAL', { news: props.item })"
                         >
                             <v-icon>fas fa-pen</v-icon>
                         </v-btn>
@@ -231,31 +102,30 @@
                             dark
                             small
                             color="red darken-2"
-                            @click.native="commit('SHOW_MODAL', { news: data, options: { remove: true }})"
+                            @click.native="commit('SHOW_MODAL', { news: props.item, options: { remove: true }})"
                         >
                             <v-icon>fas fa-times</v-icon>
                         </v-btn>
                     </v-speed-dial>
                     
                 </v-card>
-            </v-card-text>  -->
+            </scrollable>
 
-            <!-- <news v-on="$listeners"/> не работает-->
-            
+            <!--  -->   
         </v-card>
         <news @removed="removed" @appended="appended"/>
-    </widget>
-    
-         
+    </widget>        
 </template>
 
 <script>
     import Widget from './class_widget';
+    import scrollable from './scrollable';
 
     export default {
         extends: Widget,
         components: {
-            news: () => import('./modals/news')
+            news: () => import('./modals/news'),
+            scrollable
         },
         activated() {
             let container = this.$el.querySelector("#scrollable");

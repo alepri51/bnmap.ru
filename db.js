@@ -9,8 +9,8 @@ const generate = require('nanoid/generate');
 const BTC = require('./api/btc');
 const btc = new BTC({env: 'dev'});
 
-//const bolt_port = 32771;
-const bolt_port = 32774;
+const bolt_port = 32771;
+//const bolt_port = 32774;
 
 const neo = require('seraph')({
     bolt: true,
@@ -153,8 +153,8 @@ if(cluster.isMaster) {
         
         let destinations = await Destination._findAll();
         if(!!!prices.length) {
-            let rc = 6;
-            while(rc !== 1) {
+            let rc = 5;
+            while(rc !== 0) {
 
                 await Destination._save({ 
                     to: 'referer.list.members.' + rc + '.address',
@@ -165,12 +165,12 @@ if(cluster.isMaster) {
             }
     
             await Destination._save({ 
-                to: 'referer.list.members.1.address',
+                to: 'referer.list.members.0.address',
                 percent: 20
             });
 
             await Destination._save({ 
-                to: 'referer.list.members.7.address',
+                to: 'referer.list.members.6.address',
                 percent: 15
             });
 

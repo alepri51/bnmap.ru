@@ -59,7 +59,7 @@ if(cluster.isMaster) {
     app.use('/api', require('./router')(require('socket.io')(httpsServer)));
 }
 
-/* Object.prototype._path = function(path) {
+/* Object.prototype.$path = function(path) {
     let object = this;
 
     let splitted = path.split('.');

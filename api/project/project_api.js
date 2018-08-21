@@ -327,6 +327,9 @@ class Donate extends DBAccess { // DIALOG
         //let news = await db.Message._query('MATCH (:`Участник` {_id: {id}})-[:кому]-(node:Информация)', { id: this.member });
 
         let donate = await db.Product._findOne({ group: 'donate' });
+        donate.minPeriod = '10s';
+        db.Product._update({ donate });
+
         let period = ms(donate.minPeriod);
 
         let difference = period;
@@ -345,38 +348,58 @@ class Donate extends DBAccess { // DIALOG
             return product;
         });
 
-        order = await db.Order._save(payload);
+        let club = await db.Club._findAll();
+        club = club[0];
+        club.address = club.wallet.wallet_address;
 
-        /* payload.items = payload.items.map(product => {
-            product.product = product.product._id
+        let referer = await db.Member._findOne({ _id: member.referer._id });
+        referer.list.members = referer.list.members.map(async member => {
+            member = await db.Member._findOne({ _id: member._id });
 
-            return product;
-        }); */
+            return member;
+        });
 
-        /* let delivery_roots = {
-            club: await db.findOne('member', { group: 'club' }),
-            referer: await db.findOne('member', { _id: member.referer })
-        }
+        referer.list.members = await Promise.all(referer.list.members);
+        referer.list.members = referer.list.members.map(member => {
+            member.address = member.wallet.wallet_address;
+
+            return member;
+        })
+
+        let delivery_roots = {
+            club,
+            referer
+        };
+
+        let price = donate.price;
+
+        let $path = function(object, path) {
+            let splitted = path.split('.');
+            let res = splitted.reduce((obj, key) => {
+                return obj[key];
         
-        let list = await db.findOne('list', { _id: delivery_roots.referer.list });
-        let price = await db.findOne('price', { product: donate._id });
-        delivery_roots.referer.list = list;
+            }, object);
+        
+            return res;
+        }
 
-        let destinations = price.delivery.map(item => {
-            let path = item.destination.split('.');
+        payload.sum = payload.items.reduce((sum, item) => {
+            return item.cost * item.count;
+        }, 0);
+
+        let destinations = price.destinations.map(item => {
+            let path = item.to.split('.');
             let start = path.splice(0, 1).pop();
             let result = {
-                member: delivery_roots[start].path(path.join('.')),
-                sum: item.sum
+                address: $path(delivery_roots[start], path.join('.')),
+                value: payload.sum * item.percent / 100
             };
             
             return result;
-        }); */
+        });
 
-        //создать список транзакций на какие кошельки сколько рассылать по прайсингу каждого товара
+        order = await db.Order._save(payload);
 
-        //order = await db.insert('order', { ...payload });
-        //this.order = { ...this.order, ...order };
         return order;
     }
 
@@ -384,10 +407,18 @@ class Donate extends DBAccess { // DIALOG
         //data.products = await db.find('product', { _id: { $in: data.products.map(product => product.product) }});
         //this.order._id = data._id;
 
+        let _id = data.member._id;
+
+        data.member = {
+            _id
+        };
+
+        let orders = [data];
+
         return data ? {
             account: {
-                _id: data.member,
-                orders: [this.order]
+                _id,
+                orders
             }
         } : {}
     }
@@ -403,32 +434,36 @@ class Donate extends DBAccess { // DIALOG
         //console.log('EVENT:', `${data.member}:update:${this.class_name}`);
 
         data && setTimeout(async () => {
-            let order = await db.update('order', { number: data.number }, { state: 'регистрация' });
+            let order = await db.Order._update({ _id: data._id, state: 'регистрация' });
+            order = await db.Order._findOne({ _id: data._id });
 
             result.account.orders = [order];
-            this.io.emit(`${data.member}:update:${this.class_name}`,  model(result));
+            this.io.emit(`${data.member._id}:update:${this.class_name}`,  model(result));
 
             order && setTimeout(async () => {
-                let order = await db.update('order', { number: data.number }, { state: 'подтверждение' });
+                let order = await db.Order._update({ _id: data._id, state: 'подтверждение' });
+                order = await db.Order._findOne({ _id: data._id });
                 
                 result.account.orders = [order];
-                this.io.emit(`${data.member}:update:${this.class_name}`,  model(result));
+                this.io.emit(`${data.member._id}:update:${this.class_name}`,  model(result));
 
                 order && setTimeout(async () => {
-                    let order = await db.update('order', { number: data.number }, { state: 'распределение' });
+                    let order = await db.Order._update({ _id: data._id, state: 'распределение' });
+                    order = await db.Order._findOne({ _id: data._id });
                     
                     result.account.orders = [order];
-                    this.io.emit(`${data.member}:update:${this.class_name}`,  model(result));
+                    this.io.emit(`${data.member._id}:update:${this.class_name}`,  model(result));
 
                     order && setTimeout(async () => {
-                        let order = await db.update('order', { number: data.number }, { state: 'выполнен' });
+                        let order = await db.Order._update({ _id: data._id, state: 'выполнен' });
+                        order = await db.Order._findOne({ _id: data._id });
                         
                         result.account.orders = [order];
-                        this.io.emit(`${data.member}:update:${this.class_name}`,  model(result));
-                    }, 1000 * 10);
-                }, 1000 * 10);
-            }, 1000 * 10);
-        }, 1000 * 10);
+                        this.io.emit(`${data.member._id}:update:${this.class_name}`,  model(result));
+                    }, 1000 * 5);
+                }, 1000 * 5);
+            }, 1000 * 5);
+        }, 1000 * 5);
     }
 } 
 

@@ -1,64 +1,45 @@
 <template>
     <widget name="заказы">
         <v-card width="100%">
-            <v-card-title style="position: relative">
-                <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
+            <v-card-title>
+                <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Транзакции:</h2>
             </v-card-title>
             <v-divider/>
-    <v-data-iterator class="scrollable"
-      :items="filter"
-      :pagination.sync="pagination"
-      content-tag="v-card-text"
-      content-class="content"
-      
-      
-      hide-actions
-    >
-        <!-- <v-card full-width slot="item"
-        slot-scope="props">
-          <v-card-title><h4>{{ props.item.number }}</h4></v-card-title>
-          <v-divider></v-divider>
-        </v-card> -->
-      <v-flex
-        slot="item"
-        slot-scope="props"
-        xs12
-        sm12
-        md6
-        lg12
-        
-      >
-        <v-card class="ma-2" hover>
-          <v-card-title><h4>{{ props.item.number }}</h4></v-card-title>
-          <!-- <v-divider></v-divider> -->
-        </v-card>
-      </v-flex>
-
-    </v-data-iterator>
-       </v-card>
-
-        <!-- <v-card>
-            <v-card-text class="scrollable">
-                <v-data-table
-                    :headers="headers"
-                    :items="filter"
-                    
-                    class="elevation-0"
-                    item-key="_id"
-                    disable-initial-sort
-                    :pagination.sync="pagination"
-                    hide-actions
+            <scrollable :items="filter" xs12 sm12 md6 lg3>
+                <v-card 
+                    slot-scope="props"
+                    hover
+                    :height="200"
+                    style="min-width: 100px; max-width: 250px; margin: auto; display: flex; flex-direction: column"
                 >
-                    <template slot="items" slot-scope="props">
-                        <td>{{ new Date(props.item.date).toLocaleString() }}</td>
-                        <td>{{ props.item.number }}</td>
-                        <td>{{ props.item.name }}</td>
-                        <td><v-btn v-if="props.item.state === 'ожидание'" small flat color="primary">Отменить</v-btn><span v-if="props.item.state !== 'ожидание'">{{ props.item.state }}</span></td>
-                        <td class="text-xs-right">{{ props.item.sum }} BTC</td>
-                    </template>
-                </v-data-table>
-            </v-card-text>
-        </v-card> -->
+                    <v-card-title>
+                        <v-icon :color="props.item.items.length === 1 ? entities.product[props.item.items[0]].color : 'primary'" class="mr-2">{{ props.item.items.length === 1 ? entities.product[props.item.items[0]].icon : 'fas fa-file-invoice-dollar' }}</v-icon>   
+                        <h4 class="primary--text">{{ props.item.name }}</h4>
+                    </v-card-title>
+
+                    <div class="pl-3 pr-3 primary--text" v-show="!details[props.item._id]">№ {{ props.item.number }}</div>
+
+                    <v-card-text v-show="!details[props.item._id]">
+                        Состояние: <b>{{ props.item.state }}</b>
+                        ID: <b>{{ props.item._id }}</b>
+                    </v-card-text>
+
+                    <v-card-text v-show="details[props.item._id]">
+                        ОПИСАНИЕ ЗАКАЗА: <b>{{ props.item.state }}</b>
+                    </v-card-text>
+
+                    <v-spacer/>
+
+                    <v-card-actions>
+                        <v-spacer/>
+                        <v-btn small flat color="primary" @click="toggle(props.item._id)">Подробней</v-btn>
+                    </v-card-actions>
+
+                    <small class="pl-3 pr-3 pb-2">{{ new Date(props.item.date).toLocaleString() }}</small>
+
+                </v-card>
+            </scrollable>
+       </v-card>
     </widget>
 
 </template>
@@ -66,38 +47,42 @@
 <script>
     
     import Widget from './class_widget';
+    import scrollable from './scrollable';
     
     export default {
         extends: Widget,
+        components: { scrollable },
         data() {
             return {
+                show: false,
+                details: {},
                 pagination: {
                     rowsPerPage: -1,
                     sortBy: 'date',
                     descending: true
-                },
-                headers: [
-                    { text: 'Дата', value: 'date' },
-                    {
-                        text: 'Заказ',
-                        align: 'left',
-                        value: 'number'
-                    },
-                    { text: 'Наименование', value: 'name' },
-                    { text: 'Состояние', value: 'state' },
-                    { text: 'Сумма', value: 'sum' },
-                ],
+                }
             }
 
         },
         watch: {
-            pagination: {
-                handler (n, o) {
-                    console.log(n, o);
-                },
-                deep: true
+            'details': function(n, o) {
+                console.log(o, n);
             }
+        },
+        activated() {
+            let container = this.$el.querySelector("#scrollable");
+            container && (container.scrollTop = this.scroll_position);
+        },
+        methods: {
+            onScroll(e) {
+                this.scroll_position = e.target.scrollTop;
             },
+            toggle(id) {
+                //debugger
+                this.$set(this.details, id, !this.details[id]);
+                
+            }
+        }
     }
 </script>
 
@@ -108,17 +93,17 @@
         overflow: hidden;
     }
 
+    .v-card {
+        display: flex;
+        flex-direction: column;
+    }
+
     .scrollable {
         overflow-y: auto; 
         position: relative; 
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        height: 100%;
-    }
-
-    .content {
-        flex: 1
     }
 </style>
 

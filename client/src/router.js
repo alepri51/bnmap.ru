@@ -12,7 +12,13 @@ let router = new Router({
             path: '/',
             redirect: '/landing'
         }
-    ]
+    ],
+    scrollBehavior (to, from, savedPosition) {
+        //debugger;
+        // return desired position
+        let name = to.path.slice(1);
+        console.log('SCROLL:', to, from, savedPosition);
+    }
 });
 
 router.beforeEach((to, from, next) => {

@@ -81,6 +81,7 @@ export default new Vuex.Store({
         entities: {},
         defaults: {},
         auth_state: void 0,
+        scrolls: {},
         snackbar: {
             visible: false,
             color: 'red darken-2',
@@ -119,6 +120,9 @@ export default new Vuex.Store({
         },
         RESET_CACHE(state) {
             requests_cache.reset();
+        },
+        SET_SCROLL(state, { name, position }) {
+            state.scrolls[name] = position;
         },
         INIT(state) {
         
@@ -348,7 +352,7 @@ export default new Vuex.Store({
             Vue.set(state, 'common_data', data);
         },
         MUTATE_ENTITY(state, payload) {
-            //debugger;
+            debugger;
             let { entity, id, data } = payload;
             state.entities[entity] && Vue.set(state.entities[entity], id, data);
         },

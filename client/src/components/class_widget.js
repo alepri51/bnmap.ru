@@ -6,9 +6,11 @@ export default {
     components: {
         widget
     },
-    created() {
+    async created() {
         //this.state.auth && this.execute({ endpoint: this.entity, method: 'get' });
-        this.load();
+        //this.load();
+        //debugger
+        this.sign.AUTHORIZED && await this.execute({ endpoint: `${this.entity}` });
     },
     methods: {
         removed(_id) {
