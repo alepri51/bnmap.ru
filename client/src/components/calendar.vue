@@ -1,6 +1,7 @@
 <template>
     <widget name="календарь">
         <v-card>
+            <v-layout column justify-space-between d-flex>
             <!-- <v-card-title>
                 <h2 class="widget-caption"><v-icon color="primary" class="mr-2 shadow">fas fa-calendar-alt</v-icon>Календарь:</h2>
             </v-card-title> -->
@@ -20,6 +21,14 @@
                     :allowed-dates="allowedDates"
                 />
             </v-card-text>
+
+            <v-divider/>
+
+            <v-card-actions>
+                <v-spacer/>
+                <v-btn flat color="primary">Сбросить</v-btn>
+            </v-card-actions>
+            </v-layout>
         </v-card>
     </widget>
 </template>

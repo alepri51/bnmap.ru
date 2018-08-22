@@ -33,17 +33,27 @@
 <script>
     
     export default {
-        props: ['items', 'pagination'],
+        props: ['items', 'sort', 'descending'],
         data() {
             return {
                 scroll_position: 0,
-                /* pagination: {
+                pagination: {
                     rowsPerPage: -1,
-                    sortBy: 'date',
-                    descending: true
-                }, */
+                    sortBy: this.sort,
+                    descending: this.descending
+                },
             }
 
+        },
+        computed: {
+            pages: {
+                get() {
+                    return {...this.pagination}
+                },
+                set(val) {
+
+                }
+            }
         },
         activated() {
             setTimeout(() => {

@@ -38,7 +38,7 @@
 
     <v-toolbar-items v-if="authorized">
         <v-btn flat replace to="account"  color="primary" >
-            <v-icon small class="mr-1">fas fa-user-circle</v-icon>{{$store.state.auth.name}}
+            <v-icon small class="mr-1">fas fa-user-circle</v-icon>{{$store.state.auth && $store.state.auth.name}}
         </v-btn>
 
         <v-btn flat @click="commit('SHOW_MODAL', { signout: void 0 })" color="primary">

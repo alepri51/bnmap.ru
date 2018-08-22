@@ -9,12 +9,12 @@
                 <v-card-text>
                     <v-form ref="form" class="form" lazy-validation @submit.prevent>
                         <v-text-field 
+                            autofocus
                             :disabled="options.remove"
                             v-model="form.caption"
                             label="Заголовок"
-                            hint="Например: хочу дом на берегу атлантического океана"
+                            hint="Например: Нас уже полмиллиона!"
                             required
-                            autofocus
                             color="primary"
                             :rules="[
                                 () => !!form.caption || 'This field is required',

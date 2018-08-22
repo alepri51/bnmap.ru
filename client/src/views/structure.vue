@@ -40,19 +40,9 @@
                         "comp": "qrcode"
                     },
                     {
-                        "id": 2,
-                        "x": 7,
-                        "y": 0,
-                        "w": 2,
-                        "h": 3,
-                        "text": "auth",
-                        "available": false,
-                        "comp": "auth-control"
-                    },
-                    {
                         "id": 5,
                         "x": 7,
-                        "y": 3,
+                        "y": 0,
                         "w": 2,
                         "h": 3,
                         "text": "info",

@@ -3,6 +3,54 @@
         <v-card >
             <v-card-title style="position: relative">
                 <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
+
+                <v-speed-dial v-if="auth.group === 'admins'"
+                    absolute
+                    v-model="append"
+                    
+                    :bottom="bottom"
+                    :right="right"
+                    :left="left"
+                    :direction="direction"
+                    :open-on-hover="hover"
+                    :transition="transition"
+                >
+                    <v-btn
+                        slot="activator"
+                        v-model="append"
+                        dark
+                        fab
+                        color="green darken-2"
+                    >
+                        <v-icon>fas fa-chevron-down</v-icon>
+                        <v-icon>fas fa-chevron-up</v-icon>
+                    </v-btn>
+                    <v-btn
+                        fab
+                        dark
+                        small
+                        color="green"
+                        @click="commit('SHOW_MODAL', { news: props.item })"
+                    >
+                        <v-tooltip left>
+                            <v-icon slot="activator">fas fa-pen</v-icon>
+                            <span>Редактировать</span>
+                        </v-tooltip>
+                    </v-btn>
+                    <v-btn
+                        fab
+                        dark
+                        small
+                        color="green"
+                        @click.native="commit('SHOW_MODAL', { news: props.item, options: { remove: true }})"
+                    >
+                        <v-tooltip left>
+                            <v-icon slot="activator">fas fa-times</v-icon>
+                            <span>Удалить</span>
+                        </v-tooltip>
+                    </v-btn>
+                </v-speed-dial>
+                
                 <v-btn v-if="auth.group === 'admins'"
                     absolute
                     right
@@ -13,53 +61,74 @@
                     color="green"
                     @click="commit('SHOW_MODAL', { news: void 0 })"
                 >
-                    <v-icon>fas fa-plus</v-icon>
+                    <v-tooltip bottom>
+                        <v-icon slot="activator">far fa-newspaper</v-icon>
+                        <span>Добавить новость</span>
+                    </v-tooltip>
+                </v-btn>
+
+                <v-btn v-if="auth.group === 'admins'"
+                    absolute
+                    right
+                    fab
+                    
+                    dark
+                    bottom
+                    color="green"
+                    @click="commit('SHOW_MODAL', { news: void 0 })"
+                    style="margin-right: 64px"
+                >
+                    <v-tooltip bottom>
+                        <v-icon slot="activator">far fa-calendar-alt</v-icon>
+                        <span>Добавить событие</span>
+                    </v-tooltip>
                 </v-btn>
             </v-card-title>
             <v-divider/>
 
-            <scrollable :items="filter" xs12 sm12 md8 lg6 :pagitation="{
-                    rowsPerPage: -1,
-                    sortBy: 'date',
-                    descending: true
-                }">
+            <scrollable :items="filter" xs12 sm6 md6 lg4 sort="date" :descending="true">
                 <v-card 
                     slot-scope="props"
                     @mouseover="onHover(props.item._id)" 
                     @mouseout="value[props.item._id] = false" 
                     hover 
-                    :height="200"
-                    style="min-width: 300px;"
+                    :height="300"
+                    
+                    style="margin: auto"
                 >
 
-                    <div style="display: flex; height: 100%">
-                        <v-flex xs5 class="pa-0">
+                    <v-layout column>
+                        <v-flex xs5 class="">
+                            <!-- 8qrECfnHr5QD1uXJNMsfZBypRSE5z1wTeClLXsxeqDaeZFT8S7mV1Dznx8t4 -->
+                            <!-- <v-card-media>
+                                <youtube :video-id="youtube_src" :width="'100%'" :height="'100%'"></youtube>
+                            </v-card-media> -->
+
                             <v-card-media
-                                height="100%"  
-                            >
-                                <youtube video-id="XEzx09lIj_0" :player-width="100"></youtube>
-                            </v-card-media>
+                                :src="`https://picsum.photos/200/${props.item._id + 100}?random`"
+                                height="150px"
+                                
+                            />
                             <!-- <v-card-media
                                 :src="props.item.media || (props.item._id % 3 === 0) ? 'https://cdn.vuetifyjs.com/images/cards/desert.jpg' : 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg'"
                                 height="100%"  
                             /> -->
                         </v-flex>
-                        <v-flex xs7 >
-                            <v-layout column d-flex fill-height style="height: 114%">
-                                <v-card-title class="primary--text pb-1" >
+                        <v-flex xs7 :class="{'pt-0': true,'pb-0':auth.group === 'admins'}" style="display:flex; flex-direction: column; flex:1" justify-space-between>
+                                <v-card-title class="primary--text pb-0 pt-0" >
                                     <h3 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{props.item.caption}}</h3>
                                 </v-card-title>
 
-                                <v-card-text style="overflow: hidden;">
+                                <v-card-text class="pt-1 pb-1" style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">
                                     {{props.item.text}}
                                 </v-card-text>
 
-                                <div class="pl-2 pt-3 pr-2">
-                                    <v-icon small class="mr-1 accent--text">fas fa-tags</v-icon>
-                                    <small v-for="(tag, inx) in props.item.tags" :key="inx">{{tag}}{{ inx === props.item.tags.length - 1 ? '' : ', '}}</small>
-                                </div>
+                                <v-spacer/>
 
-                                <!-- <v-spacer/> -->
+                                <v-card-actions>
+                                    <v-icon small class="mr-1 accent--text" style="font-size: 14px">fas fa-tags</v-icon>
+                                    <small v-for="(tag, inx) in props.item.tags" :key="inx" style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{tag}}{{ inx === props.item.tags.length - 1 ? '' : ', '}}</small>
+                                </v-card-actions>
 
                                 <v-card-actions>
                                     <small>
@@ -67,11 +136,13 @@
                                     </small>
 
                                     <v-spacer></v-spacer>
-                                    <v-btn flat color="secondary">Смотреть</v-btn>
+                                    <v-btn icon small flat color="primary">
+                                        <v-icon small>fas fa-expand</v-icon>
+                                        <!-- <v-icon small>{{ details[props.item._id] ? 'fas fa-compress' : 'fas fa-expand' }}</v-icon> -->
+                                    </v-btn>
                                 </v-card-actions>
-                            </v-layout>
                         </v-flex>
-                    </div>
+                    </v-layout>
 
                     <v-speed-dial v-if="auth.group === 'admins'"
                         absolute
@@ -104,7 +175,10 @@
                             color="green darken-2"
                             @click="commit('SHOW_MODAL', { news: props.item })"
                         >
-                            <v-icon>fas fa-pen</v-icon>
+                            <v-tooltip left>
+                                <v-icon slot="activator">fas fa-pen</v-icon>
+                                <span>Редактировать</span>
+                            </v-tooltip>
                         </v-btn>
                         <v-btn
                             fab
@@ -113,7 +187,10 @@
                             color="red darken-2"
                             @click.native="commit('SHOW_MODAL', { news: props.item, options: { remove: true }})"
                         >
-                            <v-icon>fas fa-times</v-icon>
+                            <v-tooltip left>
+                                <v-icon slot="activator">fas fa-times</v-icon>
+                                <span>Удалить</span>
+                            </v-tooltip>
                         </v-btn>
                     </v-speed-dial>
                     
@@ -131,16 +208,16 @@
     import scrollable from './scrollable';
     
     import Vue from 'vue'
-    import VueYoutube from 'vue-youtube'
+    import { Youtube } from 'vue-youtube'
 
-    Vue.use(VueYoutube);
+    //Vue.use(VueYoutube);
 
     export default {
         extends: Widget,
         components: {
             news: () => import('./modals/news'),
             scrollable,
-            //youtube
+            Youtube
         },
         activated() {
             let container = this.$el.querySelector("#scrollable");
@@ -150,6 +227,25 @@
             filter() {
                 //debugger;
                 return this.raw_data.sort((a, b) => b.date - a.date);
+            },
+            youtube_src: {
+                get() {
+                    //debugger;
+                    //let res = await this.execute({ endpoint: 'news.youtube' });
+                    let size = Math.floor(Math.random() * (400 - 300 + 1)) + 300;
+                    let res = this.getRandomVideoId(size);
+                    return res;
+                },
+                cache: true
+            },
+            img_src: {
+                get() {
+                    debugger;
+                    //let res = await this.execute({ endpoint: 'news.youtube' });
+                    let size = Math.floor(Math.random() * (300 - 200 + 1)) + 200;
+                    return `https://picsum.photos/${size}/${size}?random`
+                },
+                cache: false
             }
         },
         filters: {
@@ -178,6 +274,17 @@
                 title_config.subtitle.text = subtitle + '$';
 
                 return title_config;
+            },
+            getRandomVideoId() {
+                let vids = ['MyFOkOacn9o', '06FIcXpZiSU', 'e5PSiVpJxYc', 'eNPns1e6THI'];
+                /* let result = ''
+                const str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz_'
+                for (let i = 0; i < 10; i++) {
+                    result += str[Math.ceil(Math.random() * str.length)]
+                } */
+                let inx = Math.floor(Math.random() * (0 - 4 + 1)) + 3;
+                let result = vids[inx];
+                return result
             }
         },
         watch: {
@@ -185,98 +292,18 @@
         },
         data() {
             return {
-                pagination: {
-                    rowsPerPage: -1
-                },
-
-                texts: {},
-
-                scroll_position: 0,
+                append: false,
 
                 active: false,
                 value: {},
                 direction: 'bottom',
                 fab: {},
                 hover: true,
-                tabs: null,
                 top: true,
-                right: false,
+                right: true,
                 bottom: false,
-                left: true,
+                left: false,
                 transition: 'slide-y-reverse-transition',
-                
-                gauge: {
-                    size: {
-                        height: 200
-                    },
-                    title: {
-                        font: {
-                            family: 'Roboto Condensed'
-                        },
-                        horizontalAlignment: 'left',
-                        //verticalAlignment: 'bottom',
-                        margin: {
-                            left: 55
-                        },
-                        text: 'Купить квартиру',
-                        subtitle: {
-                            font: {
-                                family: 'Roboto Condensed'
-                            },
-                            text: '1000$'
-                        }
-                    },
-                    scale: {
-                        startValue: 0,
-                        endValue: 100,
-                        tickInterval: 10,
-                        minorTickInterval: 5,
-                        minorTick: {
-                            visible: true
-                        },
-                        orientation: 'inside',
-                        label: {
-                            useRangeColors: true,
-                            format: {
-                                type: 'decimal',
-                                precision: 0
-                            },
-                            customizeText: function (arg) {
-                                return (arg.value === arg.min || arg.value === arg.max) ? arg.valueText + '%' : arg.valueText;
-                            }
-                        }
-                    },
-                    rangeContainer: {
-                        //offset: 10,
-                        ranges: [
-                            { startValue: 0, endValue: 20, color: this.$colors.red.darken2 },
-                            { startValue: 20, endValue: 70, color: this.$colors.yellow.darken2 },
-                            { startValue: 70, endValue: 100, color: this.$colors.green.darken2 }
-                        ]
-                    },
-                    value: 70,
-                    subvalues: [70, 50],
-                    valueIndicator: {
-                        offset: 10,
-                        palette: 'Material',
-                        color: this.$colors.green.darken2,
-                    },
-                    subvalueIndicator: {
-                        offset: -25,
-                        type: 'textCloud',
-                        text: {
-                            font: {
-                                family: 'Roboto Condensed'
-                            },
-                            format: {
-                                precision: 0
-                                
-                            },
-                            customizeText: (obj) => obj.valueText + ' %'
-                        },
-                        palette: 'Material'
-                    }
-                }
             }
         }
     }

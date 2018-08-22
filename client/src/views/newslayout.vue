@@ -45,22 +45,12 @@
                     {
                         "id": 4,
                         "x": 7,
-                        "y": 3,
+                        "y": 0,
                         "w": 2,
-                        "h": 7,
+                        "h": 8,
                         "text": "bio",
                         "available": false,
                         "comp": "calendar"
-                    },
-                    {
-                        "id": 3,
-                        "x": 7,
-                        "y": 0,
-                        "w": 2,
-                        "h": 3,
-                        "text": "balance",
-                        "available": false,
-                        "comp": "auth-control"
                     }
                 ]
 			}

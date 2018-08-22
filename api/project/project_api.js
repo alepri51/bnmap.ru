@@ -5,6 +5,8 @@ const model = require('../../model');
 
 const ms = require('./ms');
 
+const axios = require('axios');
+
 const { SecuredAPI } = require('../base_api');
 const { DBAccess } = require('../db_api');
 
@@ -65,6 +67,12 @@ class News extends DBAccess { //WIDGET AND DIALOG
             date: Date.now()
         }
     }
+
+    /* async youtube() {
+        //8qrECfnHr5QD1uXJNMsfZBypRSE5z1wTeClLXsxeqDaeZFT8S7mV1Dznx8t4
+        let res = await axios.get('https://randomyoutube.net/api/getvid?api_token=8qrECfnHr5QD1uXJNMsfZBypRSE5z1wTeClLXsxeqDaeZFT8S7mV1Dznx8t4');
+        return res.data.vid;
+    } */
 
     accessGranted(payload) {
         return (payload._id && payload.author && payload.author._id === this.member) || !!!payload._id;

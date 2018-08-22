@@ -33,22 +33,13 @@
                         "available": false,
                         "comp": "wallet"
                     },
-                    {
-                        "id": 2,
-                        "x": 7,
-                        "y": 0,
-                        "w": 2,
-                        "h": 3,
-                        "text": "auth",
-                        "available": false,
-                        "comp": "auth-control"
-                    },
+                    
                     {
                         "id": 3,
                         "x": 7,
-                        "y": 3,
+                        "y": 0,
                         "w": 2,
-                        "h": 7,
+                        "h": 8,
                         "text": "calendar",
                         "available": false,
                         "comp": "calendar"

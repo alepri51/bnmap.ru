@@ -5,11 +5,7 @@
                 <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Транзакции:</h2>
             </v-card-title>
             <v-divider/>
-            <scrollable :items="filter" xs12 sm6 md4 lg3 :pagitation="{
-                    rowsPerPage: -1,
-                    sortBy: 'date',
-                    descending: true
-                }">
+            <scrollable :items="filter" xs12 sm6 md4 lg3 sort="date" :descending="true">
                 <v-card 
                     slot-scope="props"
                     hover
