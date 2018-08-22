@@ -22,17 +22,6 @@ const httpsListenPort = 8000;
 
 const app = express();
 
-app.use('/api', cors());
-
-app.use(staticFileMiddleware);
-
-app.use('/\/$/', history({
-    disableDotRule: false,
-    verbose: true
-}));
-
-app.use(staticFileMiddleware);
-
 let httpsServer = https.createServer(credentials, app);
 
 if(cluster.isMaster) {
@@ -48,50 +37,27 @@ if(cluster.isMaster) {
 
     //let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
 
-    app.all('*', function(req, res, next) {
+    app.use('/api', cors());
+    
+    /* app.all('*', function(req, res, next) {
         next();
     });
 
     app.use('/api', function(req, res, next) {
         next();
-    });
+    }); */
 
     app.use('/api', require('./router')(require('socket.io')(httpsServer)));
+
+    app.use('/api', cors());
+
+    app.use(staticFileMiddleware);
+
+    app.use(history({
+        disableDotRule: false,
+        verbose: true
+    }));
+
+    app.use(staticFileMiddleware);
+
 }
-
-/* Object.prototype.$path = function(path) {
-    let object = this;
-
-    let splitted = path.split('.');
-    let res = splitted.reduce((obj, key) => {
-        return obj[key];
-
-    }, object);
-
-    return res;
-} */
-
-let price = {
-    cost: 100,
-    percent: void 0
-};
-
-//let { cost: sum, percent: sum } = price;
-//console.log(sum);
-
-/* let jObj = {
-    names: [
-        {
-            name: {
-                fn: 'uuu',
-                sns: [
-                    'one',
-                    'two'
-                ]
-            }
-        }
-    ]
-} */
-
-//let ooo = jObj.path('names.0.name.sns.1')
-//console.log(ooo);

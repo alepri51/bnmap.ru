@@ -4,85 +4,57 @@
             <v-card-title style="position: relative">
                 <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
 
-                <v-speed-dial v-if="auth.group === 'admins'"
+                <v-speed-dial class="top-dial" 
+                    v-if="auth.group === 'admins'"
                     absolute
                     v-model="append"
                     
-                    :bottom="bottom"
-                    :right="right"
-                    :left="left"
-                    :direction="direction"
-                    :open-on-hover="hover"
+                    bottom
+                    right
+
+                    direction="bottom"
+                    :open-on-hover="append"
+
                     :transition="transition"
                 >
                     <v-btn
                         slot="activator"
                         v-model="append"
+                        
+
                         dark
                         fab
-                        color="green darken-2"
+                        color="green"
                     >
-                        <v-icon>fas fa-chevron-down</v-icon>
-                        <v-icon>fas fa-chevron-up</v-icon>
+                        <v-icon>fas fa-plus</v-icon>
+                        <v-icon>fas fa-times</v-icon>
                     </v-btn>
                     <v-btn
                         fab
                         dark
                         small
-                        color="green"
-                        @click="commit('SHOW_MODAL', { news: props.item })"
+                        color="green darken-2"
+                        @click="commit('SHOW_MODAL', { news: void 0 })"
                     >
                         <v-tooltip left>
-                            <v-icon slot="activator">fas fa-pen</v-icon>
-                            <span>Редактировать</span>
+                            <v-icon slot="activator">far fa-newspaper</v-icon>
+                            <span>Добавить новость</span>
                         </v-tooltip>
                     </v-btn>
                     <v-btn
                         fab
                         dark
                         small
-                        color="green"
-                        @click.native="commit('SHOW_MODAL', { news: props.item, options: { remove: true }})"
+                        color="green darken-2"
+                        @click="commit('SHOW_MODAL', { news: void 0 })"
                     >
                         <v-tooltip left>
-                            <v-icon slot="activator">fas fa-times</v-icon>
-                            <span>Удалить</span>
+                            <v-icon slot="activator">far fa-calendar-alt</v-icon>
+                            <span>Добавить событие</span>
                         </v-tooltip>
                     </v-btn>
                 </v-speed-dial>
-                
-                <v-btn v-if="auth.group === 'admins'"
-                    absolute
-                    right
-                    fab
-                    
-                    dark
-                    bottom
-                    color="green"
-                    @click="commit('SHOW_MODAL', { news: void 0 })"
-                >
-                    <v-tooltip bottom>
-                        <v-icon slot="activator">far fa-newspaper</v-icon>
-                        <span>Добавить новость</span>
-                    </v-tooltip>
-                </v-btn>
 
-                <v-btn v-if="auth.group === 'admins'"
-                    absolute
-                    right
-                    fab
-                    
-                    dark
-                    bottom
-                    color="green"
-                    @click="commit('SHOW_MODAL', { news: void 0 })"
-                    style="margin-right: 64px"
-                >
-                    <v-tooltip bottom>
-                        <v-icon slot="activator">far fa-calendar-alt</v-icon>
-                        <span>Добавить событие</span>
-                    </v-tooltip>
-                </v-btn>
             </v-card-title>
             <v-divider/>
 
@@ -144,7 +116,8 @@
                         </v-flex>
                     </v-layout>
 
-                    <v-speed-dial v-if="auth.group === 'admins'"
+                    <v-speed-dial class="card-dial"
+                        v-if="auth.group === 'admins'"
                         absolute
                         v-model="fab[props.item._id]"
                         
@@ -310,12 +283,16 @@
 </script>
 
 <style scoped>
-    .v-speed-dial {
+    .card-dial {
         margin-top: 16px;
         padding-bottom: 6px;
+        z-index: 1;
         /* margin-right: 16px; */
     }
 
+    .top-dial {
+        margin-bottom: -28px;
+    }
     .v-card {
         display: flex;
         flex-direction: column;

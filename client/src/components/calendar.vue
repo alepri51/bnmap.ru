@@ -1,7 +1,7 @@
 <template>
     <widget name="календарь">
         <v-card>
-            <v-layout column justify-space-between d-flex>
+            <v-layout column justify-space-between d-flex fill-height>
             <!-- <v-card-title>
                 <h2 class="widget-caption"><v-icon color="primary" class="mr-2 shadow">fas fa-calendar-alt</v-icon>Календарь:</h2>
             </v-card-title> -->

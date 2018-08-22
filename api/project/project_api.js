@@ -5,8 +5,6 @@ const model = require('../../model');
 
 const ms = require('./ms');
 
-const axios = require('axios');
-
 const { SecuredAPI } = require('../base_api');
 const { DBAccess } = require('../db_api');
 

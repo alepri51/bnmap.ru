@@ -20,6 +20,13 @@
                 slot-scope="props"
                 v-bind="$attrs"
             >
+                <!-- <v-subheader
+                    v-if="props.item"
+                    :key="props.item._id"
+                >
+                    {{ new Date(props.item.date).toLocaleDateString() }}
+                </v-subheader> -->
+
                 <slot v-bind:item="props.item">
                     {{ props.item }}
                 </slot>
