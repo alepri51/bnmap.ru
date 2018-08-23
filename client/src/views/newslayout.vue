@@ -1,5 +1,5 @@
 <template>
-	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent"/>
+	<dashboard class="dashboard" :layout="layout" :components="components" :data={} :date="selected_date" v-resize="onResize" @REGISTER-COMPONENT="registerComponent" @date-changed="onDateChanged"/>
 <!--     <v-card v-else class="restriction">
         <v-layout column justify-center align-center>
             <h2 class="pa-2"><v-icon class="mr-2 shadow" color="red darken-2">fas fa-minus-circle</v-icon>ДОСТУП ОГРАНИЧЕН</h2>
@@ -19,13 +19,18 @@
         methods: {
             onResize() {
                 console.log('NEWS LAYOUT RESIZE');
+            },
+            onDateChanged(date) {
+                this.selected_date = date;
             }
+
         },
         computed: {
         },
 		data() {
 			return {
                 //condition: false,
+                selected_date: void 0,
 				layout: {
 					cols: 10,
 					rows: 15

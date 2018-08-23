@@ -1,5 +1,5 @@
 <template>
-	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent"/>
+	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" :date="selected_date" @REGISTER-COMPONENT="registerComponent" @date-changed="onDateChanged"/>
 </template>
 
 
@@ -14,10 +14,14 @@
         methods: {
             onResize() {
                 console.log('NEWS LAYOUT RESIZE');
+            },
+            onDateChanged(date) {
+                this.selected_date = date;
             }
         },
 		data() {
 			return {
+                selected_date: void 0,
 				layout: {
 					cols: 10,
 					rows: 15

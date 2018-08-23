@@ -26,7 +26,7 @@
 
             <v-card-actions>
                 <v-spacer/>
-                <v-btn flat color="primary">Сбросить</v-btn>
+                <v-btn flat color="primary" @click="$emit('date-changed', void 0), picker = void 0">Сбросить</v-btn>
             </v-card-actions>
             </v-layout>
         </v-card>
@@ -40,7 +40,7 @@
         extends: Widget,
         data: () => ({
             today: new Date().toISOString().slice(0, 10),
-            picker: new Date().toISOString().slice(0, 10),
+            picker: void 0, //new Date().toISOString().slice(0, 10),
             landscape: false,
             reactive: true,
             events: ['2018-07-10', '2018-07-11', '2018-07-21'],
@@ -50,7 +50,12 @@
             console.log(new Date().toISOString().slice(0, 10));
         },
         methods: {
-            allowedDates: val => ['2018-07-10', '2018-07-11', '2018-07-21'].indexOf(val) !== -1
+            allowedDates: val => true//['2018-07-10', '2018-07-11', '2018-07-21'].indexOf(val) !== -1
+        },
+        watch: {
+            'picker': function(new_val) {
+                this.$emit('date-changed', new_val);
+            }
         }
     }
 </script>

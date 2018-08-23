@@ -4,9 +4,12 @@
             <v-card-title>
                 <h2><v-icon color="primary" class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Транзакции:</h2>
             </v-card-title>
+            
             <v-divider/>
+
             <scrollable :items="filter" xs12 sm6 md4 lg3 sort="date" :descending="true">
                 <v-card 
+                    slot="content"
                     slot-scope="props"
                     hover
                     :height="200"
@@ -17,7 +20,9 @@
                         <h4 class="primary--text">{{ props.item.name }}</h4>
                     </v-card-title>
 
-                    <div class="pl-3 pr-3 primary--text" v-show="!details[props.item._id]">№ {{ props.item.number }}</div>
+                    <v-divider/>
+
+                    <div class="pt-3 pl-3 pr-3 primary--text" v-show="!details[props.item._id]">№ {{ props.item.number }}</div>
 
                     <v-card-text v-show="!details[props.item._id]">
                         Состояние: <b>{{ props.item.state }}</b>
@@ -52,6 +57,7 @@
     import scrollable from './scrollable';
     
     export default {
+        props: ['date'],
         extends: Widget,
         components: { scrollable },
         data() {
@@ -69,6 +75,14 @@
         watch: {
             'details': function(n, o) {
                 console.log(o, n);
+            }
+        },
+        computed: {
+            filter() {
+                let raw_data = this.raw_data;
+                this.date ? raw_data = this.raw_data.filter((item) => new Date(item.date).toDateString() === new Date(this.date).toDateString()) : raw_data = this.raw_data
+
+                return raw_data;
             }
         },
         activated() {

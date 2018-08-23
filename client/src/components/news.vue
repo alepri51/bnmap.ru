@@ -59,10 +59,16 @@
             <v-divider/>
 
             <scrollable :items="filter" xs12 sm6 md6 lg4 sort="date" :descending="true">
+                
+                <v-subheader slot="header" slot-scope="{ index }" v-if="date && ($vuetify.breakpoint.lgAndUp ? index < 3 : $vuetify.breakpoint.smAndUp ? index < 2 : index < 1)" >
+                    {{ index === 0 ? 'Отфильтровано: ' + new Date(date).toLocaleDateString() : '' }}
+                </v-subheader>
+
                 <v-card 
-                    slot-scope="props"
-                    @mouseover="onHover(props.item._id)" 
-                    @mouseout="value[props.item._id] = false" 
+                    slot="content"
+                    slot-scope="{ item }"
+                    @mouseover="onHover(item._id)" 
+                    @mouseout="value[item._id] = false" 
                     hover 
                     :height="300"
                     
@@ -77,7 +83,7 @@
                             </v-card-media> -->
 
                             <v-card-media
-                                :src="`https://picsum.photos/200/${props.item._id + 100}?random`"
+                                :src="`https://picsum.photos/200/${item._id + 100}?random`"
                                 height="150px"
                                 
                             />
@@ -88,23 +94,23 @@
                         </v-flex>
                         <v-flex xs7 :class="{'pt-0': true,'pb-0':auth.group === 'admins'}" style="display:flex; flex-direction: column; flex:1" justify-space-between>
                                 <v-card-title class="primary--text pb-0 pt-0" >
-                                    <h3 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{props.item.caption}}</h3>
+                                    <h3 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{item.caption}}</h3>
                                 </v-card-title>
 
                                 <v-card-text class="pt-1 pb-1" style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">
-                                    {{props.item.text}}
+                                    {{item.text}}
                                 </v-card-text>
 
                                 <v-spacer/>
 
                                 <v-card-actions>
                                     <v-icon small class="mr-1 accent--text" style="font-size: 14px">fas fa-tags</v-icon>
-                                    <small v-for="(tag, inx) in props.item.tags" :key="inx" style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{tag}}{{ inx === props.item.tags.length - 1 ? '' : ', '}}</small>
+                                    <small v-for="(tag, inx) in item.tags" :key="inx" style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{tag}}{{ inx === item.tags.length - 1 ? '' : ', '}}</small>
                                 </v-card-actions>
 
                                 <v-card-actions>
                                     <small>
-                                        {{ new Date(props.item.date).toLocaleString() }}
+                                        {{ new Date(item.date).toLocaleString() }}
                                     </small>
 
                                     <v-spacer></v-spacer>
@@ -119,7 +125,7 @@
                     <v-speed-dial class="card-dial"
                         v-if="auth.group === 'admins'"
                         absolute
-                        v-model="fab[props.item._id]"
+                        v-model="fab[item._id]"
                         
                         :bottom="bottom"
                         :right="right"
@@ -127,12 +133,12 @@
                         :direction="direction"
                         :open-on-hover="hover"
                         :transition="transition"
-                        v-show="props.item._id === active"
+                        v-show="item._id === active"
                     >
                         <v-btn
                             slot="activator"
-                            v-model="fab[props.item._id]"
-                            :style="fab[props.item._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
+                            v-model="fab[item._id]"
+                            :style="fab[item._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
                             dark
                             fab
                             small
@@ -146,7 +152,7 @@
                             dark
                             small
                             color="green darken-2"
-                            @click="commit('SHOW_MODAL', { news: props.item })"
+                            @click="commit('SHOW_MODAL', { news: item })"
                         >
                             <v-tooltip left>
                                 <v-icon slot="activator">fas fa-pen</v-icon>
@@ -158,7 +164,7 @@
                             dark
                             small
                             color="red darken-2"
-                            @click.native="commit('SHOW_MODAL', { news: props.item, options: { remove: true }})"
+                            @click.native="commit('SHOW_MODAL', { news: item, options: { remove: true }})"
                         >
                             <v-tooltip left>
                                 <v-icon slot="activator">fas fa-times</v-icon>
@@ -186,6 +192,7 @@
     //Vue.use(VueYoutube);
 
     export default {
+        props: ['date'],
         extends: Widget,
         components: {
             news: () => import('./modals/news'),
@@ -198,8 +205,10 @@
         },
         computed: {
             filter() {
-                //debugger;
-                return this.raw_data.sort((a, b) => b.date - a.date);
+                let raw_data = this.raw_data;
+                this.date ? raw_data = this.raw_data.filter((item) => new Date(item.date).toDateString() === new Date(this.date).toDateString()) : raw_data = this.raw_data
+
+                return raw_data;
             },
             youtube_src: {
                 get() {
@@ -219,11 +228,6 @@
                     return `https://picsum.photos/${size}/${size}?random`
                 },
                 cache: false
-            }
-        },
-        filters: {
-            mine(value) {
-                return value;
             }
         },
         methods: {

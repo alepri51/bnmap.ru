@@ -6,7 +6,7 @@
 			:key="c.id"
 			:style="{ top: (c.y * v) + '%', left: (c.x * h) + '%', width: (c.w * h) + '%', height: (c.h * v) + '%'}">
 			<keep-alive>
-                <component :is="c.comp" :meta="c" :data="data[c.id]" v-on="$listeners"/>
+                <component :is="c.comp" :meta="c" :data="data[c.id]" v-on="$listeners" v-bind="$attrs"/>
 			</keep-alive>
 		</div>
 	</div>

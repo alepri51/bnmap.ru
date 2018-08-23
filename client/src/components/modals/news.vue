@@ -8,6 +8,7 @@
             <v-card-text>
                 <v-card-text>
                     <v-form ref="form" class="form" lazy-validation @submit.prevent>
+                        <v-file-upload label="Картинка" class="mb-4" :value="form.picture" @input="form.picture = arguments[0]" @form-data="form.blob = arguments[0]"/>
                         <v-text-field 
                             autofocus
                             :disabled="options.remove"
@@ -83,10 +84,14 @@
 
 <script>
     import Modal from '../class_modal';
+    import vFileUpload from '../v-file-upload';
     
     export default {
         extends: Modal,
         inheritAttrs: false,
+        components: {
+            vFileUpload
+        },
         //props: ['options'],
         /* data() {
             return {

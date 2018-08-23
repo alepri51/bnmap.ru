@@ -22,30 +22,30 @@ class DBAccess extends SecuredAPI {
         return true;
     }
 
-    async beforeInsert(payload) {
+    async beforeInsert(payload, req) {
         return payload;
     }
 
-    async insert(payload) {
-        payload = await this.beforeInsert(payload);
+    async insert(payload, req) {
+        payload = await this.beforeInsert(payload, req);
         return await db[this.constructor.name]._update({ ...payload });
     }
 
-    async beforeUpdate(payload) {
+    async beforeUpdate(payload, req) {
         return payload;
     }
 
-    async update(payload) {
-        payload = await this.beforeUpdate(payload)
+    async update(payload, req) {
+        payload = await this.beforeUpdate(payload, req)
         return await db[this.constructor.name]._update({ ...payload });
     }
 
-    async beforeDelete(payload) {
+    async beforeDelete(payload, req) {
         return payload;
     }
 
-    async delete(payload) {
-        payload = await this.beforeDelete(payload);
+    async delete(payload, req) {
+        payload = await this.beforeDelete(payload, req);
         let deleted = payload;
         await db[this.constructor.name]._query('MATCH (node {_id: {id}}) DETACH DELETE node', { id: payload._id });
         return deleted;
@@ -65,10 +65,10 @@ class DBAccess extends SecuredAPI {
 
             switch(req.method) {
                 case 'DELETE':
-                    data = await this.delete(payload);
+                    data = await this.delete(payload, req);
                     break;
                 default:
-                    data = payload._id ? await this.update(payload) : await this.insert(payload);
+                    data = payload._id ? await this.update(payload, req) : await this.insert(payload, req);
                     break;
             }
 

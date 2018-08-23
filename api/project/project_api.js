@@ -77,7 +77,7 @@ class News extends DBAccess { //WIDGET AND DIALOG
         //return false;
     }
 
-    async beforeInsert(payload) {
+    async beforeInsert(payload, req) {
         payload.author = { _id: this.member };
         payload.date = Date.now();
         return payload;
@@ -246,29 +246,6 @@ class Order extends DBAccess { //WIDGET
         });
 
         return result;
-
-        /* let orders = await db.find('order', { member: this.member });
-        orders = orders.map(async order => {
-            order.items = order.items.map(async item => {
-                item.product = await db.findOne('product', { _id: item.product });
-
-                return item;
-            });
-
-            order.items = await Promise.all(order.items);
-            return order;
-        });
-
-        orders = await Promise.all(orders);
-
-        let result = model({
-            account: { 
-                _id: this.member,
-                orders
-            }
-        });
-
-        return result; */
     }
 }
 
@@ -394,16 +371,25 @@ class Donate extends DBAccess { // DIALOG
             return item.cost * item.count;
         }, 0);
 
-        let destinations = price.destinations.map(item => {
+        let destinations = price.destinations.map((item, inx) => {
             let path = item.to.split('.');
             let start = path.splice(0, 1).pop();
             let result = {
+                line: inx,
+                percent: item.percent,
                 address: $path(delivery_roots[start], path.join('.')),
-                value: payload.sum * item.percent / 100
+                amount: payload.sum * item.percent / 100
             };
             
             return result;
         });
+
+        destinations = {
+            type: 'donate',
+            amount: payload.sum,
+            address: payload.address,
+            destinations 
+        }
 
         order = await db.Order._save(payload);
 

@@ -376,6 +376,7 @@ export default new Vuex.Store({
             let config = {
                 url: endpoint,
                 method: method || 'get',
+                headers: {}
             };
 
             config.cache = config.method === 'get' ? requests_cache : false;
@@ -385,6 +386,7 @@ export default new Vuex.Store({
             try {
 
                 config.method === 'get' ? config.params = payload : config.data = payload;
+                payload && payload.blob && (config.headers['content-type'] = 'multipart/form-data');
 
                 response = await api(config);
                 

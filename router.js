@@ -8,11 +8,22 @@ router.use(express.json());
 router.use(express.urlencoded({extended: false}));
 
 let types = require('./api');
-let model = require('./model');
+
+const multer  = require('multer');
+const upload = multer().single('blob');
 
 let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
 
-let proccedRequest = async function(req) {
+let proccedRequest = async function(req, res) {
+    upload(req, res, function (err, a, b) {
+        if (err) {
+            // An error occurred when uploading
+            return
+        }
+    
+        // Everything went fine
+    });
+
     let { type, id, action } = req.params;
 
     console.log('---------------BEGIN-----------------');
@@ -45,13 +56,17 @@ let proccedRequest = async function(req) {
 let io = void 0;
 let current_request = void 0;
 
+/* router.all(patterns, upload.single('multipart'), async (req, res, next) => {
+    next();
+}); */
+
 router.all(patterns, async (req, res, next) => {
     if(req.method === 'OPTIONS') {
         console.log("req.method === 'OPTIONS'");
     }
 
     try {
-        let response = await proccedRequest(req, io);
+        let response = await proccedRequest(req, res);
         res.json(response).end();
     }
     catch(err) {

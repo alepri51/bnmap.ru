@@ -1,5 +1,6 @@
 <template>
     <v-container fluid grid-list-xl class="pl-3 pr-3 pt-0 pb-0 mt-3 mb-3" style="overflow-y: auto" id="scrollable">
+        
         <v-data-iterator 
             :items="items"
             :pagination.sync="pagination"
@@ -10,24 +11,20 @@
             justify-center
             align-content-start
 
-            style="height: 100%; width: 100%; padding-top: 3px"
-            no-data-text=""
+            style="height: 100%; width: 100%; padding-top: 3px;"
             hide-actions
         >
+            <v-subheader class="mt-4" slot="no-data" style="display:block">Ничего не найдено</v-subheader>
+
             <v-flex
                 v-scroll:#scrollable="onScroll"
                 slot="item"
                 slot-scope="props"
                 v-bind="$attrs"
             >
-                <!-- <v-subheader
-                    v-if="props.item"
-                    :key="props.item._id"
-                >
-                    {{ new Date(props.item.date).toLocaleDateString() }}
-                </v-subheader> -->
+                <slot name="header" v-bind:index="props.index"></slot>
 
-                <slot v-bind:item="props.item">
+                <slot name="content" v-bind:item="props.item">
                     {{ props.item }}
                 </slot>
             </v-flex>
