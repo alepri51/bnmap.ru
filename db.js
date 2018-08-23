@@ -9,8 +9,8 @@ const generate = require('nanoid/generate');
 const BTC = require('./api/btc');
 const btc = new BTC({env: 'dev'});
 
-const bolt_port = 32768;
-//const bolt_port = 32774;
+//const bolt_port = 32768;
+const bolt_port = 32774;
 
 const neo = require('seraph')({
     bolt: true,
@@ -102,7 +102,7 @@ if(cluster.isMaster) {
         caption: String,
         media: String,
         text: String,
-        date: Date
+        date: Number
         //author: Member
     };
 

@@ -60,7 +60,7 @@
             getFormData(files){
                 const data = new FormData();
                 [...files].forEach(file => {
-                    data.append('data', file, file.name); // currently only one file at a time
+                    data.append('blob', file, file.name); // currently only one file at a time
                 });
                 return data;
             },

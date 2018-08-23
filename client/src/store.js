@@ -368,15 +368,17 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        async execute({ commit, state }, { method, endpoint, payload, callback }) {
+        async execute({ commit, state }, { method, endpoint, payload, headers, callback }) {
             console.log('REQUEST:', endpoint);
 
             let response;
 
+            headers = headers || {};
+
             let config = {
                 url: endpoint,
                 method: method || 'get',
-                headers: {}
+                headers
             };
 
             config.cache = config.method === 'get' ? requests_cache : false;
@@ -386,7 +388,6 @@ export default new Vuex.Store({
             try {
 
                 config.method === 'get' ? config.params = payload : config.data = payload;
-                payload && payload.blob && (config.headers['content-type'] = 'multipart/form-data');
 
                 response = await api(config);
                 

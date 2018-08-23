@@ -15,11 +15,27 @@ export default {
 
             //validated && !this.options.remove && this.commit('MUTATE_ENTITY', { entity: this.entity, id: this.form._id, data: {...this.form} });
 
+            let headers = {};
+            let data = void 0;
+
+            if(this.form.blob) {
+                headers = {
+                    'content-type': 'multipart/form-data'
+                };
+
+                data = Object.keys(this.form).reduce((memo, key) => {
+                    key !== 'blob' && memo.has(key) ? memo.set(key, this.form[key]) : memo.append(key, this.form[key]);
+
+                    return memo;
+                }, this.form.blob);
+            }
+
             validated ? 
                 this.execute({ 
-                    method: this.options.remove ? 'delete' : 'post', 
+                    method: this.options.remove ? 'delete' : 'post',
+                    headers,
                     endpoint: `${this.entity}.save`,
-                    payload: this.form, 
+                    payload: data || this.form, 
                     callback: (response) => {
                         if(!response.error) {
                             this.commit('HIDE_MODAL', { [this.entity]: void 0 });

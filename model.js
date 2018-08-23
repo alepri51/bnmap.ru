@@ -42,6 +42,8 @@ let model = (data = {}) => {
         referals: [_hierarchy]
     }, { idAttribute: '_id' });
 
+    _news.define({ author: _member });
+    
     //_member.define({ referals: [_member] });
     //_member.define({ list: [_member] });
 

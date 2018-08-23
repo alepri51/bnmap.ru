@@ -73,7 +73,7 @@ class News extends DBAccess { //WIDGET AND DIALOG
     } */
 
     accessGranted(payload) {
-        return (payload._id && payload.author && payload.author._id === this.member) || !!!payload._id;
+        return (payload._id && parseInt(payload.author) === this.member) || !!!payload._id;
         //return false;
     }
 

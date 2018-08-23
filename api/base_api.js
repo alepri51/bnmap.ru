@@ -110,7 +110,7 @@ class API {
         delete payload.iat;
         delete payload.exp;
 
-        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '10s'});
+        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '1000s'});
         this.payload = payload;
     }
 

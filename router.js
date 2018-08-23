@@ -9,21 +9,74 @@ router.use(express.urlencoded({extended: false}));
 
 let types = require('./api');
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+const fs = require('fs-extra');
+const path = require('path');
+
+MyCustomStorage.prototype.getDestination = function(req, file, cb) {
+    let destination = path.join(__dirname, this.destination, 'users');
+    fs.ensureDirSync(destination);
+
+    destination = path.join(destination, req.object.auth.member + '', 'files');
+    fs.ensureDirSync(destination);
+
+    destination = path.join(destination, file.originalname);
+
+    cb(null, destination)
+}
+
+function MyCustomStorage (opts) {
+    this.destination = opts.destination || 'uploads';
+    //this.getDestination = (opts.destination || getDestination)
+}
+
+MyCustomStorage.prototype._handleFile = function _handleFile (req, file, cb) {
+    this.getDestination(req, file, function (err, path) {
+        if (err) return cb(err);
+
+        let outStream = fs.createWriteStream(path);
+
+        file.stream.pipe(outStream);
+        outStream.on('error', cb);
+        outStream.on('finish', function (err) {
+            cb(err, {
+                path: path,
+                size: outStream.bytesWritten
+            });
+        })
+    })
+};
+
+MyCustomStorage.prototype._removeFile = function _removeFile (req, file, cb) {
+    fs.unlink(file.path, cb)
+};
+
 const multer  = require('multer');
-const upload = multer().single('blob');
+const blobUpload = multer({
+    storage: new MyCustomStorage({ destination: 'uploads' }),
+    limits: {
+        fileSize: 1024 * 200
+    }
+});
+
+let multipartDetector = function(req, res, next) {
+    if(req.object.auth && req.headers['content-type'] && req.headers['content-type'].indexOf('multipart/form-data') !== -1) {
+        let blob = blobUpload.single('blob');
+        blob(req, res, async function (err) {
+            //if(err) throw err;
+
+            err ? res.status(500).json(err).end() : next();
+        })
+    }
+    else next();
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
 
-let proccedRequest = async function(req, res) {
-    upload(req, res, function (err, a, b) {
-        if (err) {
-            // An error occurred when uploading
-            return
-        }
-    
-        // Everything went fine
-    });
 
+let processToken = function(req, res, next) {
     let { type, id, action } = req.params;
 
     console.log('---------------BEGIN-----------------');
@@ -34,6 +87,27 @@ let proccedRequest = async function(req, res) {
     !types[type] && (type = 'unknown');
 
     let object = new types[type](req.headers.authorization, id, io);
+    req.object = object;
+
+    next();
+};
+
+let proccedRequest = async function(req, res) {
+    
+    let { action } = req.params;
+    
+    /* let { type, id, action } = req.params;
+
+    console.log('---------------BEGIN-----------------');
+    console.log('REQUEST:', req.path);
+    console.log('---------------BEGIN-----------------');
+
+    type = type.toLowerCase();
+    !types[type] && (type = 'unknown');
+
+    let object = new types[type](req.headers.authorization, id, io); */
+
+    let object = req.object;
 
     !object[action] && (action = 'default');
 
@@ -54,13 +128,8 @@ let proccedRequest = async function(req, res) {
 };
 
 let io = void 0;
-let current_request = void 0;
 
-/* router.all(patterns, upload.single('multipart'), async (req, res, next) => {
-    next();
-}); */
-
-router.all(patterns, async (req, res, next) => {
+router.all(patterns, processToken, multipartDetector, async (req, res, next) => {
     if(req.method === 'OPTIONS') {
         console.log("req.method === 'OPTIONS'");
     }
