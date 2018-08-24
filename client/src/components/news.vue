@@ -83,7 +83,7 @@
                             </v-card-media> -->
 
                             <v-card-media
-                                :src="`https://picsum.photos/200/${item._id + 100}?random`"
+                                :src="`https://placeimg.com/1000/${item._id + 600}/nature`"
                                 height="150px"
                                 
                             />

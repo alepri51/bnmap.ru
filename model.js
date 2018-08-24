@@ -28,10 +28,12 @@ let model = (data = {}) => {
         items: [_item]
     }, { idAttribute: '_id' });
 
-    const _hierarchy = new schema.Entity('hierarchy', {}, { idAttribute: '_id' });
+    const _hierarchy = new schema.Entity('member', {}, { idAttribute: '_id' });
     _hierarchy.define({ referals: [_hierarchy] });
 
     const _list = new schema.Entity('list', {}, { idAttribute: '_id' });
+    
+    const _referal = new schema.Entity('member', {}, { idAttribute: '_id' });
 
     const _member = new schema.Entity('member', {
         news: [_news],

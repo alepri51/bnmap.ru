@@ -79,7 +79,7 @@ class DBAccess extends SecuredAPI {
 
             return normalized;
         }
-        else this.generateError({ code:403, message: 'Вам отказано в доступе.', data: this.constructor.name });
+        else this.generateError({ code:400, message: 'Вам отказано в доступе.', data: this.constructor.name });
     }
 }
 

@@ -8,7 +8,14 @@
             <v-card-text>
                 <v-card-text>
                     <v-form ref="form" class="form" lazy-validation @submit.prevent>
-                        <v-file-upload label="Картинка" class="mb-4" :value="form.picture" @input="form.picture = arguments[0]" @form-data="form.blob = arguments[0]"/>
+                        <v-file-upload 
+                            :disabled="options.remove"
+                            label="Картинка" 
+                            class="mb-4" 
+                            :value="form.picture" 
+                            @input="form.picture = arguments[0]" 
+                            @form-data="form.blob = arguments[0]"
+                        />
                         <v-text-field 
                             autofocus
                             :disabled="options.remove"

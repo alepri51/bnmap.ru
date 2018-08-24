@@ -83,10 +83,15 @@ class News extends DBAccess { //WIDGET AND DIALOG
         return payload;
     }
 
+    async beforeUpdate(payload, req) {
+        payload.author = { _id: payload.author };
+        return payload;
+    }
+
     async transformData(data, req) {
         return {
             account: {
-                _id: data.member,
+                _id: this.member,
                 news: [data]
             }
         }

@@ -18,7 +18,7 @@ export default {
             let headers = {};
             let data = void 0;
 
-            if(this.form.blob) {
+            if(this.form.blob instanceof FormData) {
                 headers = {
                     'content-type': 'multipart/form-data'
                 };
@@ -65,18 +65,19 @@ export default {
     },
     watch: {
         'state.sign': async function (new_val, old_val) {
-            if(!this.visible && new_val.AUTHORIZED) {
+            /* if(this.visible && new_val.AUTHORIZED) {
+                debugger
                 let response = await this.execute({ method: 'post', endpoint: `${this.entity}.defaults` });
                 !response.error && (this.defaults = response.rest_data);
-            }
+            } */
     },
         'visible': async function (new_val, old_val) {
             //debugger;
 
-            /* if(this.sign.AUTHORIZED && new_val) {
+            if(this.sign.AUTHORIZED && new_val) {
                 let response = await this.execute({ method: 'post', endpoint: `${this.entity}.defaults` });
                 !response.error && (this.defaults = response.rest_data);
-            } */
+            }
         }
     }
 }
