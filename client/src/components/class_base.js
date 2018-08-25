@@ -19,14 +19,9 @@ export default {
         }
     },
     async created() {
-        //debugger;
-        //this.load();
-        /* console.log('CREATED:', `${this.auth.member}:update:${this.entity}`);
-        
-        let response = await this.execute({ endpoint: `${this.entity}.defaults` });
-        this.defaults = response.rest_data;
-
         if(this.auth.member) {
+            console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
+
             this.$socket.off(this.events.update);
 
             let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
@@ -36,8 +31,7 @@ export default {
             });
 
             this.events.update = update.id;
-        } */
-
+        }
     },
     watch: {
         'state.sign': async function (new_val, old_val) {

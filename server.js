@@ -6,10 +6,12 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const https = require('https');
 const path = require('path');
 const cluster = require('cluster');
+const compression = require('compression');
+const helmet = require('helmet');
 
 const express = require('express');
 const staticFileMiddleware = express.static('client/dist', {});
-const staticImagesMiddleware = express.static('uploads/users', {});
+const staticImagesMiddleware = express.static('uploads', {});
 
 const history = require('connect-history-api-fallback');
 const cors = require('cors');
@@ -38,6 +40,15 @@ if(cluster.isMaster) {
 
 
     //let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:type'];
+
+    app.use(helmet());
+    app.use(helmet.hidePoweredBy({ setTo: 'PHP 4.2.0' }));
+
+    app.use(compression({
+        filter: function (req, res) {
+          return true;
+        }
+    }));
 
     app.use('/api', cors());
     

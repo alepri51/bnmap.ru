@@ -2,6 +2,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const compress_images = require('compress-images');
 
 const model = require('../model');
 const db = require('../db');
@@ -64,7 +65,7 @@ class DBAccess extends SecuredAPI {
 
     async save(payload, req, res) {
 
-        let blobSave = () => new Promise(async (resolve, reject) => {
+        let blobSave = (payload) => new Promise(async (resolve, reject) => {
             if(req.blob) {
                 if(req.blob.err) {
                     let err = req.blob.err;
@@ -72,10 +73,10 @@ class DBAccess extends SecuredAPI {
                     resolve(err);
                 }
                 else {
-                    let destination = path.join(process.cwd(), 'uploads', 'users');
+                    let destination = path.join(process.cwd(), 'uploads');
                     fs.ensureDirSync(destination);
 
-                    destination = path.join(destination, this.member + '', 'files');
+                    destination = path.join(destination, payload._id + '', 'files');
                     fs.ensureDirSync(destination);
                     
                     let files = req.blob.files.map(file => {
@@ -86,7 +87,49 @@ class DBAccess extends SecuredAPI {
 
                     let err = await Promise.all(files);
                     err = err.some(err => err);
-                    resolve(err);
+
+                    if(!err) {
+                        req.blob.files.forEach(file => {
+                            let ext = path.extname(file.originalname).toLowerCase();
+                            let jpg = ['.jpg', '.jpeg'].includes(ext);
+
+                            let name = path.basename(file.originalname, ext);
+                            let source = path.join(destination, name + '*.{jpg,JPG,jpeg,JPEG,png,svg,gif}');
+                            
+                            source = source.replace(/\\/gi, '/');
+                            destination = destination.replace(/\\/gi, '/') + '/compressed-' + name;
+
+                            compress_images(source, destination, {compress_force: true, statistic: true, autoupdate: false}, false,
+                                {jpg: {engine: 'mozjpeg', command: ['-quality', '60']}},
+                                {png: {engine: 'pngquant', command: ['--quality=20-50']}},
+                                {svg: {engine: 'svgo', command: '--multipass'}},
+                                {gif: {engine: 'gifsicle', command: ['--colors', '64', '--use-col=web']}}, 
+                                function(err){
+                                    //payload.compressed = 'compressed-'  + (jpg ? name + '.webp' : payload.picture);
+                                    payload.compressed = 'compressed-'  + payload.picture;
+                                    console.log(err);
+                                    resolve(err);
+                                }
+                            );
+                        });
+
+                        /* let source = path.join(destination, '*.{jpg,JPG,jpeg,JPEG,png,svg,gif}');
+                        source = source.replace(/\\/gi, '/');
+                        destination = destination.replace(/\\/gi, '/') + '/compressed-';
+
+                        compress_images(source, destination, {compress_force: false, statistic: true, autoupdate: false}, false,
+                            {jpg: {engine: 'webp ', command: ['-q', '60']}},
+                            {png: {engine: 'pngquant', command: ['--quality=20-50']}},
+                            {svg: {engine: 'svgo', command: '--multipass'}},
+                            {gif: {engine: 'gifsicle', command: ['--colors', '64', '--use-col=web']}}, 
+                            function(err){
+                                payload.compressed = 'compressed-'  + payload.picture;
+                                console.log(err);
+                                resolve(err);
+                            }
+                        ); */
+                    } 
+                    else resolve(err);
                 }
             } 
             else resolve();
@@ -99,10 +142,16 @@ class DBAccess extends SecuredAPI {
             switch(req.method) {
                 case 'DELETE':
                     data = await this.delete(payload, req);
+                    let destination = path.join(process.cwd(), 'uploads', payload._id + '');
+                    fs.removeSync(destination);
                     break;
                 default:
-                    let err = await blobSave();
-                    !err && (data = payload._id ? await this.update(payload, req) : await this.insert(payload, req));
+                    payload.picture && (payload.compressed = 'compressed-'  + payload.picture);
+                    data = payload._id ? await this.update(payload, req) : await this.insert(payload, req);
+                    
+                    //payload = data;
+                    let err = await blobSave(data);
+                    //!err && (data = await db[this.constructor.name]._update({ ...payload }));
                     break;
             }
 

@@ -10,7 +10,7 @@ const BTC = require('./api/btc');
 const btc = new BTC({env: 'dev'});
 
 //const bolt_port = 32768;
-const bolt_port = 32774;
+const bolt_port = 32768;
 
 const neo = require('seraph')({
     bolt: true,
@@ -110,6 +110,7 @@ if(cluster.isMaster) {
 
     let news = {
         picture: String,
+        compressed: String,
         tags: Array,
         ...info
     };

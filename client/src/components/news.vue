@@ -13,7 +13,7 @@
                     right
 
                     direction="bottom"
-                    :open-on-hover="append"
+                    :open-on-hover="true"
 
                     :transition="transition"
                 >
@@ -24,7 +24,7 @@
 
                         dark
                         fab
-                        color="green"
+                        color="green darken-2"
                     >
                         <v-icon>fas fa-plus</v-icon>
                         <v-icon>fas fa-times</v-icon>
@@ -88,7 +88,7 @@
                                 
                             /> -->
                             <v-card-media
-                                :src="`https://localhost:8000/${auth.member}/files/${item.picture}`"
+                                :src="`https://localhost:8000/${item._id}/files/${item.compressed}`"
                                 height="150px"
                                 
                             />
@@ -270,7 +270,9 @@
             }
         },
         watch: {
-            //'fab': (val) => console.log('SHOW:', val)
+            'append': function(val) {
+                val && this.onHover(0);
+            }
         },
         data() {
             return {

@@ -29,7 +29,7 @@
                 console.log('LIST:', this.raw_data);
                 
                 let list = this.raw_data.filter(list => list._id === this.entities.member[this.auth.member].list)[0];
-                list = list && list.members.map(member => this.entities.member[member]);
+                list = list && list.members && list.members.map(member => this.entities.member[member]);
                 return list && list.sort((a, b) => a._rel.номер - b._rel.номер);
                 //return this.raw_data;
             }

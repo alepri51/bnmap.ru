@@ -1,0 +1,10 @@
+File from: [c:/nodejs/bnmap.ru/uploads/165/files/bhmap.png]
+
+File to: [c:/nodejs/bnmap.ru/uploads/165/files/compressed-bhmap.png]
+
+Compression algorithm: [pngquant]
+
+============== LOG ============== 
+Error: Command failed: c:\nodejs\bnmap.ru\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o c:/nodejs/bnmap.ru/uploads/165/files/compressed-bhmap.png c:/nodejs/bnmap.ru/uploads/165/files/bhmap.png
+  error: 'c:/nodejs\bnmap.ru\uploads\165\files\compressed-bhmap.png' exists; not overwriting
+================================= 

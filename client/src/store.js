@@ -184,52 +184,6 @@ export default new Vuex.Store({
                 return response;
             });
 
-            /* let onResponse = (response => {
-
-                let {token, auth, error, entities, map, result, entry, cached, ...rest} = response.data;
-
-                let signed_state = auth && auth.member ? 'AUTHORIZED' : state.token && !token  ? 'EXPIRED' : 'UNAUTHORIZED';
-
-                //let signed_id = auth ? true : !!state.auth;
-                
-                signed_state === 'UNAUTHORIZED' && requests_cache.reset();
-                //signed_state === 'EXPIRED' ? this.commit('SHOW_MODAL', { signin: void 0 }) : error && router.replace('landing');
-
-                if(error) {
-                    if(!error.system) {
-                        let vertical = error.message.length > 50;
-                        this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
-
-                        //signed_state === 'UNAUTHORIZED' && requests_cache.reset();
-                        //signed_state === 'EXPIRED' ? this.commit('SHOW_MODAL', { signin: void 0 }) : router.replace('landing');
-                    }
-                    else console.error(error.code, error.message, error.data);
-                    //Для упрощения доступа к ошибке
-                    response.error = error;
-                };
-                
-                this.commit('SET_AUTH_STATE', signed_state);
-
-                //оставшиеся данные
-                response.rest_data = { ...rest };
-
-                if(signed_state === 'AUTHORIZED') {
-                    auth && this.commit('SET_AUTH', auth);
-                    !cached && this.commit('SET_TOKEN', token);
-    
-                    entities = entities || {};
-    
-                    !cached && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
-    
-                    response.data.cached = !!response.config.cache;
-                    //return response;
-                }
-                //else  router.replace('landing');
-
-                //token ? state.auth && state.auth.member ? this.commit('SET_AUTH_STATE', 'AUTHORIZED') : this.commit('SET_AUTH_STATE', 'UNAUTHORIZED') : (error && error.data.expired) ? this.commit('SET_AUTH_STATE', 'EXPIRED') : !state.auth && this.commit('SET_AUTH_STATE', 'UNAUTHORIZED');
-                return response;
-            }); */
-            
             let onError = (error => {
                 //Promise.reject(error);
                 this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
@@ -354,7 +308,7 @@ export default new Vuex.Store({
         MUTATE_ENTITY(state, payload) {
             debugger;
             let { entity, id, data } = payload;
-            state.entities[entity] && Vue.set(state.entities[entity], id, data);
+            //state.entities[entity] && Vue.set(state.entities[entity], id, data);
         },
         //PROJECT SPECIFIC
         ACCOUNT(state, id) {
