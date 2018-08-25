@@ -16,7 +16,7 @@ class SignIn extends API {
         //console.log(email, password);
         this.error = void 0;
 
-        let member = await Member._findOne({ email });
+        let member = await Member._findOne({ email }, { compositions: ['wallet'] });
         let auth = member && await bcrypt.compare(`${email}:${password}`, member.hash);
 
         auth && await this.generateJWT({ member });
@@ -57,7 +57,9 @@ class SignUp extends API {
             Array.isArray(root) && (root = root[0]);
 
             if(referer) {
-            
+                let list = await List._findOne({ _id: referer.list._id });
+                referer.list.members = list.members;
+
                 let members = referer.list.members.sort((a, b) => a._rel.номер - b._rel.номер);
                 members = members.slice(1); 
 
@@ -84,7 +86,7 @@ class SignUp extends API {
                 });
 
                 //СОХРАНЕНИЕ НОВОГО СПИСКА, ЗДЕСТЬ ЧТО ТО НЕ ТАК
-                let list = await List._save({members});
+                list = await List._save({members});
 
                 member.list = list;
                 await Member._update(member);

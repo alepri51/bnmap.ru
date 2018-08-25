@@ -42,8 +42,8 @@ class News extends DBAccess { //WIDGET AND DIALOG
     async default() {
         //let news = await db.find('news', { member: this.member });
         //let news = await db.Info._findAll();
-        //let news = await db.Message._query('MATCH (:`Участник` {_id: {id}})-[:кому]-(node:Информация)', { id: this.member });
-        let news = await db.News._findAll();
+        let news = await db.News._query('MATCH (node:Новость)', { });
+        //let news = await db.News._findAll();
 
         let result = model({
             account: { 
@@ -127,10 +127,11 @@ class Structure extends SecuredAPI { //LAYOUT
     }
 
     async default(params) {
-        let member = await db.Member._findOne({ _id: this.member });
+        let member = await db.Member._findOne({ _id: this.member }, { compositions: ['list', 'referals'] });
+        let list = await db.List._findOne({ _id: member.list._id });
+        member.list.members = list.members;
 
-        
-        member.list.members = member.list.members.map(member => {
+        /* member.list.members = member.list.members.map(member => {
             !member._rel.номер && (member._rel.номер = 0);
             return member;
         });
@@ -141,11 +142,11 @@ class Structure extends SecuredAPI { //LAYOUT
         member.list.members.every((member, inx, arr) => {
             member._rel.номер !== inx && (arr[0]._rel.номер = inx);
             return member._rel.номер === inx;
-        });
+        }); */
         
         let { name, email, ref } = member;
 
-        member.list = member.list.members;
+        //member.list = member.list.members;
         member.referals = [
             {
                 _id: member._id,

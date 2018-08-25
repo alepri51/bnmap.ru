@@ -25,8 +25,12 @@
         }),
         computed: {
             filter() {
+                //debugger
                 console.log('LIST:', this.raw_data);
-                return this.raw_data.sort((a, b) => a._rel.номер - b._rel.номер);
+                
+                let list = this.raw_data.filter(list => list._id === this.entities.member[this.auth.member].list)[0];
+                list = list && list.members.map(member => this.entities.member[member]);
+                return list && list.sort((a, b) => a._rel.номер - b._rel.номер);
                 //return this.raw_data;
             }
         },

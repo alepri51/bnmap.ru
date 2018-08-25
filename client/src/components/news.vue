@@ -82,8 +82,13 @@
                                 <youtube :video-id="youtube_src" :width="'100%'" :height="'100%'"></youtube>
                             </v-card-media> -->
 
-                            <v-card-media
+                            <!-- <v-card-media
                                 :src="`https://placeimg.com/1000/${item._id + 600}/nature`"
+                                height="150px"
+                                
+                            /> -->
+                            <v-card-media
+                                :src="`https://localhost:8000/${auth.member}/files/${item.picture}`"
                                 height="150px"
                                 
                             />

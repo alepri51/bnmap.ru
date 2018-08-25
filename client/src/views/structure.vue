@@ -67,7 +67,7 @@
                         "h": 15,
                         "text": "hier",
                         "available": false,
-                        "comp": "hierarchy"
+                        "comp": "referal"
                     }
                 ]
 			}

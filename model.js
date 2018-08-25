@@ -28,7 +28,7 @@ let model = (data = {}) => {
         items: [_item]
     }, { idAttribute: '_id' });
 
-    const _hierarchy = new schema.Entity('member', {}, { idAttribute: '_id' });
+    const _hierarchy = new schema.Entity('referal', {}, { idAttribute: '_id' });
     _hierarchy.define({ referals: [_hierarchy] });
 
     const _list = new schema.Entity('list', {}, { idAttribute: '_id' });
@@ -40,14 +40,14 @@ let model = (data = {}) => {
         transactions: [_transaction],
         wallet: _wallet,
         orders: [_order],
-        list: [_list],
+        list: _list,
         referals: [_hierarchy]
     }, { idAttribute: '_id' });
 
     _news.define({ author: _member });
-    
+
     //_member.define({ referals: [_member] });
-    //_member.define({ list: [_member] });
+    _list.define({ members: [_member] });
 
     const _auth = new schema.Entity('auth', {}, { idAttribute: 'id' });
     const _error = new schema.Entity('error', {}, { idAttribute: 'code' });

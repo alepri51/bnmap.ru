@@ -9,8 +9,8 @@ const generate = require('nanoid/generate');
 const BTC = require('./api/btc');
 const btc = new BTC({env: 'dev'});
 
-const bolt_port = 32768;
-//const bolt_port = 32774;
+//const bolt_port = 32768;
+const bolt_port = 32774;
 
 const neo = require('seraph')({
     bolt: true,
@@ -38,14 +38,15 @@ if(cluster.isMaster) {
         name: String,
         email: String,
         hash: String,
-        referer: String,
         ref: String,
         group: String
     };
     
     let wallet = {
         club_address: String,
-        wallet_address: String
+        wallet_address: String,
+        privateKey: String,
+        publicKey: String
     };
     
     let Wallet = neoModel(neo, 'Кошелек', wallet);

@@ -40,7 +40,7 @@ export default {
 
     },
     watch: {
-        'auth.member': async function (new_val, old_val) {
+        'state.sign': async function (new_val, old_val) {
             if(this.auth.member) {
                 console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
 

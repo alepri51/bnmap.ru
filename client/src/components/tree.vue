@@ -27,7 +27,7 @@ export default {
     computed: {
         referals() {
             //debugger
-            return this.model.referals ? this.model.referals.map(ref => this.$store.state.entities.hierarchy[ref]) : []
+            return this.model.referals ? this.model.referals.map(ref => this.$store.state.entities.referal[ref]) : []
         },
         isFolder: function () {
             //debugger;

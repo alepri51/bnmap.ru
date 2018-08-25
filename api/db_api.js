@@ -1,5 +1,8 @@
 'use strict';
 
+const fs = require('fs-extra');
+const path = require('path');
+
 const model = require('../model');
 const db = require('../db');
 
@@ -59,8 +62,38 @@ class DBAccess extends SecuredAPI {
 
     }
 
-    async save(payload, req) {
+    async save(payload, req, res) {
+
+        let blobSave = () => new Promise(async (resolve, reject) => {
+            if(req.blob) {
+                if(req.blob.err) {
+                    let err = req.blob.err;
+                    this.generateError({ code: err.code, message: err.message, data: this.constructor.name });  
+                    resolve(err);
+                }
+                else {
+                    let destination = path.join(process.cwd(), 'uploads', 'users');
+                    fs.ensureDirSync(destination);
+
+                    destination = path.join(destination, this.member + '', 'files');
+                    fs.ensureDirSync(destination);
+                    
+                    let files = req.blob.files.map(file => {
+                        let fullname = path.join(destination, file.originalname);
+
+                        return new Promise((resolve) => fs.writeFile(fullname, file.buffer, (err) => resolve(err)));
+                    });
+
+                    let err = await Promise.all(files);
+                    err = err.some(err => err);
+                    resolve(err);
+                }
+            } 
+            else resolve();
+        });
+
         if(this.accessGranted(payload)) {
+
             let data = void 0;
 
             switch(req.method) {
@@ -68,7 +101,8 @@ class DBAccess extends SecuredAPI {
                     data = await this.delete(payload, req);
                     break;
                 default:
-                    data = payload._id ? await this.update(payload, req) : await this.insert(payload, req);
+                    let err = await blobSave();
+                    !err && (data = payload._id ? await this.update(payload, req) : await this.insert(payload, req));
                     break;
             }
 

@@ -31,6 +31,25 @@ function MyCustomStorage (opts) {
 }
 
 MyCustomStorage.prototype._handleFile = function _handleFile (req, file, cb) {
+    /* req.blob = () => new Promise((resolve, reject) => 
+        this.getDestination(req, file, function (err, path) {
+            if (err) return cb(err);
+
+            let outStream = fs.createWriteStream(path);
+
+            file.stream.pipe(outStream);
+            outStream.on('error', cb);
+            outStream.on('finish', function (err) {
+                err ? reject(err) : resolve({
+                    path: path,
+                    size: outStream.bytesWritten
+                });
+            });
+        })
+    );
+
+    cb(); */
+
     this.getDestination(req, file, function (err, path) {
         if (err) return cb(err);
 
@@ -43,8 +62,8 @@ MyCustomStorage.prototype._handleFile = function _handleFile (req, file, cb) {
                 path: path,
                 size: outStream.bytesWritten
             });
-        })
-    })
+        });
+    });
 };
 
 MyCustomStorage.prototype._removeFile = function _removeFile (req, file, cb) {
@@ -52,21 +71,43 @@ MyCustomStorage.prototype._removeFile = function _removeFile (req, file, cb) {
 };
 
 const multer  = require('multer');
-const blobUpload = multer({
+/*const blobUpload = multer({
     storage: new MyCustomStorage({ destination: 'uploads' }),
     limits: {
-        fileSize: 1024 * 200
+        fileSize: 1024 * 1024
+    }
+}); */
+
+const storage = multer.memoryStorage();
+const blobUpload = multer({ 
+    storage,
+    limits: {
+        fileSize: 1024 * 6024
     }
 });
 
 let multipartDetector = function(req, res, next) {
     if(req.object.auth && req.headers['content-type'] && req.headers['content-type'].indexOf('multipart/form-data') !== -1) {
-        let blob = blobUpload.single('blob');
-        blob(req, res, async function (err) {
+        
+        let none = blobUpload.any();
+        none(req, res, (err) => {
+            req.blob = {
+                err,
+                files: req.files
+            }
+
+            next();
+        });
+
+        /* blob(req, res, function (err) {
+            err ? res.status(500).json(err).end() : next();
+        }); */
+
+/*         blob(req, res, async function (err) {
             //if(err) throw err;
 
             err ? res.status(500).json(err).end() : next();
-        })
+        }) */
     }
     else next();
 };
@@ -114,7 +155,7 @@ let proccedRequest = async function(req, res) {
     let executor = action ? object[action].bind(object) : object.default.bind(object);
 
     let params = Object.keys(req.body).length === 0 ? req.query : req.body;
-    let result = await executor(params, req);
+    let result = await executor(params, req, res);
 
     let { token, auth, error } = object;
 

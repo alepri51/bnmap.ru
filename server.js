@@ -9,6 +9,8 @@ const cluster = require('cluster');
 
 const express = require('express');
 const staticFileMiddleware = express.static('client/dist', {});
+const staticImagesMiddleware = express.static('uploads/users', {});
+
 const history = require('connect-history-api-fallback');
 const cors = require('cors');
 
@@ -52,6 +54,7 @@ if(cluster.isMaster) {
     app.use('/api', cors());
 
     app.use(staticFileMiddleware);
+    app.use(staticImagesMiddleware);
 
     app.use(history({
         disableDotRule: false,
@@ -59,5 +62,5 @@ if(cluster.isMaster) {
     }));
 
     app.use(staticFileMiddleware);
-
+    app.use(staticImagesMiddleware);
 }
