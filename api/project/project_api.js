@@ -20,6 +20,25 @@ class NewsLayout extends SecuredAPI { //LAYOUT
     }
 }
 
+class ArticleLayout extends SecuredAPI { //WIDGET AND DIALOG
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default() {
+        let sections = await db.Section._findAll();
+
+        let result = model({
+            account: { 
+                _id: this.member,
+                sections
+            }
+        });
+
+        return result;
+    }
+}
+
 class News extends DBAccess { //WIDGET AND DIALOG
     constructor(...args) {
         super(...args);
@@ -59,7 +78,7 @@ class News extends DBAccess { //WIDGET AND DIALOG
         let {value, percent = 99} = super.defaults();
 
         return {
-            caption: 'Заголовок' + new Date(),
+            title: 'Заголовок' + new Date(),
             text: 'Текст новости',
             tags: ['новость'],
             date: Date.now()
@@ -490,5 +509,6 @@ module.exports = {
     Donate,
     Order,
     Hierarchy,
-    Structure
+    Structure,
+    ArticleLayout
 };

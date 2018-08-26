@@ -11,6 +11,7 @@ export default {
     },
     methods: {
         submit() {
+            //debugger;
             let validated = this.options.remove || this.$refs.form.validate();
 
             //validated && !this.options.remove && this.commit('MUTATE_ENTITY', { entity: this.entity, id: this.form._id, data: {...this.form} });

@@ -15,17 +15,18 @@
                             :value="form.picture" 
                             @input="form.picture = arguments[0]" 
                             @form-data="form.blob = arguments[0]"
+                            @clear="form.picture = ''"
                         />
                         <v-text-field 
                             autofocus
                             :disabled="options.remove"
-                            v-model="form.caption"
+                            v-model="form.title"
                             label="Заголовок"
                             hint="Например: Нас уже полмиллиона!"
                             required
                             color="primary"
                             :rules="[
-                                () => !!form.caption || 'This field is required',
+                                () => !!form.title || 'This field is required',
                             ]"
                             @keyup.enter="submit"
                             validate-on-blur

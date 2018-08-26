@@ -94,9 +94,14 @@ export default new Vuex.Store({
         notFound: false,
         menu: [
             {
-                icon: '',
+                icon: 'fas fa-newspaper',
                 name: 'Новости',
                 to: 'newslayout'
+            },
+            {
+                icon: '',
+                name: 'Статьи',
+                to: 'articlelayout'
             },
             {
                 icon: '',

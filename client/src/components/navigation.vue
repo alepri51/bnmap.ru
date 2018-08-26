@@ -19,6 +19,7 @@
         ripple
         :to="item.to"
       >
+        <v-icon v-if="item.icon" small color="primary" class="mr-1">{{ item.icon }}</v-icon>
         {{ item.name }}
 
       </v-tab>

@@ -24,7 +24,7 @@
 
                         dark
                         fab
-                        color="green darken-2"
+                        color="green"
                     >
                         <v-icon>fas fa-plus</v-icon>
                         <v-icon>fas fa-times</v-icon>
@@ -33,7 +33,7 @@
                         fab
                         dark
                         small
-                        color="green darken-2"
+                        color="green"
                         @click="commit('SHOW_MODAL', { news: void 0 })"
                     >
                         <v-tooltip left>
@@ -45,7 +45,7 @@
                         fab
                         dark
                         small
-                        color="green darken-2"
+                        color="green"
                         @click="commit('SHOW_MODAL', { news: void 0 })"
                     >
                         <v-tooltip left>
@@ -99,7 +99,7 @@
                         </v-flex>
                         <v-flex xs7 :class="{'pt-0': true,'pb-0':auth.group === 'admins'}" style="display:flex; flex-direction: column; flex:1" justify-space-between>
                                 <v-card-title class="primary--text pb-0 pt-0" >
-                                    <h3 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{item.caption}}</h3>
+                                    <h3 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{item.title}}</h3>
                                 </v-card-title>
 
                                 <v-card-text class="pt-1 pb-1" style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">
@@ -156,7 +156,7 @@
                             fab
                             dark
                             small
-                            color="green darken-2"
+                            color="green"
                             @click="commit('SHOW_MODAL', { news: item })"
                         >
                             <v-tooltip left>
@@ -168,7 +168,7 @@
                             fab
                             dark
                             small
-                            color="red darken-2"
+                            color="red"
                             @click.native="commit('SHOW_MODAL', { news: item, options: { remove: true }})"
                         >
                             <v-tooltip left>

@@ -6,21 +6,7 @@
                     <h2 class="widget-caption"><v-icon class="mr-1 primary--text">fas fa-sitemap</v-icon>Иерархия:</h2>
                 </v-card-title>
                 <v-divider/>
-                <tree :model="filter" :selection="selection" @selected="onSelect" />
-                <!-- <network style="flex: 1" class="pa-3"
-                    ref="network"
-                    :nodes="filter.nodes"
-                    :edges="filter.edges"
-                    :options="network.options"
-                                        
-                    v-on="$listeners"
-                    @select-node="onSelectNode"
-                    @deselect-node="onDeselectNode"
-                    @after-drawing.once="onInitRedraw"
-                ></network> -->
-                <!-- <v-card-text >
-                    
-                </v-card-text> -->
+                <tree :model="filter" :selection="selection" @selected="onSelect" field="referals" :storage="entities.referal" :controls="true" class="ma-2"/>
             </v-layout>
         </v-card>
     </widget>
@@ -126,7 +112,7 @@
         },
         computed: {
             filter() {
-                //debugger;
+                debugger;
                 let model = this.raw_data.filter(member => member._id === this.auth.member)[0] || {};
                 return model;
             }

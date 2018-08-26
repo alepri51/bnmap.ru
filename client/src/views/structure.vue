@@ -1,5 +1,5 @@
 <template>
-	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent" @select-node="onSelectNode"/>
+	<dashboard v-if="!sign.UNAUTHORIZED" class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent" @select-node="onSelectNode"/>
 </template>
 
 

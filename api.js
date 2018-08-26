@@ -2,7 +2,7 @@
 
 const { Unknown } = require('./api/base_api');
 const { SignIn, SignOut, SignUp } = require('./api/auth_api');
-const { NewsLayout, News, Payment, Wallet, Donate, Order, Structure, Hierarchy } = require('./api/project/project_api');
+const { NewsLayout, News, Payment, Wallet, Donate, Order, Structure, Hierarchy, ArticleLayout } = require('./api/project/project_api');
 
 let classes = {
     SignIn,
@@ -16,7 +16,8 @@ let classes = {
     Donate,
     Order,
     Hierarchy,
-    Structure
+    Structure,
+    ArticleLayout
 }
 
 module.exports = Object.entries(classes).reduce((memo, item) => {

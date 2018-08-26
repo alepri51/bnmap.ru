@@ -100,8 +100,7 @@ if(cluster.isMaster) {
     Price.compose(Destination, 'destinations', 'распределение');
 
     let info = {
-        caption: String,
-        media: String,
+        title: String,
         text: String,
         date: Number
     };
@@ -119,7 +118,6 @@ if(cluster.isMaster) {
     News.compose(Member, 'author', 'автор');
 
     let event = {
-        event_date: Date,
         ...info
     };
 
@@ -149,7 +147,67 @@ if(cluster.isMaster) {
     OrderItem.compose(Order, 'order', 'принадлежит');
     OrderItem.compose(Product, 'product', 'продукт');
 
+    let section = {
+        title: String
+    };
+
+    let Section = neoModel(neo, ['Содержание', 'Раздел'], section);
+    Section.compose(Section, 'sections', 'состоит', { many: true });
+
+    let article = {
+        ...info
+    };
+
+    let Article = neoModel(neo, ['Информация', 'Статья'], article);
+    Section.compose(Article, 'articles', 'включает', { many: true });
+
+
     (async function() { //INIT DATABASE
+
+        let sections = await Section._findAll();
+        if(!sections.length) {
+            let section = await Section._save({
+                title: 'Раздел 1'
+            });
+            section.sections = [];
+
+            let topic = await Section._save({
+                title: 'Тема 2.1',
+            });
+            section.sections.push(topic);
+            
+            let topic1 = await Section._save({
+                title: 'Тема 2.1.1',
+            });
+            topic.sections = [topic1];
+
+            topic = await Section._save({
+                title: 'Тема 1.1',
+            });
+            section.sections.push(topic);
+
+            await Section._update(section);
+            sections = await Section._findAll();
+
+            topic.articles = [];
+
+            let article = await Article._save({
+                title: 'Сатья 1.1.1',
+                topic
+            });
+            topic.articles.push(article);
+
+            article = await Article._save({
+                title: 'Сатья 1.1.2',
+                topic
+            });
+            topic.articles.push(article);
+            //await Section._update(topic);
+
+            await Section._update(topic);
+    
+        }
+        sections = await Section._findAll();
 
         let prices = await Price._findAll();
         
@@ -190,15 +248,17 @@ if(cluster.isMaster) {
         });
 
         let products = await Product._findAll();
-        let product = !!!products.length && await Product._save({ 
-            name: 'взнос',
-            icon: 'fas fa-donate',
-            color: 'red darken-2',
-            maxQty: 1,
-            group: 'donate',
-            minPeriod: '1m',
-            price
-        });
+        if(!products.length) {
+            await Product._save({ 
+                name: 'взнос',
+                icon: 'fas fa-donate',
+                color: 'red darken-2',
+                maxQty: 1,
+                group: 'donate',
+                minPeriod: '1m',
+                price
+            });
+        };
 
 
 
@@ -288,6 +348,8 @@ if(cluster.isMaster) {
         News,
         Event,
         Order,
-        OrderItem
+        OrderItem,
+        Section,
+        Article
     }
 }

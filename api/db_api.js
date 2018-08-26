@@ -146,7 +146,7 @@ class DBAccess extends SecuredAPI {
                     fs.removeSync(destination);
                     break;
                 default:
-                    payload.picture && (payload.compressed = 'compressed-'  + payload.picture);
+                    payload.picture ? (payload.compressed = 'compressed-'  + payload.picture) : payload.compressed = '';
                     data = payload._id ? await this.update(payload, req) : await this.insert(payload, req);
                     
                     //payload = data;

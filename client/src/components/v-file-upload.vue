@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-text-field 
+            @input="onChange"
             single-line
             readonly
             clearable
@@ -49,6 +50,7 @@
         },
         watch: {
             value(v){
+                //debugger
                 this.filename = v;
             }
         },
@@ -57,6 +59,11 @@
         },
 
         methods: {
+            onChange(val) {
+                !val && this.$emit('clear');
+                //console.log(val);
+                //debugger
+            },
             getFormData(files){
                 const data = new FormData();
                 [...files].forEach(file => {
@@ -71,6 +78,7 @@
                 }
             },
             onFileChange($event){
+                //debugger
                 const files = $event.target.files || $event.dataTransfer.files;
                 const form = this.getFormData(files);
                 if (files) {
