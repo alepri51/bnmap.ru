@@ -112,22 +112,6 @@ class DBAccess extends SecuredAPI {
                                 }
                             );
                         });
-
-                        /* let source = path.join(destination, '*.{jpg,JPG,jpeg,JPEG,png,svg,gif}');
-                        source = source.replace(/\\/gi, '/');
-                        destination = destination.replace(/\\/gi, '/') + '/compressed-';
-
-                        compress_images(source, destination, {compress_force: false, statistic: true, autoupdate: false}, false,
-                            {jpg: {engine: 'webp ', command: ['-q', '60']}},
-                            {png: {engine: 'pngquant', command: ['--quality=20-50']}},
-                            {svg: {engine: 'svgo', command: '--multipass'}},
-                            {gif: {engine: 'gifsicle', command: ['--colors', '64', '--use-col=web']}}, 
-                            function(err){
-                                payload.compressed = 'compressed-'  + payload.picture;
-                                console.log(err);
-                                resolve(err);
-                            }
-                        ); */
                     } 
                     else resolve(err);
                 }
